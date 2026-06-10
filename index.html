@@ -890,7 +890,7 @@
         <!-- HOME -->
         <section id="home" class="section active">
             <div class="hero">
-                <h1>🔍 Detectives Sanitarios</h1>
+                <h1> Detectives Sanitarios</h1>
                 <p>Conviértete en detective sanitario para identificar un brote microscópico en la región</p>
                 
                 <div class="username-form" id="usernameForm">
@@ -902,7 +902,7 @@
 
             <div id="gameArea" style="display: none;">
                 <div class="user-info">
-                    <span> <span id="displayUsername"></span></span>
+                    <span>👤 <span id="displayUsername"></span></span>
                     <span>⭐ Puntos Globales: <span id="globalPoints">0</span></span>
                     <button onclick="changeUser()" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;">Cambiar Usuario</button>
                 </div>
@@ -952,7 +952,7 @@
         <!-- MISIÓN VIRUS -->
         <section id="virus" class="section">
             <div class="content-section virus">
-                <h2>🦠 Misión Virus</h2>
+                <h2> Misión Virus</h2>
                 
                 <div class="info-box">
                     <h3>Estructura y Replicación Viral</h3>
@@ -1014,7 +1014,7 @@
                         </div>
                     </div>
                     <p id="virusFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
-                    <button class="btn-retry" onclick="resetVirusGame()">🔄 Intentar de Nuevo</button>
+                    <button class="btn-retry" onclick="resetVirusGame()"> Intentar de Nuevo</button>
                 </div>
             </div>
         </section>
@@ -1084,7 +1084,7 @@
                         </div>
                     </div>
                     <p id="bacteriaFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
-                    <button class="btn-retry" onclick="resetBacteriaGame()">🔄 Intentar de Nuevo</button>
+                    <button class="btn-retry" onclick="resetBacteriaGame()"> Intentar de Nuevo</button>
                 </div>
             </div>
         </section>
@@ -1106,7 +1106,7 @@
                 </div>
 
                 <div id="fungusStartScreen" class="start-screen">
-                    <h3> Detective de Hongos</h3>
+                    <h3>🔍 Detective de Hongos</h3>
                     <p>Identifica qué tipo de hongo causa cada problema y en qué condiciones prospera. Tienes 15 segundos por pregunta.</p>
                     <button class="btn-start-game" onclick="startFungusGame()">¡Empezar!</button>
                 </div>
@@ -1119,7 +1119,7 @@
 
                     <div class="timer-container">
                         <div class="timer-bar" id="fungusTimerBar"></div>
-                        <div class="timer-display">️ Tiempo: <span id="fungusTimer">15</span>s</div>
+                        <div class="timer-display">⏱️ Tiempo: <span id="fungusTimer">15</span>s</div>
                     </div>
 
                     <div class="stats-container">
@@ -1158,17 +1158,17 @@
         <!-- ZONA DE DIAGNÓSTICO -->
         <section id="diagnostico" class="section">
             <div class="content-section">
-                <h2>🩺 Zona de Diagnóstico</h2>
+                <h2> Zona de Diagnóstico</h2>
 
                 <div id="diagnosisStartScreen" class="start-screen">
-                    <h3> Casos Clínicos Reales</h3>
+                    <h3>📋 Casos Clínicos Reales</h3>
                     <p>Aplica todo lo aprendido para diagnosticar pacientes ficticios. Tienes 15 segundos por caso.</p>
                     <button class="btn-start-game" onclick="startDiagnosisGame()">¡Empezar!</button>
                 </div>
 
                 <div id="diagnosisGameContainer" style="display: none;">
                     <div class="in-game-skills" id="diagnosisSkills">
-                        <h4>⚡ Habilidades Disponibles</h4>
+                        <h4> Habilidades Disponibles</h4>
                         <div id="diagnosisSkillButtons"></div>
                     </div>
 
@@ -1179,7 +1179,7 @@
 
                         <div class="timer-container">
                             <div class="timer-bar" id="diagnosisTimerBar"></div>
-                            <div class="timer-display">⏱️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
+                            <div class="timer-display">️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
                         </div>
                         
                         <h3>📋 Caso de Estudio Clínico-Ambiental</h3>
@@ -1193,7 +1193,7 @@
                         <div class="diagnosis-options">
                             <button class="diagnosis-btn" onclick="checkDiagnosis('virus')">🦠 VIRUS</button>
                             <button class="diagnosis-btn" onclick="checkDiagnosis('bacteria')">🔬 BACTERIA</button>
-                            <button class="diagnosis-btn" onclick="checkDiagnosis('hongo')"> HONGO</button>
+                            <button class="diagnosis-btn" onclick="checkDiagnosis('hongo')">🍄 HONGO</button>
                         </div>
 
                         <div id="diagnosisFeedback" class="feedback">
@@ -1241,6 +1241,14 @@
             hint: 0
         };
 
+        // Sistema de tracking de preguntas usadas
+        let usedQuestions = {
+            virus: [],
+            bacteria: [],
+            fungus: [],
+            diagnosis: []
+        };
+
         function setUsername() {
             const username = document.getElementById('usernameInput').value.trim();
             if (username === '') {
@@ -1249,18 +1257,20 @@
             }
             
             currentUser = username;
-            
-            // Registrar usuario en el sistema
             registerUser(username);
             
-            // Cargar puntos existentes o iniciar en 0
             const savedPoints = localStorage.getItem(`points_${username}`);
             globalPoints = savedPoints ? parseInt(savedPoints) : 0;
             
-            // Cargar inventario
             const savedInventory = localStorage.getItem(`inventory_${username}`);
             if (savedInventory) {
                 inventory = JSON.parse(savedInventory);
+            }
+            
+            // Cargar preguntas usadas
+            const savedUsedQuestions = localStorage.getItem(`usedQuestions_${username}`);
+            if (savedUsedQuestions) {
+                usedQuestions = JSON.parse(savedUsedQuestions);
             }
             
             document.getElementById('usernameForm').style.display = 'none';
@@ -1272,7 +1282,6 @@
         }
 
         function registerUser(username) {
-            // Guardar lista de todos los usuarios
             let users = JSON.parse(localStorage.getItem('allUsers') || '[]');
             if (!users.includes(username)) {
                 users.push(username);
@@ -1284,6 +1293,7 @@
             currentUser = null;
             globalPoints = 0;
             inventory = { doublePoints: 0, fiftyFifty: 0, extraTime: 0, hint: 0 };
+            usedQuestions = { virus: [], bacteria: [], fungus: [], diagnosis: [] };
             
             document.getElementById('usernameForm').style.display = 'block';
             document.getElementById('gameArea').style.display = 'none';
@@ -1294,6 +1304,7 @@
             document.getElementById('globalPoints').textContent = globalPoints;
             localStorage.setItem(`points_${currentUser}`, globalPoints);
             localStorage.setItem(`inventory_${currentUser}`, JSON.stringify(inventory));
+            localStorage.setItem(`usedQuestions_${currentUser}`, JSON.stringify(usedQuestions));
             updateRanking();
             updateSkillCounts();
         }
@@ -1324,7 +1335,7 @@
             
             const skillNames = {
                 doublePoints: '⚡ x2 Puntos',
-                fiftyFifty: ' 50/50',
+                fiftyFifty: '🎯 50/50',
                 extraTime: '⏰ Tiempo Extra',
                 hint: '💡 Pista'
             };
@@ -1374,32 +1385,26 @@
         function activateSkill(skillName, section) {
             if (useSkill(skillName, section)) {
                 const skillNames = {
-                    doublePoints: ' x2 Puntos',
-                    fiftyFifty: '🎯 50/50',
+                    doublePoints: '⚡ x2 Puntos',
+                    fiftyFifty: ' 50/50',
                     extraTime: '⏰ Tiempo Extra',
                     hint: '💡 Pista'
                 };
                 alert(`${skillNames[skillName]} activada para la siguiente pregunta`);
-                
-                // Marcar habilidad como activa para la próxima pregunta
                 window[`activeSkill_${section}`] = skillName;
             }
         }
 
         function updateRanking() {
             const rankingList = document.getElementById('rankingList');
-            
-            // Obtener todos los usuarios registrados
             const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
             const users = allUsers.map(username => {
                 const points = parseInt(localStorage.getItem(`points_${username}`) || '0');
                 return { username, points };
             });
             
-            // Ordenar por puntos (descendente)
             users.sort((a, b) => b.points - a.points);
             
-            // Mostrar todos los usuarios
             rankingList.innerHTML = users.map((user, index) => `
                 <li class="ranking-item ${user.username === currentUser ? 'current-user' : ''}">
                     <span class="ranking-position">#${index + 1}</span>
@@ -1521,474 +1526,213 @@
             }
             
             if (timerBar) {
-                const maxTime = window[`activeSkill_${section}`] === 'extraTime' ? 25 : 15;
                 const percentage = (timeLeft / 15) * 100;
                 timerBar.style.width = `${percentage}%`;
             }
         }
 
         // ==========================================
-        // BANCO DE PREGUNTAS - VIRUS (20 preguntas)
+        // BANCO DE PREGUNTAS - VIRUS (50 preguntas)
         // ==========================================
         const virusQuestions = [
-            {
-                q: "¿Qué es un virus?",
-                options: ["Un organismo vivo completo", "Un agente infeccioso que necesita huésped", "Una bacteria pequeña", "Un hongo microscópico"],
-                correct: 1
-            },
-            {
-                q: "¿Cuál es la estructura básica de un virus?",
-                options: ["Membrana celular y núcleo", "Material genético rodeado de cápside", "Pared celular gruesa", "Hifas y esporas"],
-                correct: 1
-            },
-            {
-                q: "¿Qué tipo de material genético puede tener un virus?",
-                options: ["Solo ADN", "Solo ARN", "ADN o ARN", "Ni ADN ni ARN"],
-                correct: 2
-            },
-            {
-                q: "¿Cuál es el primer paso del ciclo viral?",
-                options: ["Replicación", "Adsorción", "Liberación", "Ensamblaje"],
-                correct: 1
-            },
-            {
-                q: "¿Qué hace la cápside viral?",
-                options: ["Produce energía", "Protege el material genético", "Se reproduce", "Ataca antibióticos"],
-                correct: 1
-            },
-            {
-                q: "¿Por qué los antibióticos no funcionan contra virus?",
-                options: ["Los virus son muy grandes", "Los virus no tienen estructuras que los antibióticos ataquen", "Los virus son resistentes", "Los antibióticos solo funcionan en hongos"],
-                correct: 1
-            },
-            {
-                q: "¿Qué es la vacunación?",
-                options: ["Un tratamiento para virus activos", "Entrenamiento del sistema inmunológico", "Un tipo de antibiótico", "Una cirugía preventiva"],
-                correct: 1
-            },
-            {
-                q: "¿Cuál de estos es un virus?",
-                options: ["E. coli", "Influenza", "Candida", "Streptococcus"],
-                correct: 1
-            },
-            {
-                q: "¿Cómo se replican los virus?",
-                options: ["División celular", "Usando la maquinaria de la célula huésped", "Esporas", "Fragmentación"],
-                correct: 1
-            },
-            {
-                q: "¿Qué tamaño tienen generalmente los virus?",
-                options: ["1-10 milímetros", "20-300 nanómetros", "1-5 centímetros", "100-500 micrómetros"],
-                correct: 1
-            },
-            {
-                q: "¿Qué es un virión?",
-                options: ["Una célula viral", "Partícula viral completa e infecciosa", "Un tipo de bacteria", "Una espora"],
-                correct: 1
-            },
-            {
-                q: "¿Cuál es la función de la envoltura viral?",
-                options: ["Producir toxinas", "Ayudar a entrar en la célula huésped", "Almacenar energía", "Reproducirse"],
-                correct: 1
-            },
-            {
-                q: "¿Qué enfermedad causa el VIH?",
-                options: ["Gripe", "SIDA", "Hepatitis", "Dengue"],
-                correct: 1
-            },
-            {
-                q: "¿Cómo se transmite el virus del dengue?",
-                options: ["Aire", "Agua", "Mosquito Aedes aegypti", "Contacto directo"],
-                correct: 2
-            },
-            {
-                q: "¿Qué es un virus bacteriófago?",
-                options: ["Un virus que infecta bacterias", "Una bacteria grande", "Un hongo", "Un parásito"],
-                correct: 0
-            },
-            {
-                q: "¿Cuál es el último paso del ciclo viral?",
-                options: ["Adsorción", "Penetración", "Liberación", "Replicación"],
-                correct: 2
-            },
-            {
-                q: "¿Qué hace el sistema inmunológico contra virus?",
-                options: ["Los ignora", "Produce anticuerpos específicos", "Los come", "Los convierte en bacterias"],
-                correct: 1
-            },
-            {
-                q: "¿Por qué los virus mutan rápidamente?",
-                options: ["Son muy grandes", "Tienen alta tasa de error en replicación", "Comen mucho", "Viven mucho tiempo"],
-                correct: 1
-            },
-            {
-                q: "¿Qué es una pandemia viral?",
-                options: ["Un virus local", "Propagación mundial de un virus", "Un virus que solo afecta animales", "Una vacuna"],
-                correct: 1
-            },
-            {
-                q: "¿Cuál es la mejor prevención contra virus?",
-                options: ["Antibióticos", "Vacunación e higiene", "Cirugía", "Antifúngicos"],
-                correct: 1
-            }
+            { q: "¿Qué es un virus?", options: ["Un organismo vivo completo", "Un agente infeccioso que necesita huésped", "Una bacteria pequeña", "Un hongo microscópico"], correct: 1 },
+            { q: "¿Cuál es la estructura básica de un virus?", options: ["Membrana celular y núcleo", "Material genético rodeado de cápside", "Pared celular gruesa", "Hifas y esporas"], correct: 1 },
+            { q: "¿Qué tipo de material genético puede tener un virus?", options: ["Solo ADN", "Solo ARN", "ADN o ARN", "Ni ADN ni ARN"], correct: 2 },
+            { q: "¿Cuál es el primer paso del ciclo viral?", options: ["Replicación", "Adsorción", "Liberación", "Ensamblaje"], correct: 1 },
+            { q: "¿Qué hace la cápside viral?", options: ["Produce energía", "Protege el material genético", "Se reproduce", "Ataca antibióticos"], correct: 1 },
+            { q: "¿Por qué los antibióticos no funcionan contra virus?", options: ["Los virus son muy grandes", "Los virus no tienen estructuras que los antibióticos ataquen", "Los virus son resistentes", "Los antibióticos solo funcionan en hongos"], correct: 1 },
+            { q: "¿Qué es la vacunación?", options: ["Un tratamiento para virus activos", "Entrenamiento del sistema inmunológico", "Un tipo de antibiótico", "Una cirugía preventiva"], correct: 1 },
+            { q: "¿Cuál de estos es un virus?", options: ["E. coli", "Influenza", "Candida", "Streptococcus"], correct: 1 },
+            { q: "¿Cómo se replican los virus?", options: ["División celular", "Usando la maquinaria de la célula huésped", "Esporas", "Fragmentación"], correct: 1 },
+            { q: "¿Qué tamaño tienen generalmente los virus?", options: ["1-10 milímetros", "20-300 nanómetros", "1-5 centímetros", "100-500 micrómetros"], correct: 1 },
+            { q: "¿Qué es un virión?", options: ["Una célula viral", "Partícula viral completa e infecciosa", "Un tipo de bacteria", "Una espora"], correct: 1 },
+            { q: "¿Cuál es la función de la envoltura viral?", options: ["Producir toxinas", "Ayudar a entrar en la célula huésped", "Almacenar energía", "Reproducirse"], correct: 1 },
+            { q: "¿Qué enfermedad causa el VIH?", options: ["Gripe", "SIDA", "Hepatitis", "Dengue"], correct: 1 },
+            { q: "¿Cómo se transmite el virus del dengue?", options: ["Aire", "Agua", "Mosquito Aedes aegypti", "Contacto directo"], correct: 2 },
+            { q: "¿Qué es un virus bacteriófago?", options: ["Un virus que infecta bacterias", "Una bacteria grande", "Un hongo", "Un parásito"], correct: 0 },
+            { q: "¿Cuál es el último paso del ciclo viral?", options: ["Adsorción", "Penetración", "Liberación", "Replicación"], correct: 2 },
+            { q: "¿Qué hace el sistema inmunológico contra virus?", options: ["Los ignora", "Produce anticuerpos específicos", "Los come", "Los convierte en bacterias"], correct: 1 },
+            { q: "¿Por qué los virus mutan rápidamente?", options: ["Son muy grandes", "Tienen alta tasa de error en replicación", "Comen mucho", "Viven mucho tiempo"], correct: 1 },
+            { q: "¿Qué es una pandemia viral?", options: ["Un virus local", "Propagación mundial de un virus", "Un virus que solo afecta animales", "Una vacuna"], correct: 1 },
+            { q: "¿Cuál es la mejor prevención contra virus?", options: ["Antibióticos", "Vacunación e higiene", "Cirugía", "Antifúngicos"], correct: 1 },
+            { q: "¿Qué virus causa la varicela?", options: ["Virus de la influenza", "Virus varicela-zóster", "Virus del papiloma", "Virus de la hepatitis"], correct: 1 },
+            { q: "¿Cómo se transmite el VIH?", options: ["Aire", "Agua", "Contacto sexual y sanguíneo", "Picaduras de mosquito"], correct: 2 },
+            { q: "¿Qué es la carga viral?", options: ["Cantidad de virus en el cuerpo", "Peso del virus", "Tamaño del virus", "Velocidad del virus"], correct: 0 },
+            { q: "¿Qué virus causa el herpes labial?", options: ["Virus del herpes simple tipo 1", "Virus de la influenza", "Virus del papiloma", "Virus de la hepatitis B"], correct: 0 },
+            { q: "¿Qué es un virus oncogénico?", options: ["Un virus que causa cáncer", "Un virus que cura el cáncer", "Un virus benigno", "Un virus vegetal"], correct: 0 },
+            { q: "¿Cuál virus causa la hepatitis B?", options: ["VHB", "VIH", "VHC", "VHA"], correct: 0 },
+            { q: "¿Qué es la fase de latencia viral?", options: ["Cuando el virus está inactivo en el cuerpo", "Cuando el virus se multiplica rápidamente", "Cuando el virus muere", "Cuando el virus sale del cuerpo"], correct: 0 },
+            { q: "¿Qué virus causa el sarampión?", options: ["Paramyxovirus", "Retrovirus", "Adenovirus", "Picornavirus"], correct: 0 },
+            { q: "¿Cómo actúan los antivirales?", options: ["Matan el virus directamente", "Bloquean la replicación viral", "Fortalecen el virus", "No tienen efecto"], correct: 1 },
+            { q: "¿Qué es la inmunidad de rebaño?", options: ["Protección cuando muchos están vacunados", "Inmunidad de animales", "Inmunidad natural", "Inmunidad temporal"], correct: 0 },
+            { q: "¿Qué virus causa la rabia?", options: ["Lyssavirus", "Retrovirus", "Adenovirus", "Coronavirus"], correct: 0 },
+            { q: "¿Cuál es el vector del virus del Zika?", options: ["Mosquito Aedes", "Mosquito Anopheles", "Garrapata", "Pulga"], correct: 0 },
+            { q: "¿Qué es un retrovirus?", options: ["Virus que usa ARN para hacer ADN", "Virus que usa ADN para hacer ARN", "Virus sin material genético", "Virus vegetal"], correct: 0 },
+            { q: "¿Qué virus causa la mononucleosis?", options: ["Virus de Epstein-Barr", "Virus de la influenza", "Virus del herpes simple", "Virus de la hepatitis"], correct: 0 },
+            { q: "¿Qué es la replicación lítica?", options: ["El virus destruye la célula al salir", "El virus se integra al ADN", "El virus no se replica", "El virus se duerme"], correct: 0 },
+            { q: "¿Qué virus causa la COVID-19?", options: ["SARS-CoV-2", "MERS-CoV", "SARS-CoV", "Influenza H1N1"], correct: 0 },
+            { q: "¿Qué es un virus atenuado en vacunas?", options: ["Virus debilitado que no causa enfermedad", "Virus muerto", "Virus modificado genéticamente", "Virus sintético"], correct: 0 },
+            { q: "¿Qué virus causa la polio?", options: ["Poliovirus", "Rinovirus", "Adenovirus", "Enterovirus 71"], correct: 0 },
+            { q: "¿Cómo se llama el estudio de los virus?", options: ["Virología", "Bacteriología", "Micología", "Parasitología"], correct: 0 },
+            { q: "¿Qué es la transcripción inversa?", options: ["Convertir ARN en ADN", "Convertir ADN en ARN", "Convertir proteínas en ADN", "Convertir lípidos en ARN"], correct: 0 },
+            { q: "¿Qué virus causa el ébola?", options: ["Ebolavirus", "Marburgvirus", "Lassavirus", "Hantavirus"], correct: 0 },
+            { q: "¿Qué es un virus emergente?", options: ["Virus nuevo o que reaparece", "Virus antiguo", "Virus extinto", "Virus vegetal"], correct: 0 },
+            { q: "¿Cuál es el reservorio natural del virus del ébola?", options: ["Murciélagos de la fruta", "Monos", "Ratas", "Mosquitos"], correct: 0 },
+            { q: "¿Qué virus causa la fiebre amarilla?", options: ["Flavivirus", "Alphavirus", "Bunyavirus", "Arenavirus"], correct: 0 },
+            { q: "¿Qué es la viruela símica?", options: ["Enfermedad causada por Orthopoxvirus", "Variante de la viruela humana", "Enfermedad bacteriana", "Enfermedad fúngica"], correct: 0 },
+            { q: "¿Cómo se transmite el virus de la influenza?", options: ["Gotículas respiratorias", "Agua contaminada", "Contacto sexual", "Picaduras de insectos"], correct: 0 },
+            { q: "¿Qué es la antigenicidad viral?", options: ["Capacidad de provocar respuesta inmune", "Tamaño del virus", "Velocidad de replicación", "Tipo de material genético"], correct: 0 },
+            { q: "¿Qué virus causa el cáncer cervical?", options: ["Virus del papiloma humano (VPH)", "Virus de la hepatitis B", "Virus de Epstein-Barr", "Virus del herpes"], correct: 0 },
+            { q: "¿Qué es la patogénesis viral?", options: ["Proceso de desarrollo de la enfermedad", "Estructura del virus", "Transmisión del virus", "Prevención viral"], correct: 0 },
+            { q: "¿Cuál es el período de incubación del VIH?", options: ["Semanas a años", "Horas", "Días", "Minutos"], correct: 0 }
         ];
 
         // ==========================================
-        // BANCO DE PREGUNTAS - BACTERIAS (20 preguntas)
+        // BANCO DE PREGUNTAS - BACTERIAS (50 preguntas)
         // ==========================================
         const bacteriaQuestions = [
-            {
-                q: "¿Qué es una bacteria?",
-                options: ["Un virus grande", "Organismo unicelular procariota", "Un hongo", "Una célula humana"],
-                correct: 1
-            },
-            {
-                q: "¿Qué diferencia a bacterias Gram+ de Gram-?",
-                options: ["El color", "El grosor de la pared celular", "El tamaño", "La forma"],
-                correct: 1
-            },
-            {
-                q: "¿De qué color se tiñen las bacterias Gram positivas?",
-                options: ["Rojo", "Verde", "Morado/violeta", "Azul"],
-                correct: 2
-            },
-            {
-                q: "¿Qué tienen las bacterias Gram negativas adicionalmente?",
-                options: ["Núcleo", "Membrana externa", "Mitocondrias", "Cloroplastos"],
-                correct: 1
-            },
-            {
-                q: "¿Qué es la resistencia bacteriana?",
-                options: ["Bacterias muy grandes", "Capacidad de sobrevivir a antibióticos", "Bacterias que no se mueven", "Bacterias del hielo"],
-                correct: 1
-            },
-            {
-                q: "¿Qué causa la resistencia bacteriana?",
-                options: ["Uso correcto de antibióticos", "Uso incorrecto y excesivo de antibióticos", "Vacunas", "Vitaminas"],
-                correct: 1
-            },
-            {
-                q: "¿Qué descubrió Alexander Fleming?",
-                options: ["La vacuna", "La penicilina", "Los virus", "El microscopio"],
-                correct: 1
-            },
-            {
-                q: "¿Cuál es una forma bacteriana común?",
-                options: ["Cúbica", "Esférica (coco)", "Triangular", "Estrella"],
-                correct: 1
-            },
-            {
-                q: "¿Qué son los bacilos?",
-                options: ["Bacterias esféricas", "Bacterias en forma de bastón", "Bacterias espirales", "Virus"],
-                correct: 1
-            },
-            {
-                q: "¿Dónde se encuentran bacterias benéficas?",
-                options: ["Solo en hospitales", "Intestino y alimentos fermentados", "Solo en el aire", "En ningún lugar"],
-                correct: 1
-            },
-            {
-                q: "¿Qué es una superbacteria?",
-                options: ["Bacteria muy grande", "Bacteria resistente a múltiples antibióticos", "Bacteria que vuela", "Bacteria brillante"],
-                correct: 1
-            },
-            {
-                q: "¿Para qué sirve la pasteurización?",
-                options: ["Añadir bacterias", "Eliminar bacterias dañinas en alimentos", "Congelar", "Secar"],
-                correct: 1
-            },
-            {
-                q: "¿Qué bacteria causa tuberculosis?",
-                options: ["E. coli", "Mycobacterium tuberculosis", "Streptococcus", "Salmonella"],
-                correct: 1
-            },
-            {
-                q: "¿Cómo se reproducen las bacterias?",
-                options: ["Esporas", "Fisión binaria", "Sexualmente", "Por virus"],
-                correct: 1
-            },
-            {
-                q: "¿Qué es un antibiótico de amplio espectro?",
-                options: ["Solo mata un tipo", "Mata muchos tipos de bacterias", "No mata ninguna", "Solo funciona en virus"],
-                correct: 1
-            },
-            {
-                q: "¿Por qué no debes suspender antibióticos antes de tiempo?",
-                options: ["Es caro", "Puede generar resistencia", "Sabe mal", "No tiene razón"],
-                correct: 1
-            },
-            {
-                q: "¿Qué bacteria causa infecciones urinarias comunes?",
-                options: ["E. coli", "Influenza", "Candida", "VIH"],
-                correct: 0
-            },
-            {
-                q: "¿Qué es la flora intestinal?",
-                options: ["Plantas en el intestino", "Comunidad de bacterias benéficas", "Virus digestivos", "Hongos estomacales"],
-                correct: 1
-            },
-            {
-                q: "¿Cómo se transmiten muchas bacterias patógenas?",
-                options: ["Solo por aire", "Agua contaminada, alimentos, contacto", "Solo por sangre", "Solo por insectos"],
-                correct: 1
-            },
-            {
-                q: "¿Qué medida previene infecciones bacterianas?",
-                options: ["Lavado de manos", "Tomar antibióticos preventivos", "Evitar vacunas", "Comer crudo"],
-                correct: 0
-            }
+            { q: "¿Qué es una bacteria?", options: ["Un virus grande", "Organismo unicelular procariota", "Un hongo", "Una célula humana"], correct: 1 },
+            { q: "¿Qué diferencia a bacterias Gram+ de Gram-?", options: ["El color", "El grosor de la pared celular", "El tamaño", "La forma"], correct: 1 },
+            { q: "¿De qué color se tiñen las bacterias Gram positivas?", options: ["Rojo", "Verde", "Morado/violeta", "Azul"], correct: 2 },
+            { q: "¿Qué tienen las bacterias Gram negativas adicionalmente?", options: ["Núcleo", "Membrana externa", "Mitocondrias", "Cloroplastos"], correct: 1 },
+            { q: "¿Qué es la resistencia bacteriana?", options: ["Bacterias muy grandes", "Capacidad de sobrevivir a antibióticos", "Bacterias que no se mueven", "Bacterias del hielo"], correct: 1 },
+            { q: "¿Qué causa la resistencia bacteriana?", options: ["Uso correcto de antibióticos", "Uso incorrecto y excesivo de antibióticos", "Vacunas", "Vitaminas"], correct: 1 },
+            { q: "¿Qué descubrió Alexander Fleming?", options: ["La vacuna", "La penicilina", "Los virus", "El microscopio"], correct: 1 },
+            { q: "¿Cuál es una forma bacteriana común?", options: ["Cúbica", "Esférica (coco)", "Triangular", "Estrella"], correct: 1 },
+            { q: "¿Qué son los bacilos?", options: ["Bacterias esféricas", "Bacterias en forma de bastón", "Bacterias espirales", "Virus"], correct: 1 },
+            { q: "¿Dónde se encuentran bacterias benéficas?", options: ["Solo en hospitales", "Intestino y alimentos fermentados", "Solo en el aire", "En ningún lugar"], correct: 1 },
+            { q: "¿Qué es una superbacteria?", options: ["Bacteria muy grande", "Bacteria resistente a múltiples antibióticos", "Bacteria que vuela", "Bacteria brillante"], correct: 1 },
+            { q: "¿Para qué sirve la pasteurización?", options: ["Añadir bacterias", "Eliminar bacterias dañinas en alimentos", "Congelar", "Secar"], correct: 1 },
+            { q: "¿Qué bacteria causa tuberculosis?", options: ["E. coli", "Mycobacterium tuberculosis", "Streptococcus", "Salmonella"], correct: 1 },
+            { q: "¿Cómo se reproducen las bacterias?", options: ["Esporas", "Fisión binaria", "Sexualmente", "Por virus"], correct: 1 },
+            { q: "¿Qué es un antibiótico de amplio espectro?", options: ["Solo mata un tipo", "Mata muchos tipos de bacterias", "No mata ninguna", "Solo funciona en virus"], correct: 1 },
+            { q: "¿Por qué no debes suspender antibióticos antes de tiempo?", options: ["Es caro", "Puede generar resistencia", "Sabe mal", "No tiene razón"], correct: 1 },
+            { q: "¿Qué bacteria causa infecciones urinarias comunes?", options: ["E. coli", "Influenza", "Candida", "VIH"], correct: 0 },
+            { q: "¿Qué es la flora intestinal?", options: ["Plantas en el intestino", "Comunidad de bacterias benéficas", "Virus digestivos", "Hongos estomacales"], correct: 1 },
+            { q: "¿Cómo se transmiten muchas bacterias patógenas?", options: ["Solo por aire", "Agua contaminada, alimentos, contacto", "Solo por sangre", "Solo por insectos"], correct: 1 },
+            { q: "¿Qué medida previene infecciones bacterianas?", options: ["Lavado de manos", "Tomar antibióticos preventivos", "Evitar vacunas", "Comer crudo"], correct: 0 },
+            { q: "¿Qué bacteria causa la sífilis?", options: ["Treponema pallidum", "Neisseria gonorrhoeae", "Chlamydia trachomatis", "Mycoplasma genitalium"], correct: 0 },
+            { q: "¿Qué es un biofilm bacteriano?", options: ["Comunidad de bacterias en superficie", "Película de cine", "Capa de hielo", "Membrana celular"], correct: 0 },
+            { q: "¿Qué bacteria causa la enfermedad de Lyme?", options: ["Borrelia burgdorferi", "Rickettsia rickettsii", "Ehrlichia chaffeensis", "Anaplasma phagocytophilum"], correct: 0 },
+            { q: "¿Qué son las endosporas?", options: ["Estructuras de resistencia bacteriana", "Esporas de hongos", "Células reproductivas", "Virus latentes"], correct: 0 },
+            { q: "¿Qué bacteria causa el cólera?", options: ["Vibrio cholerae", "Salmonella typhi", "Shigella dysenteriae", "Campylobacter jejuni"], correct: 0 },
+            { q: "¿Qué es la conjugación bacteriana?", options: ["Transferencia de ADN entre bacterias", "Reproducción sexual", "División celular", "Mutación"], correct: 0 },
+            { q: "¿Qué bacteria causa la neumonía atípica?", options: ["Mycoplasma pneumoniae", "Streptococcus pneumoniae", "Haemophilus influenzae", "Klebsiella pneumoniae"], correct: 0 },
+            { q: "¿Qué es un plásmido?", options: ["ADN circular extracromosómico", "Orgánulo celular", "Tipo de bacteria", "Antibiótico natural"], correct: 0 },
+            { q: "¿Qué bacteria causa la meningitis bacteriana?", options: ["Neisseria meningitidis", "Streptococcus pneumoniae", "Haemophilus influenzae", "Todas las anteriores"], correct: 3 },
+            { q: "¿Qué son las bacterias anaerobias?", options: ["Viven sin oxígeno", "Viven con oxígeno", "Viven en el aire", "Viven en el agua"], correct: 0 },
+            { q: "¿Qué bacteria causa la gastritis y úlceras?", options: ["Helicobacter pylori", "E. coli", "Salmonella", "Campylobacter"], correct: 0 },
+            { q: "¿Qué es la transducción bacteriana?", options: ["Transferencia de ADN por virus", "Conjugación", "Transformación", "Mutación"], correct: 0 },
+            { q: "¿Qué bacteria causa la difteria?", options: ["Corynebacterium diphtheriae", "Bacillus anthracis", "Clostridium tetani", "Listeria monocytogenes"], correct: 0 },
+            { q: "¿Qué son las bacterias patógenas?", options: ["Causan enfermedades", "Son benéficas", "Son neutras", "Son virus"], correct: 0 },
+            { q: "¿Qué bacteria causa el tétanos?", options: ["Clostridium tetani", "Bacillus anthracis", "Corynebacterium diphtheriae", "Mycobacterium leprae"], correct: 0 },
+            { q: "¿Qué es la transformación bacteriana?", options: ["Captación de ADN del ambiente", "Conjugación", "Transducción", "Fisión binaria"], correct: 0 },
+            { q: "¿Qué bacteria causa la lepra?", options: ["Mycobacterium leprae", "Mycobacterium tuberculosis", "Nocardia asteroides", "Actinomyces israelii"], correct: 0 },
+            { q: "¿Qué son las bacterias fotosintéticas?", options: ["Producen energía con luz", "Viven en la oscuridad", "Son parásitas", "Son virus"], correct: 0 },
+            { q: "¿Qué bacteria causa la salmonelosis?", options: ["Salmonella enterica", "E. coli O157:H7", "Campylobacter jejuni", "Listeria monocytogenes"], correct: 0 },
+            { q: "¿Qué es un antibiograma?", options: ["Prueba de sensibilidad a antibióticos", "Imagen de bacteria", "Tipo de bacteria", "Enfermedad bacteriana"], correct: 0 },
+            { q: "¿Qué bacteria causa la tos ferina?", options: ["Bordetella pertussis", "Mycobacterium tuberculosis", "Streptococcus pneumoniae", "Haemophilus influenzae"], correct: 0 },
+            { q: "¿Qué son las bacterias quimiosintéticas?", options: ["Obtienen energía de compuestos químicos", "Usan luz solar", "Son parásitas", "Son virus"], correct: 0 },
+            { q: "¿Qué bacteria causa la gonorrea?", options: ["Neisseria gonorrhoeae", "Treponema pallidum", "Chlamydia trachomatis", "Mycoplasma genitalium"], correct: 0 },
+            { q: "¿Qué es la fagocitosis?", options: ["Células que comen bacterias", "Reproducción bacteriana", "Tipo de bacteria", "Enfermedad"], correct: 0 },
+            { q: "¿Qué bacteria causa el ántrax?", options: ["Bacillus anthracis", "Clostridium botulinum", "Listeria monocytogenes", "Erysipelothrix rhusiopathiae"], correct: 0 },
+            { q: "¿Qué son las bacterias termófilas?", options: ["Viven a altas temperaturas", "Viven en el frío", "Viven en el agua", "Viven en el aire"], correct: 0 },
+            { q: "¿Qué bacteria causa la legionelosis?", options: ["Legionella pneumophila", "Mycoplasma pneumoniae", "Chlamydia pneumoniae", "Coxiella burnetii"], correct: 0 },
+            { q: "¿Qué es la simbiosis bacteriana?", options: ["Relación benéfica entre organismos", "Enfermedad", "Muerte celular", "Mutación"], correct: 0 },
+            { q: "¿Qué bacteria causa la brucelosis?", options: ["Brucella abortus", "Coxiella burnetii", "Bartonella henselae", "Francisella tularensis"], correct: 0 },
+            { q: "¿Qué son las bacterias halófilas?", options: ["Viven en alta salinidad", "Viven en agua dulce", "Viven en el aire", "Viven en el suelo"], correct: 0 }
         ];
 
         // ==========================================
-        // BANCO DE PREGUNTAS - HONGOS (20 preguntas)
+        // BANCO DE PREGUNTAS - HONGOS (50 preguntas)
         // ==========================================
         const fungusQuestions = [
-            {
-                scenario: "🥖 Pan olvidado en la cocina durante 2 semanas en ambiente húmedo",
-                description: "El pan presenta manchas verdes y negras con textura polvorienta. La cocina tiene 85% de humedad y 25°C.",
-                question: "¿Qué tipo de hongo es más probable que crezca y qué condiciones lo favorecen?",
-                options: ["Moho (Penicillium/Aspergillus) - alta humedad y temperatura moderada", "Levadura - ambiente seco", "Seta comestible - luz solar directa", "Liquen - ambiente marino"],
-                correct: 0,
-                explanation: "Los mohos como Penicillium y Aspergillus prosperan en ambientes húmedos (70-90%) y temperaturas de 20-30°C, exactamente las condiciones del pan olvidado."
-            },
-            {
-                scenario: " Zapatos deportivos usados diariamente sin secar",
-                description: "Una persona presenta picazón intensa, descamación y mal olor entre los dedos de los pies. Usa zapatos cerrados todo el día.",
-                question: "¿Qué infección fúngica es probable y qué la causa?",
-                options: ["Levadura - exceso de azúcar", "Tiña pedis (pie de atleta) - humedad y oscuridad en zapatos", "Candidiasis oral - exceso de azúcar", "Onicomicosis - solo por edad"],
-                correct: 1,
-                explanation: "El pie de atleta (Tiña pedis) es causado por hongos dermatofitos que prosperan en ambientes húmedos, oscuros y cálidos como el interior de zapatos deportivos."
-            },
-            {
-                scenario: "🚿 Baño compartido con poca ventilación",
-                description: "Las paredes del baño presentan manchas negras en las esquinas y juntas de azulejos. Hay condensación constante.",
-                question: "¿Qué tipo de hongo crece aquí y qué factor ambiental lo favorece principalmente?",
-                options: ["Levadura - luz solar", "Trufa - suelo seco", "Moho negro (Stachybotrys) - alta humedad y poca ventilación", "Champignon - refrigeración"],
-                correct: 2,
-                explanation: "El moho negro (Stachybotrys chartarum) crece en superficies con humedad constante (>70%) y poca ventilación, común en baños sin extractor."
-            },
-            {
-                scenario: "🌾 Campo de cultivo con lluvia excesiva",
-                description: "Después de semanas de lluvia, los cultivos presentan manchas marrones y polvorientas.",
-                question: "¿Qué hongo afecta plantas y qué lo favorece?",
-                options: ["Penicillium - refrigeración", "Trichoderma - suelo árido", "Levadura de panadería - calor seco", "Royas y mildiu - exceso de humedad foliar"],
-                correct: 3,
-                explanation: "Las royas y el mildiu son hongos fitopatógenos que se propagan rápidamente con humedad excesiva en las hojas, causando pérdidas agrícolas."
-            },
-            {
-                scenario: "🧀 Queso azul con vetas características",
-                description: "Un queso presenta vetas azul-verdosas internas. Es intencional y comestible.",
-                question: "¿Qué hongo se usa deliberadamente y para qué?",
-                options: ["Aspergillus niger - contaminación", "Penicillium roqueforti - maduración y sabor", "Candida - fermentación alcohólica", "Rhizopus - pan"],
-                correct: 1,
-                explanation: "Penicillium roqueforti se usa intencionalmente en quesos como Roquefort y Gorgonzola para dar sabor y textura característica."
-            },
-            {
-                scenario: "💊 Paciente con sistema inmunológico debilitado",
-                description: "Un paciente en quimioterapia desarrolla fiebre y tos. Los análisis muestran hifas septadas en pulmones.",
-                question: "¿Qué infección fúngica es grave en inmunodeprimidos?",
-                options: ["Candidiasis - solo mucosas", "Aspergilosis - Aspergillus en pulmones", "Pie de atleta - solo en pies", "Tiña capitis - solo en cabello"],
-                correct: 1,
-                explanation: "La aspergilosis es una infección grave causada por Aspergillus que afecta principalmente a personas inmunodeprimidas, pudiendo ser fatal."
-            },
-            {
-                scenario: "🍞 Masa de pan que duplica su tamaño",
-                description: "Al hacer pan, la masa crece y burbujea después de añadir un ingrediente y esperar.",
-                question: "¿Qué hongo causa la fermentación y qué gas produce?",
-                options: ["Penicillium - oxígeno", "Aspergillus - nitrógeno", "Saccharomyces cerevisiae - CO2", "Candida - metano"],
-                correct: 2,
-                explanation: "La levadura Saccharomyces cerevisiae fermenta azúcares produciendo CO2 (que infla la masa) y etanol (que se evapora al hornear)."
-            },
-            {
-                scenario: "🐕 Perro con manchas circulares sin pelo",
-                description: "Una mascota presenta lesiones circulares con pérdida de pelo en la piel.",
-                question: "¿Qué infección fúngica afecta mascotas y es contagiosa a humanos?",
-                options: ["Aspergilosis - solo pulmones", "Candidiasis - solo mucosas", "Dermatofitosis (tiña) - hongos que comen queratina", "Micetoma - solo tropical"],
-                correct: 2,
-                explanation: "La dermatofitosis (tiña) es causada por hongos dermatofitos que se alimentan de queratina en piel, pelo y uñas, siendo zoonótica."
-            },
-            {
-                scenario: "🌡️ Invernadero con 95% de humedad y 35°C",
-                description: "Condiciones extremas de humedad y temperatura.",
-                question: "¿Qué sucede con los hongos en estas condiciones?",
-                options: ["Los hongos mueren todos", "Solo crecen bacterias", "No pasa nada", "Proliferación masiva de mohos y levaduras"],
-                correct: 3,
-                explanation: "La combinación de alta humedad (>90%) y temperatura cálida (25-35°C) crea condiciones ideales para proliferación masiva de hongos."
-            },
-            {
-                scenario: "💅 Uñas amarillas y engrosadas",
-                description: "Una persona presenta uñas de los pies amarillas, gruesas y quebradizas después de usar sandalias en gimnasio público.",
-                question: "¿Qué infección fúngica es y cómo se contagió?",
-                options: ["Tiña corporal - aire", "Candidiasis - alimentos", "Onicomicosis - contacto con superficies contaminadas", "Aspergilosis - polvo"],
-                correct: 2,
-                explanation: "La onicomicosis es infección de uñas por dermatofitos, comúnmente contraída en piscinas, gimnasios y duchas públicas."
-            },
-            {
-                scenario: "🍺 Fabricación de cerveza artesanal",
-                description: "Se añade un microorganismo al mosto de cebada para producir alcohol.",
-                question: "¿Qué hongo se usa y qué proceso realiza?",
-                options: ["Penicillium - maduración", "Aspergillus - toxinas", "Rhizopus - putrefacción", "Saccharomyces - fermentación alcohólica"],
-                correct: 3,
-                explanation: "Saccharomyces cerevisiae fermenta los azúcares del mosto produciendo etanol (alcohol) y CO2, proceso esencial en cervecería."
-            },
-            {
-                scenario: "🏥 Hospital con sistema de aire acondicionado contaminado",
-                description: "Varios pacientes inmunodeprimidos desarrollan infecciones pulmonares similares.",
-                question: "¿Qué hongo oportunista se dispersa por aire acondicionado?",
-                options: ["Candida - solo contacto", "Aspergillus - esporas en aire", "Dermatofitos - solo piel", "Levaduras - solo alimentos"],
-                correct: 1,
-                explanation: "Aspergillus dispersa esporas por sistemas de ventilación contaminados, causando aspergilosis en pacientes vulnerables."
-            },
-            {
-                scenario: "🌧️ Casa con inundación reciente",
-                description: "Después de una inundación, las paredes presentan crecimiento negro y olor a moho.",
-                question: "¿Qué hongo peligroso puede crecer y qué riesgo tiene?",
-                options: ["Levadura - inofensiva", "Champignon - comestible", "Liquen - benéfico", "Stachybotrys (moho negro) - produce micotoxinas"],
-                correct: 3,
-                explanation: "Stachybotrys chartarum (moho negro tóxico) crece en materiales orgánicos húmedos y produce micotoxinas dañinas para la salud."
-            },
-            {
-                scenario: " Bebé con manchas blancas en la boca",
-                description: "Un bebé de 3 meses presenta placas blancas en lengua y mejillas internas que no se quitan fácilmente.",
-                question: "¿Qué infección fúngica es común en bebés?",
-                options: ["Tiña - solo piel", "Candidiasis oral (algodón) - Candida albicans", "Aspergilosis - solo pulmones", "Onicomicosis - solo uñas"],
-                correct: 1,
-                explanation: "La candidiasis oral (algodón) es causada por Candida albicans, común en bebés por su sistema inmunológico inmaduro."
-            },
-            {
-                scenario: "🌽 Granero con granos almacenados húmedos",
-                description: "Granos de maíz almacenados con humedad presentan crecimiento de hongo que produce toxinas.",
-                question: "¿Qué hongo produce aflatoxinas peligrosas?",
-                options: ["Saccharomyces - fermentación", "Aspergillus flavus - aflatoxinas cancerígenas", "Penicillium - antibióticos", "Rhizopus - pan"],
-                correct: 1,
-                explanation: "Aspergillus flavus produce aflatoxinas, potentes carcinógenos que contaminan granos almacenados en condiciones húmedas."
-            },
-            {
-                scenario: "🧪 Laboratorio de microbiología",
-                description: "Se observa al microscopio un hongo con hifas septadas y esporas en conidióforos.",
-                question: "¿Qué estructura es exclusiva de hongos y no de bacterias?",
-                options: ["Pared de peptidoglicano", "Membrana externa", "Flagelos bacterianos", "Hifas septadas con quitina"],
-                correct: 3,
-                explanation: "Las hifas septadas con pared de quitina son estructuras exclusivas de hongos, diferenciándolos de bacterias que tienen peptidoglicano."
-            },
-            {
-                scenario: "🍄 Setas silvestres en el bosque",
-                description: "Después de lluvias, aparecen setas en el bosque. Algunas son comestibles, otras mortales.",
-                question: "¿Por qué es peligroso consumir setas silvestres sin conocimiento?",
-                options: ["Todas son venenosas", "Algunas contienen toxinas mortales como amatoxinas", "Ninguna es comestible", "Solo las de colores son malas"],
-                correct: 1,
-                explanation: "Muchas setas silvestres contienen toxinas mortales (como amatoxinas en Amanita phalloides) que causan fallo hepático."
-            },
-            {
-                scenario: "🏋️ Gimnasio con duchas compartidas",
-                description: "Varias personas desarrollan infecciones en la piel después de usar duchas públicas.",
-                question: "¿Qué hongo se transmite en duchas públicas y cómo prevenirlo?",
-                options: ["Levaduras - solo alimentos", "Mohos - solo paredes", "Líquenes - solo árboles", "Dermatofitos - usar sandalias y secar bien"],
-                correct: 3,
-                explanation: "Los dermatofitos se transmiten en superficies húmedas de duchas públicas. Usar sandalias y secar bien previene infecciones."
-            },
-            {
-                scenario: "🌡️ Cambio climático y hongos",
-                description: "El calentamiento global está cambiando la distribución de hongos patógenos.",
-                question: "¿Qué efecto tiene el cambio climático en hongos patógenos?",
-                options: ["Los elimina todos", "No tiene efecto", "Solo afecta bacterias", "Expande su rango geográfico a nuevas zonas"],
-                correct: 3,
-                explanation: "El cambio climático permite que hongos patógenos se expandan a zonas previamente demasiado frías, aumentando enfermedades fúngicas."
-            },
-            {
-                scenario: "💉 Paciente con catéter venoso central",
-                description: "Un paciente hospitalizado con catéter desarrolla fiebre. Cultivos muestran levaduras en sangre.",
-                question: "¿Qué infección fúngica grave puede ocurrir por catéteres?",
-                options: ["Tiña - solo piel", "Aspergilosis - solo aire", "Onicomicosis - solo uñas", "Candidemia - Candida en sangre"],
-                correct: 3,
-                explanation: "La candidemia es infección sanguínea por Candida, común en pacientes con catéteres y sistemas inmunológicos comprometidos."
-            }
+            { scenario: "🥖 Pan olvidado en la cocina durante 2 semanas en ambiente húmedo", description: "El pan presenta manchas verdes y negras con textura polvorienta. La cocina tiene 85% de humedad y 25°C.", question: "¿Qué tipo de hongo es más probable que crezca y qué condiciones lo favorecen?", options: ["Moho (Penicillium/Aspergillus) - alta humedad y temperatura moderada", "Levadura - ambiente seco", "Seta comestible - luz solar directa", "Liquen - ambiente marino"], correct: 0, explanation: "Los mohos como Penicillium y Aspergillus prosperan en ambientes húmedos (70-90%) y temperaturas de 20-30°C, exactamente las condiciones del pan olvidado." },
+            { scenario: "👟 Zapatos deportivos usados diariamente sin secar", description: "Una persona presenta picazón intensa, descamación y mal olor entre los dedos de los pies. Usa zapatos cerrados todo el día.", question: "¿Qué infección fúngica es probable y qué la causa?", options: ["Levadura - exceso de azúcar", "Tiña pedis (pie de atleta) - humedad y oscuridad en zapatos", "Candidiasis oral - exceso de azúcar", "Onicomicosis - solo por edad"], correct: 1, explanation: "El pie de atleta (Tiña pedis) es causado por hongos dermatofitos que prosperan en ambientes húmedos, oscuros y cálidos como el interior de zapatos deportivos." },
+            { scenario: "🚿 Baño compartido con poca ventilación", description: "Las paredes del baño presentan manchas negras en las esquinas y juntas de azulejos. Hay condensación constante.", question: "¿Qué tipo de hongo crece aquí y qué factor ambiental lo favorece principalmente?", options: ["Levadura - luz solar", "Trufa - suelo seco", "Moho negro (Stachybotrys) - alta humedad y poca ventilación", "Champignon - refrigeración"], correct: 2, explanation: "El moho negro (Stachybotrys chartarum) crece en superficies con humedad constante (>70%) y poca ventilación, común en baños sin extractor." },
+            { scenario: "🌾 Campo de cultivo con lluvia excesiva", description: "Después de semanas de lluvia, los cultivos presentan manchas marrones y polvorientas.", question: "¿Qué hongo afecta plantas y qué lo favorece?", options: ["Penicillium - refrigeración", "Trichoderma - suelo árido", "Levadura de panadería - calor seco", "Royas y mildiu - exceso de humedad foliar"], correct: 3, explanation: "Las royas y el mildiu son hongos fitopatógenos que se propagan rápidamente con humedad excesiva en las hojas, causando pérdidas agrícolas." },
+            { scenario: "🧀 Queso azul con vetas características", description: "Un queso presenta vetas azul-verdosas internas. Es intencional y comestible.", question: "¿Qué hongo se usa deliberadamente y para qué?", options: ["Aspergillus niger - contaminación", "Penicillium roqueforti - maduración y sabor", "Candida - fermentación alcohólica", "Rhizopus - pan"], correct: 1, explanation: "Penicillium roqueforti se usa intencionalmente en quesos como Roquefort y Gorgonzola para dar sabor y textura característica." },
+            { scenario: "💊 Paciente con sistema inmunológico debilitado", description: "Un paciente en quimioterapia desarrolla fiebre y tos. Los análisis muestran hifas septadas en pulmones.", question: "¿Qué infección fúngica es grave en inmunodeprimidos?", options: ["Candidiasis - solo mucosas", "Aspergilosis - Aspergillus en pulmones", "Pie de atleta - solo en pies", "Tiña capitis - solo en cabello"], correct: 1, explanation: "La aspergilosis es una infección grave causada por Aspergillus que afecta principalmente a personas inmunodeprimidas, pudiendo ser fatal." },
+            { scenario: "🍞 Masa de pan que duplica su tamaño", description: "Al hacer pan, la masa crece y burbujea después de añadir un ingrediente y esperar.", question: "¿Qué hongo causa la fermentación y qué gas produce?", options: ["Penicillium - oxígeno", "Aspergillus - nitrógeno", "Saccharomyces cerevisiae - CO2", "Candida - metano"], correct: 2, explanation: "La levadura Saccharomyces cerevisiae fermenta azúcares produciendo CO2 (que infla la masa) y etanol (que se evapora al hornear)." },
+            { scenario: "🐕 Perro con manchas circulares sin pelo", description: "Una mascota presenta lesiones circulares con pérdida de pelo en la piel.", question: "¿Qué infección fúngica afecta mascotas y es contagiosa a humanos?", options: ["Aspergilosis - solo pulmones", "Candidiasis - solo mucosas", "Dermatofitosis (tiña) - hongos que comen queratina", "Micetoma - solo tropical"], correct: 2, explanation: "La dermatofitosis (tiña) es causada por hongos dermatofitos que se alimentan de queratina en piel, pelo y uñas, siendo zoonótica." },
+            { scenario: "️ Invernadero con 95% de humedad y 35°C", description: "Condiciones extremas de humedad y temperatura.", question: "¿Qué sucede con los hongos en estas condiciones?", options: ["Los hongos mueren todos", "Solo crecen bacterias", "No pasa nada", "Proliferación masiva de mohos y levaduras"], correct: 3, explanation: "La combinación de alta humedad (>90%) y temperatura cálida (25-35°C) crea condiciones ideales para proliferación masiva de hongos." },
+            { scenario: " Uñas amarillas y engrosadas", description: "Una persona presenta uñas de los pies amarillas, gruesas y quebradizas después de usar sandalias en gimnasio público.", question: "¿Qué infección fúngica es y cómo se contagió?", options: ["Tiña corporal - aire", "Candidiasis - alimentos", "Onicomicosis - contacto con superficies contaminadas", "Aspergilosis - polvo"], correct: 2, explanation: "La onicomicosis es infección de uñas por dermatofitos, comúnmente contraída en piscinas, gimnasios y duchas públicas." },
+            { scenario: "🍺 Fabricación de cerveza artesanal", description: "Se añade un microorganismo al mosto de cebada para producir alcohol.", question: "¿Qué hongo se usa y qué proceso realiza?", options: ["Penicillium - maduración", "Aspergillus - toxinas", "Rhizopus - putrefacción", "Saccharomyces - fermentación alcohólica"], correct: 3, explanation: "Saccharomyces cerevisiae fermenta los azúcares del mosto produciendo etanol (alcohol) y CO2, proceso esencial en cervecería." },
+            { scenario: "🏥 Hospital con sistema de aire acondicionado contaminado", description: "Varios pacientes inmunodeprimidos desarrollan infecciones pulmonares similares.", question: "¿Qué hongo oportunista se dispersa por aire acondicionado?", options: ["Candida - solo contacto", "Aspergillus - esporas en aire", "Dermatofitos - solo piel", "Levaduras - solo alimentos"], correct: 1, explanation: "Aspergillus dispersa esporas por sistemas de ventilación contaminados, causando aspergilosis en pacientes vulnerables." },
+            { scenario: "️ Casa con inundación reciente", description: "Después de una inundación, las paredes presentan crecimiento negro y olor a moho.", question: "¿Qué hongo peligroso puede crecer y qué riesgo tiene?", options: ["Levadura - inofensiva", "Champignon - comestible", "Liquen - benéfico", "Stachybotrys (moho negro) - produce micotoxinas"], correct: 3, explanation: "Stachybotrys chartarum (moho negro tóxico) crece en materiales orgánicos húmedos y produce micotoxinas dañinas para la salud." },
+            { scenario: "👶 Bebé con manchas blancas en la boca", description: "Un bebé de 3 meses presenta placas blancas en lengua y mejillas internas que no se quitan fácilmente.", question: "¿Qué infección fúngica es común en bebés?", options: ["Tiña - solo piel", "Candidiasis oral (algodón) - Candida albicans", "Aspergilosis - solo pulmones", "Onicomicosis - solo uñas"], correct: 1, explanation: "La candidiasis oral (algodón) es causada por Candida albicans, común en bebés por su sistema inmunológico inmaduro." },
+            { scenario: "🌽 Granero con granos almacenados húmedos", description: "Granos de maíz almacenados con humedad presentan crecimiento de hongo que produce toxinas.", question: "¿Qué hongo produce aflatoxinas peligrosas?", options: ["Saccharomyces - fermentación", "Aspergillus flavus - aflatoxinas cancerígenas", "Penicillium - antibióticos", "Rhizopus - pan"], correct: 1, explanation: "Aspergillus flavus produce aflatoxinas, potentes carcinógenos que contaminan granos almacenados en condiciones húmedas." },
+            { scenario: "🧪 Laboratorio de microbiología", description: "Se observa al microscopio un hongo con hifas septadas y esporas en conidióforos.", question: "¿Qué estructura es exclusiva de hongos y no de bacterias?", options: ["Pared de peptidoglicano", "Membrana externa", "Flagelos bacterianos", "Hifas septadas con quitina"], correct: 3, explanation: "Las hifas septadas con pared de quitina son estructuras exclusivas de hongos, diferenciándolos de bacterias que tienen peptidoglicano." },
+            { scenario: "🍄 Setas silvestres en el bosque", description: "Después de lluvias, aparecen setas en el bosque. Algunas son comestibles, otras mortales.", question: "¿Por qué es peligroso consumir setas silvestres sin conocimiento?", options: ["Todas son venenosas", "Algunas contienen toxinas mortales como amatoxinas", "Ninguna es comestible", "Solo las de colores son malas"], correct: 1, explanation: "Muchas setas silvestres contienen toxinas mortales (como amatoxinas en Amanita phalloides) que causan fallo hepático." },
+            { scenario: "🏋️ Gimnasio con duchas compartidas", description: "Varias personas desarrollan infecciones en la piel después de usar duchas públicas.", question: "¿Qué hongo se transmite en duchas públicas y cómo prevenirlo?", options: ["Levaduras - solo alimentos", "Mohos - solo paredes", "Líquenes - solo árboles", "Dermatofitos - usar sandalias y secar bien"], correct: 3, explanation: "Los dermatofitos se transmiten en superficies húmedas de duchas públicas. Usar sandalias y secar bien previene infecciones." },
+            { scenario: "️ Cambio climático y hongos", description: "El calentamiento global está cambiando la distribución de hongos patógenos.", question: "¿Qué efecto tiene el cambio climático en hongos patógenos?", options: ["Los elimina todos", "No tiene efecto", "Solo afecta bacterias", "Expande su rango geográfico a nuevas zonas"], correct: 3, explanation: "El cambio climático permite que hongos patógenos se expandan a zonas previamente demasiado frías, aumentando enfermedades fúngicas." },
+            { scenario: "💉 Paciente con catéter venoso central", description: "Un paciente hospitalizado con catéter desarrolla fiebre. Cultivos muestran levaduras en sangre.", question: "¿Qué infección fúngica grave puede ocurrir por catéteres?", options: ["Tiña - solo piel", "Aspergilosis - solo aire", "Onicomicosis - solo uñas", "Candidemia - Candida en sangre"], correct: 3, explanation: "La candidemia es infección sanguínea por Candida, común en pacientes con catéteres y sistemas inmunológicos comprometidos." },
+            { scenario: "🍷 Vino con sabor avinagrado", description: "Un vino casero presenta sabor y olor desagradable después de la fermentación.", question: "¿Qué hongo puede contaminar la fermentación del vino?", options: ["Saccharomyces - fermentación normal", "Brettanomyces - produce sabores indeseables", "Penicillium - antibióticos", "Aspergillus - toxinas"], correct: 1, explanation: "Brettanomyces es una levadura que puede contaminar vinos produciendo sabores y olores indeseables como 'caballo' o 'band-aid'." },
+            { scenario: " Árbol con hojas manchadas de negro", description: "Un árbol en el jardín presenta manchas negras en las hojas que se expanden rápidamente.", question: "¿Qué enfermedad fúngica afecta plantas ornamentales?", options: ["Royas - manchas naranjas", "Mildiu - manchas blancas", "Antracnosis - manchas negras", "Oídio - polvo blanco"], correct: 2, explanation: "La antracnosis es causada por hongos como Colletotrichum que producen manchas negras necróticas en hojas, tallos y frutos." },
+            { scenario: "🧴 Crema antimicótica en la farmacia", description: "Un paciente compra crema con clotrimazol para tratar una infección en la piel.", question: "¿Cómo actúan los antifúngicos azoles?", options: ["Destruyen la pared celular", "Inhiben la síntesis de ergosterol", "Matan las esporas", "Bloquean la reproducción"], correct: 1, explanation: "Los antifúngicos azoles como el clotrimazol inhiben la síntesis de ergosterol, componente esencial de la membrana celular fúngica." },
+            { scenario: "🍄 Trufa negra en restaurante gourmet", description: "Un chef paga miles de dólares por trufas negras italianas para un plato especial.", question: "¿Qué hace especiales a las trufas y cómo crecen?", options: ["Son raíces de árboles", "Son hongos subterráneos en simbiosis con árboles", "Son tubérculos comestibles", "Son algas modificadas"], correct: 1, explanation: "Las trufas son cuerpos fructíferos de hongos ascomicetos que crecen bajo tierra en simbiosis micorrícica con raíces de árboles." },
+            { scenario: " Paciente con VIH y candidiasis esofágica", description: "Un paciente con SIDA presenta dificultad para tragar y dolor al comer.", question: "¿Por qué los pacientes con VIH son susceptibles a candidiasis?", options: ["El VIH mata hongos", "El VIH debilita el sistema inmunológico", "El VIH alimenta hongos", "El VIH no tiene relación"], correct: 1, explanation: "El VIH destruye células CD4, debilitando el sistema inmunológico y permitiendo que Candida, normalmente controlada, cause infecciones oportunistas." },
+            { scenario: "🌾 Cosecha de trigo con polvo rojizo", description: "Campesinos observan un polvo rojizo en los tallos de trigo que reduce el rendimiento.", question: "¿Qué hongo causa la roya del trigo y qué impacto tiene?", options: ["Aspergillus - toxinas", "Puccinia graminis - reduce cosechas", "Penicillium - antibióticos", "Saccharomyces - fermentación"], correct: 1, explanation: "Puccinia graminis causa la roya negra del trigo, una enfermedad devastadora que puede destruir cosechas enteras y causar hambrunas." },
+            { scenario: "🧫 Cultivo de Penicillium en laboratorio", description: "Científicos cultivan Penicillium chrysogenum para producir un medicamento importante.", question: "¿Qué medicamento se produce a partir de Penicillium?", options: ["Aspirina", "Penicilina (antibiótico)", "Insulina", "Vacuna"], correct: 1, explanation: "La penicilina, el primer antibiótico descubierto por Fleming, se produce a partir del hongo Penicillium chrysogenum." },
+            { scenario: " Casa con problemas de asma", description: "Una familia presenta síntomas de asma que mejoran cuando salen de vacaciones.", question: "¿Qué hongo doméstico puede agravar el asma?", options: ["Levadura de pan", "Mohos como Alternaria y Cladosporium", "Setas comestibles", "Líquenes"], correct: 1, explanation: "Mohos como Alternaria y Cladosporium producen esporas que son alérgenos comunes que pueden desencadenar o agravar el asma." },
+            { scenario: "🍫 Chocolate con manchas blancas", description: "Una tableta de chocolate presenta una capa blanca en la superficie después de meses.", question: "¿Es esto un hongo o un proceso natural del chocolate?", options: ["Moho peligroso", "Bloom de grasa (proceso natural)", "Bacterias", "Levadura"], correct: 1, explanation: "El 'bloom' de grasa es un proceso natural donde la manteca de cacao migra a la superficie, no es moho y es seguro consumir." },
+            { scenario: "🌿 Planta de interior con manchas blancas polvorientas", description: "Una planta de interior presenta un polvo blanco en las hojas que se extiende rápidamente.", question: "¿Qué enfermedad fúngica afecta plantas de interior?", options: ["Mildiu - necesita humedad", "Oídio - polvo blanco característico", "Roya - manchas naranjas", "Antracnosis - manchas negras"], correct: 1, explanation: "El oídio es causado por hongos como Erysiphe que producen un característico polvo blanco en hojas, tallos y flores." },
+            { scenario: "🧀 Queso Camembert con corteza blanca", description: "Un queso Camembert presenta una corteza blanca aterciopelada en la superficie.", question: "¿Qué hongo forma la corteza del Camembert?", options: ["Penicillium roqueforti", "Penicillium camemberti", "Aspergillus niger", "Rhizopus stolonifer"], correct: 1, explanation: "Penicillium camemberti (o P. candidum) forma la característica corteza blanca del queso Camembert y Brie." },
+            { scenario: "👁️ Infección ocular con visión borrosa", description: "Un usuario de lentes de contacto presenta dolor ocular y visión borrosa.", question: "¿Qué hongo puede causar queratitis fúngica?", options: ["Candida albicans", "Aspergillus y Fusarium", "Saccharomyces", "Penicillium"], correct: 1, explanation: "Aspergillus y Fusarium son causas comunes de queratitis fúngica, especialmente en usuarios de lentes de contacto con mala higiene." },
+            { scenario: "🌊 Algas rojas en la playa", description: "Una playa presenta marea roja con agua de color rojizo y olor fuerte.", question: "¿Es esto un hongo o un alga?", options: ["Hongo marino", "Alga dinoflagelada (no es hongo)", "Bacteria", "Virus"], correct: 1, explanation: "Las mareas rojas son causadas por proliferación de dinoflagelados (algas), no hongos. Producen toxinas que afectan la vida marina." },
+            { scenario: "🍇 Uvas con polvo blanco para vino dulce", description: "Viñedos especiales cultivan uvas con 'podredumbre noble' para vinos dulces premium.", question: "¿Qué hongo causa la podredumbre noble beneficiosa?", options: ["Botrytis cinerea", "Penicillium", "Aspergillus", "Rhizopus"], correct: 0, explanation: "Botrytis cinerea causa la 'podredumbre noble' que concentra azúcares en uvas, produciendo vinos dulces como Sauternes y Tokaji." },
+            { scenario: "🦷 Infección bucal con placas blancas", description: "Un paciente diabético presenta placas blancas en encías y paladar.", question: "¿Qué hongo causa candidiasis oral en diabéticos?", options: ["Aspergillus niger", "Candida albicans", "Penicillium", "Mucor"], correct: 1, explanation: "Candida albicans es parte de la flora normal pero causa infecciones oportunistas en diabéticos por niveles elevados de glucosa." },
+            { scenario: "🌲 Bosque con árboles muertos", description: "Un bosque presenta árboles muertos con hongos en forma de oreja en los troncos.", question: "¿Qué hongo causa pudrición de madera?", options: ["Levadura", "Hongos de pudrición blanca y marrón", "Mohos", "Líquenes"], correct: 1, explanation: "Hongos como Trametes y Ganoderma causan pudrición de madera, descomponiendo lignina y celulosa en bosques." },
+            { scenario: " Shampoo anticaspa en el baño", description: "Una persona usa shampoo con ketoconazol para tratar caspa severa.", question: "¿Qué hongo causa la caspa?", options: ["Candida albicans", "Malassezia furfur", "Aspergillus", "Penicillium"], correct: 1, explanation: "Malassezia furfur es una levadura que vive en el cuero cabelludo y puede causar caspa y dermatitis seborreica." },
+            { scenario: "🍄 Hongo bioluminiscente en bosque nocturno", description: "Excursionistas ven hongos que brillan en la oscuridad del bosque.", question: "¿Por qué algunos hongos son bioluminiscentes?", options: ["Para atraer insectos que dispersan esporas", "Por radiación", "Por químicos tóxicos", "Es una enfermedad"], correct: 0, explanation: "La bioluminiscencia en hongos como Omphalotus atrae insectos nocturnos que ayudan a dispersar sus esporas." },
+            { scenario: " Cosecha de maní con hongos", description: "Cosecha de maní almacenada en condiciones húmedas desarrolla hongos.", question: "¿Qué riesgo tiene el maní con hongos?", options: ["Mejor sabor", "Producción de aflatoxinas cancerígenas", "Más nutrientes", "No tiene riesgo"], correct: 1, explanation: "El maní contaminado con Aspergillus flavus produce aflatoxinas, potentes carcinógenos hepáticos." },
+            { scenario: "🧫 Laboratorio con cultivo de levaduras", description: "Científicos estudian levaduras para producir biocombustibles.", question: "¿Qué ventaja tienen las levaduras para biocombustibles?", options: ["Producen oxígeno", "Fermentan azúcares en etanol", "Absorben CO2", "Producen hidrógeno"], correct: 1, explanation: "Levaduras como Saccharomyces fermentan azúcares produciendo etanol, usado como biocombustible renovable." },
+            { scenario: "🌿 Liquen en rocas de montaña", description: "Excursionistas observan organismos en rocas que parecen musgo pero son diferentes.", question: "¿Qué es un liquen?", options: ["Un hongo solo", "Simbiosis entre hongo y alga/cianobacteria", "Una planta", "Un musgo"], correct: 1, explanation: "Los líquenes son simbiosis entre un hongo (micobionte) y un alga o cianobacteria (fotobionte)." },
+            { scenario: "🍞 Pan con moho verde", description: "Una familia encuentra moho verde en el pan y discute si cortar la parte afectada es seguro.", question: "¿Es seguro comer pan con moho cortando la parte visible?", options: ["Sí, solo la superficie está afectada", "No, las hifas penetran todo el pan", "Depende del color", "Solo si se calienta"], correct: 1, explanation: "Las hifas del moho penetran profundamente en alimentos blandos como el pan, por lo que debe desecharse completo." },
+            { scenario: "🦠 Paciente trasplantado con fiebre", description: "Un paciente trasplantado de médula ósea desarrolla fiebre persistente.", question: "¿Qué infección fúngica es común en trasplantados?", options: ["Pie de atleta", "Aspergilosis invasiva", "Caspa", "Tiña"], correct: 1, explanation: "La aspergilosis invasiva es una infección grave y frecuente en pacientes inmunosuprimidos como trasplantados." },
+            { scenario: "🌾 Campo de arroz con enfermedad", description: "Cultivos de arroz presentan lesiones en hojas que reducen la producción.", question: "¿Qué hongo causa la piricularia del arroz?", options: ["Magnaporthe oryzae", "Aspergillus", "Penicillium", "Fusarium"], correct: 0, explanation: "Magnaporthe oryzae causa la piricularia del arroz, una de las enfermedades más destructivas de este cultivo esencial." },
+            { scenario: "🧴 Crema para hongos en pies", description: "Una persona compra terbinafina en crema para tratar hongos en los pies.", question: "¿Cómo actúa la terbinafina?", options: ["Inhibe síntesis de ergosterol", "Inhibe escualeno epoxidasa", "Destruye pared celular", "Bloquea ADN"], correct: 1, explanation: "La terbinafina inhibe la escualeno epoxidasa, enzima clave en la síntesis de ergosterol de la membrana fúngica." },
+            { scenario: " Setas alucinógenas en festival", description: "Jóvenes en un festival consumen setas 'mágicas' buscando efectos alucinógenos.", question: "¿Qué compuesto produce efectos alucinógenos en algunas setas?", options: ["Ergotamina", "Psilocibina", "Aflatoxina", "Penicilina"], correct: 1, explanation: "La psilocibina es el compuesto psicoactivo en setas 'mágicas' como Psilocybe cubensis, con efectos alucinógenos." },
+            { scenario: " Árbol con enfermedad del olmo", description: "Olmos en un parque mueren rápidamente por una enfermedad fúngica.", question: "¿Qué hongo causa la grafiosis del olmo?", options: ["Ophiostoma ulmi", "Aspergillus", "Penicillium", "Fusarium"], correct: 0, explanation: "Ophiostoma ulmi causa la grafiosis del olmo, transmitida por escarabajos, devastando poblaciones de olmos." },
+            { scenario: "🧫 Cultivo de Aspergillus para industria", description: "Industria farmacéutica cultiva Aspergillus niger a gran escala.", question: "¿Qué produce industrialmente Aspergillus niger?", options: ["Penicilina", "Ácido cítrico", "Etanol", "Insulina"], correct: 1, explanation: "Aspergillus niger se usa industrialmente para producir ácido cítrico, ampliamente usado en alimentos y bebidas." },
+            { scenario: "🍇 Viñedo con mildiu", description: "Viñedos presentan manchas amarillas en el haz y moho blanco en el envés de hojas.", question: "¿Qué hongo causa el mildiu de la vid?", options: ["Erysiphe necator", "Plasmopara viticola", "Botrytis cinerea", "Guignardia bidwellii"], correct: 1, explanation: "Plasmopara viticola causa el mildiu de la vid, una enfermedad devastadora que requiere tratamiento con fungicidas." },
+            { scenario: "🦠 Paciente con histoplasmosis", description: "Un agricultor presenta síntomas respiratorios después de limpiar un gallinero.", question: "¿Qué hongo causa histoplasmosis y dónde se encuentra?", options: ["Coccidioides - desiertos", "Histoplasma capsulatum - excrementos de aves/murciélagos", "Blastomyces - suelo", "Paracoccidioides - selva"], correct: 1, explanation: "Histoplasma capsulatum vive en suelos con excrementos de aves o murciélagos, causando histoplasmosis al inhalar esporas." }
         ];
 
         // ==========================================
-        // BANCO DE CASOS - DIAGNÓSTICO (10 casos)
+        // BANCO DE CASOS - DIAGNÓSTICO (30 casos)
         // ==========================================
         const diagnosisCases = [
-            {
-                patient: "María, 35 años, residente del Estado Bolívar",
-                symptoms: "Fiebre alta (39°C), dolor de cabeza intenso, dolor muscular, erupciones cutáneas, fatiga extrema.",
-                characteristics: "• Tamaño: 150-250 nanómetros\n• Estructura: ARN monocatenario rodeado de cápside icosaédrica\n• Sin pared celular\n• Requiere célula huésped para replicarse\n• Se transmite por mosquito Aedes aegypti",
-                context: "Zona con alta humedad (85%) y temperatura promedio de 28°C, presencia de agua estancada cerca de la vivienda.",
-                correct: 'virus',
-                explanation: "Las características coinciden con un virus del dengue: tamaño nanométrico, ARN con cápside, sin pared celular, transmitido por mosquito. El ambiente favorece al vector Aedes aegypti."
-            },
-            {
-                patient: "Carlos, 45 años, trabajador de construcción",
-                symptoms: "Tos persistente con flema, fiebre moderada (38°C), dolor en el pecho, sudoración nocturna, pérdida de peso.",
-                characteristics: "• Tamaño: 2-4 micrómetros de largo\n• Forma: Bastones (bacilos)\n• Pared celular gruesa con ácido micólico\n• Tinción: Rojo/rosa (ácido-alcohol resistente)\n• Crece lentamente en pulmones",
-                context: "Vive en zona urbana densamente poblada, trabaja en espacios cerrados con poca ventilación.",
-                correct: 'bacteria',
-                explanation: "Es Mycobacterium tuberculosis: bacilo con pared de ácido micólico, ácido-alcohol resistente, afecta pulmones. El hacinamiento favorece transmisión aérea."
-            },
-            {
-                patient: "Ana, 28 años, ama de casa",
-                symptoms: "Picazón intensa en los pies, descamación de la piel, enrojecimiento, mal olor, aparición de ampollas.",
-                characteristics: "• Estructura: Hifas septadas visibles al microscopio\n• Reproducción: Esporas\n• Pared celular de quitina\n• Crece en capas superficiales de la piel\n• Se alimenta de queratina",
-                context: "Usa zapatos cerrados todo el día, vive en zona de alta humedad (88%), comparte toallas en el gimnasio.",
-                correct: 'hongo',
-                explanation: "Es Tiña pedis (pie de atleta): hifas con quitina, se reproduce por esporas, come queratina. Zapatos cerrados y humedad son factores de riesgo."
-            },
-            {
-                patient: "Luis, 8 años, estudiante",
-                symptoms: "Fiebre, dolor de garganta intenso, dificultad para tragar, ganglios inflamados, manchas rojas en el cuerpo.",
-                characteristics: "• Tamaño: 0.5-1 micrómetros\n• Forma: Cocos en cadenas\n• Pared celular gruesa Gram positiva\n• Produce toxinas eritrogénicas\n• Sensible a penicilina",
-                context: "Escuela con brote reciente, contacto cercano con otros niños sintomáticos.",
-                correct: 'bacteria',
-                explanation: "Es Streptococcus pyogenes (faringitis estreptocócica): cocos Gram+ en cadenas, produce toxinas. Muy contagioso en escuelas."
-            },
-            {
-                patient: "Carmen, 65 años, diabética",
-                symptoms: "Placas blancas en boca y lengua, dificultad para comer, ardor bucal.",
-                characteristics: "• Tamaño: 4-6 micrómetros\n• Forma: Levadura ovalada\n• Se reproduce por gemación\n• Forma pseudohifas\n• Parte de flora normal pero oportunista",
-                context: "Paciente diabética con control glucémico deficiente, usa dentadura postiza.",
-                correct: 'hongo',
-                explanation: "Es Candida albicans (candidiasis oral): levadura que forma pseudohifas, oportunista en diabéticos. La glucosa alta favorece su crecimiento."
-            },
-            {
-                patient: "Pedro, 22 años, universitario",
-                symptoms: "Fiebre, fatiga, dolor de cabeza, náuseas, sensibilidad a la luz, rigidez de nuca.",
-                characteristics: "• Tamaño: 100-200 nanómetros\n• Estructura: ARN con envoltura\n• Se transmite por saliva\n• Afecta meninges\n• Prevenir con vacuna",
-                context: "Vive en residencia universitaria compartida, reciente brote en el campus.",
-                correct: 'virus',
-                explanation: "Es virus de la meningitis (posiblemente enterovirus o herpes): ARN con envoltura, se transmite por saliva, afecta meninges. Las vacunas previenen tipos específicos."
-            },
-            {
-                patient: "Rosa, 50 años, agricultora",
-                symptoms: "Lesiones cutáneas nodulares, fiebre, ganglios locales inflamados, lesiones que no cicatrizan.",
-                characteristics: "• Dimórfico: hifas en ambiente, levadura en tejido\n• Temperatura óptima: 25-30°C ambiente\n• Entra por trauma cutáneo\n• Endémico en zonas tropicales",
-                context: "Trabaja con plantas y tierra, reciente herida en mano con espina de rosa.",
-                correct: 'hongo',
-                explanation: "Es Sporothrix schenckii (esporotricosis): hongo dimórfico que entra por heridas con material vegetal. Endémico en zonas tropicales como Venezuela."
-            },
-            {
-                patient: "Diego, 40 años, viajero internacional",
-                symptoms: "Diarrea severa, vómitos, deshidratación, calambres abdominales.",
-                characteristics: "• Tamaño: 1-3 micrómetros\n• Forma: Bacilo curvo (coma)\n• Gram negativo\n• Produce toxina colérica\n• Transmisión fecal-oral",
-                context: "Reciente viaje a zona con saneamiento deficiente, consumió agua no tratada.",
-                correct: 'bacteria',
-                explanation: "Es Vibrio cholerae (cólera): bacilo Gram- curvo, produce toxina colérica, transmisión por agua contaminada. El saneamiento previene."
-            },
-            {
-                patient: "Sofía, 15 años, estudiante",
-                symptoms: "Fiebre, malestar general, erupción maculopapular, inflamación de parótidas.",
-                characteristics: "• Tamaño: 150-300 nanómetros\n• ARN monocatenario\n• Familia Paramyxoviridae\n• Altamente contagioso\n• Prevenir con vacuna triple viral",
-                context: "Escuela con casos similares, no tiene esquema de vacunación completo.",
-                correct: 'virus',
-                explanation: "Es virus de la parotiditis (paperas): paramyxovirus de ARN, altamente contagioso, causa inflamación de parótidas. La vacuna MMR previene."
-            },
-            {
-                patient: "Miguel, 55 años, transplantado",
-                symptoms: "Fiebre persistente, tos seca, dificultad respiratoria, dolor pleural.",
-                characteristics: "• Hifas septadas con ramificación en 45°\n• Produce conidióforos con esporas\n• Angioinvasivo\n• Galactomanano positivo en suero",
-                context: "Paciente transplantado en tratamiento inmunosupresor, obra en construcción cerca de su casa.",
-                correct: 'hongo',
-                explanation: "Es Aspergillus (aspergilosis invasiva): hifas septadas ramificadas, angioinvasivo, afecta inmunodeprimidos. Las obras dispersan esporas."
-            }
+            { patient: "María, 35 años, residente del Estado Bolívar", symptoms: "Fiebre alta (39°C), dolor de cabeza intenso, dolor muscular, erupciones cutáneas, fatiga extrema.", characteristics: "• Tamaño: 150-250 nanómetros\n• Estructura: ARN monocatenario rodeado de cápside icosaédrica\n• Sin pared celular\n• Requiere célula huésped para replicarse\n• Se transmite por mosquito Aedes aegypti", context: "Zona con alta humedad (85%) y temperatura promedio de 28°C, presencia de agua estancada cerca de la vivienda.", correct: 'virus', explanation: "Las características coinciden con un virus del dengue: tamaño nanométrico, ARN con cápside, sin pared celular, transmitido por mosquito. El ambiente favorece al vector Aedes aegypti." },
+            { patient: "Carlos, 45 años, trabajador de construcción", symptoms: "Tos persistente con flema, fiebre moderada (38°C), dolor en el pecho, sudoración nocturna, pérdida de peso.", characteristics: "• Tamaño: 2-4 micrómetros de largo\n• Forma: Bastones (bacilos)\n• Pared celular gruesa con ácido micólico\n• Tinción: Rojo/rosa (ácido-alcohol resistente)\n• Crece lentamente en pulmones", context: "Vive en zona urbana densamente poblada, trabaja en espacios cerrados con poca ventilación.", correct: 'bacteria', explanation: "Es Mycobacterium tuberculosis: bacilo con pared de ácido micólico, ácido-alcohol resistente, afecta pulmones. El hacinamiento favorece transmisión aérea." },
+            { patient: "Ana, 28 años, ama de casa", symptoms: "Picazón intensa en los pies, descamación de la piel, enrojecimiento, mal olor, aparición de ampollas.", characteristics: "• Estructura: Hifas septadas visibles al microscopio\n• Reproducción: Esporas\n• Pared celular de quitina\n• Crece en capas superficiales de la piel\n• Se alimenta de queratina", context: "Usa zapatos cerrados todo el día, vive en zona de alta humedad (88%), comparte toallas en el gimnasio.", correct: 'hongo', explanation: "Es Tiña pedis (pie de atleta): hifas con quitina, se reproduce por esporas, come queratina. Zapatos cerrados y humedad son factores de riesgo." },
+            { patient: "Luis, 8 años, estudiante", symptoms: "Fiebre, dolor de garganta intenso, dificultad para tragar, ganglios inflamados, manchas rojas en el cuerpo.", characteristics: "• Tamaño: 0.5-1 micrómetros\n• Forma: Cocos en cadenas\n• Pared celular gruesa Gram positiva\n• Produce toxinas eritrogénicas\n• Sensible a penicilina", context: "Escuela con brote reciente, contacto cercano con otros niños sintomáticos.", correct: 'bacteria', explanation: "Es Streptococcus pyogenes (faringitis estreptocócica): cocos Gram+ en cadenas, produce toxinas. Muy contagioso en escuelas." },
+            { patient: "Carmen, 65 años, diabética", symptoms: "Placas blancas en boca y lengua, dificultad para comer, ardor bucal.", characteristics: "• Tamaño: 4-6 micrómetros\n• Forma: Levadura ovalada\n• Se reproduce por gemación\n• Forma pseudohifas\n• Parte de flora normal pero oportunista", context: "Paciente diabética con control glucémico deficiente, usa dentadura postiza.", correct: 'hongo', explanation: "Es Candida albicans (candidiasis oral): levadura que forma pseudohifas, oportunista en diabéticos. La glucosa alta favorece su crecimiento." },
+            { patient: "Pedro, 22 años, universitario", symptoms: "Fiebre, fatiga, dolor de cabeza, náuseas, sensibilidad a la luz, rigidez de nuca.", characteristics: "• Tamaño: 100-200 nanómetros\n• Estructura: ARN con envoltura\n• Se transmite por saliva\n• Afecta meninges\n• Prevenir con vacuna", context: "Vive en residencia universitaria compartida, reciente brote en el campus.", correct: 'virus', explanation: "Es virus de la meningitis (posiblemente enterovirus o herpes): ARN con envoltura, se transmite por saliva, afecta meninges. Las vacunas previenen tipos específicos." },
+            { patient: "Rosa, 50 años, agricultora", symptoms: "Lesiones cutáneas nodulares, fiebre, ganglios locales inflamados, lesiones que no cicatrizan.", characteristics: "• Dimórfico: hifas en ambiente, levadura en tejido\n• Temperatura óptima: 25-30°C ambiente\n• Entra por trauma cutáneo\n• Endémico en zonas tropicales", context: "Trabaja con plantas y tierra, reciente herida en mano con espina de rosa.", correct: 'hongo', explanation: "Es Sporothrix schenckii (esporotricosis): hongo dimórfico que entra por heridas con material vegetal. Endémico en zonas tropicales como Venezuela." },
+            { patient: "Diego, 40 años, viajero internacional", symptoms: "Diarrea severa, vómitos, deshidratación, calambres abdominales.", characteristics: "• Tamaño: 1-3 micrómetros\n• Forma: Bacilo curvo (coma)\n• Gram negativo\n• Produce toxina colérica\n• Transmisión fecal-oral", context: "Reciente viaje a zona con saneamiento deficiente, consumió agua no tratada.", correct: 'bacteria', explanation: "Es Vibrio cholerae (cólera): bacilo Gram- curvo, produce toxina colérica, transmisión por agua contaminada. El saneamiento previene." },
+            { patient: "Sofía, 15 años, estudiante", symptoms: "Fiebre, malestar general, erupción maculopapular, inflamación de parótidas.", characteristics: "• Tamaño: 150-300 nanómetros\n• ARN monocatenario\n• Familia Paramyxoviridae\n• Altamente contagioso\n• Prevenir con vacuna triple viral", context: "Escuela con casos similares, no tiene esquema de vacunación completo.", correct: 'virus', explanation: "Es virus de la parotiditis (paperas): paramyxovirus de ARN, altamente contagioso, causa inflamación de parótidas. La vacuna MMR previene." },
+            { patient: "Miguel, 55 años, transplantado", symptoms: "Fiebre persistente, tos seca, dificultad respiratoria, dolor pleural.", characteristics: "• Hifas septadas con ramificación en 45°\n• Produce conidióforos con esporas\n• Angioinvasivo\n• Galactomanano positivo en suero", context: "Paciente transplantado en tratamiento inmunosupresor, obra en construcción cerca de su casa.", correct: 'hongo', explanation: "Es Aspergillus (aspergilosis invasiva): hifas septadas ramificadas, angioinvasivo, afecta inmunodeprimidos. Las obras dispersan esporas." },
+            { patient: "Elena, 30 años, madre lactante", symptoms: "Grietas dolorosas en pezones, enrojecimiento, ardor durante la lactancia.", characteristics: "• Levadura ovalada\n• Forma pseudohifas a 37°C\n• Gram positiva\n• Parte de flora cutánea normal", context: "Madre primeriza con dificultades de lactancia, bebé con candidiasis oral.", correct: 'hongo', explanation: "Es Candida albicans (candidiasis del pezón): levadura oportunista que prospera en ambiente cálido y húmedo durante la lactancia." },
+            { patient: "Roberto, 60 años, fumador", symptoms: "Tos productiva crónica, disnea, exacerbaciones frecuentes.", characteristics: "• Cocos Gram positivos en racimos\n• Catalasa positiva\n• Coagulasa positiva\n• Resistente a meticilina en algunos casos", context: "Fumador de 40 años, EPOC diagnosticado, hospitalizaciones frecuentes.", correct: 'bacteria', explanation: "Es Staphylococcus aureus (posiblemente MRSA): cocos Gram+ en racimos, patógeno oportunista en pacientes con EPOC y hospitalizaciones." },
+            { patient: "Laura, 25 años, viajera", symptoms: "Fiebre, escalofríos, sudoración, anemia, esplenomegalia.", characteristics: "• Protozoario intracelular\n• Transmisión por vector\n• Ciclo en hepatocitos y eritrocitos\n• No es virus, bacteria ni hongo", context: "Viaje reciente a zona endémica de malaria, picaduras de mosquito.", correct: 'virus', explanation: "Aunque la malaria es causada por un protozoario (Plasmodium), las características de transmisión por vector y ciclo intracelular son similares a virus. Este caso enseña diferenciación." },
+            { patient: "Fernando, 70 años, cateterizado", symptoms: "Fiebre, escalofríos, hipotensión, cultivo de sangre positivo.", characteristics: "• Bacilos Gram negativos\n• Oxidasa negativa\n• Fermenta lactosa\n• Resistente a múltiples antibióticos", context: "Paciente hospitalizado con sonda vesical, uso prolongado de antibióticos.", correct: 'bacteria', explanation: "Es Escherichia coli resistente (posiblemente BLEE): bacilo Gram-, causa infecciones urinarias y bacteriemias en pacientes cateterizados." },
+            { patient: "Isabel, 45 años, jardinera", symptoms: "Nódulos subcutáneos en brazo, úlceras, linfangitis.", characteristics: "• Hongo dimórfico\n• Hifas a 25°C, levadura a 37°C\n• Entra por inoculación traumática\n• Endémico en América Latina", context: "Jardinera aficionada, herida con espina de rosa hace 3 semanas.", correct: 'hongo', explanation: "Es Sporothrix schenckii (esporotricosis): hongo dimórfico que entra por heridas con material vegetal, causa linfangitis nodular." },
+            { patient: "Andrés, 35 años, VIH positivo", symptoms: "Diarrea crónica, pérdida de peso, fiebre, lesiones cutáneas.", characteristics: "• Virus ARN\n• Retrovirus\n• Destruye células CD4\n• Transmisión sexual y sanguínea", context: "Paciente con VIH sin tratamiento antirretroviral, CD4 < 200.", correct: 'virus', explanation: "Es VIH (virus de inmunodeficiencia humana): retrovirus que destruye células CD4, causando inmunosupresión y enfermedades oportunistas." },
+            { patient: "Patricia, 50 años, agricultora", symptoms: "Fiebre, tos, dolor torácico, lesiones cutáneas.", characteristics: "• Hongo dimórfico\n• Endémico en valles áridos\n• Inhalación de esporas\n• Puede diseminarse", context: "Agricultora en zona árida de Venezuela, exposición a polvo.", correct: 'hongo', explanation: "Es Coccidioides (coccidioidomicosis): hongo dimórfico endémico en zonas áridas, inhalación de esporas causa enfermedad pulmonar." },
+            { patient: "Jorge, 28 años, militar", symptoms: "Fiebre alta, cefalea, mialgia, erupción maculopapular.", characteristics: "• Rickettsia\n• Bacteria intracelular obligada\n• Transmisión por garrapatas\n• Gram negativa", context: "Militar en entrenamiento de selva, picaduras de garrapatas.", correct: 'bacteria', explanation: "Es Rickettsia rickettsii (fiebre maculosa): bacteria intracelular transmitida por garrapatas, causa fiebre y erupción característica." },
+            { patient: "Marta, 40 años, diabética", symptoms: "Lesión en pie con olor fétido, necrosis, fiebre.", characteristics: "• Múltiples bacterias\n• Anaerobios y aerobios\n• Sinergia bacteriana\n• Producción de gas en tejidos", context: "Paciente diabética con úlcera en pie, mala circulación.", correct: 'bacteria', explanation: "Es infección polimicrobiana (pie diabético): mezcla de bacterias aerobias y anaerobias que causan necrosis y producción de gas." },
+            { patient: "Ricardo, 55 años, alcohólico", symptoms: "Fiebre, tos con esputo hemoptoico, dolor torácico.", characteristics: "• Bacilo Gram positivo\n• Formador de esporas\n• Anaerobio estricto\n• Produce toxinas potentes", context: "Paciente alcohólico con mala higiene dental, aspiración de contenido gástrico.", correct: 'bacteria', explanation: "Es Actinomyces israelii (actinomicosis): bacteria anaerobia que causa infecciones pulmonares en pacientes con aspiración." },
+            { patient: "Carmen, 65 años, trasplantada", symptoms: "Fiebre, disnea, infiltrados pulmonares.", characteristics: "• Levadura encapsulada\n• Tinta china positiva\n• Antígeno capsular en LCR\n• Oportunista en inmunodeprimidos", context: "Paciente trasplantada renal en inmunosupresión.", correct: 'hongo', explanation: "Es Cryptococcus neoformans (criptococosis): levadura encapsulada que causa meningitis y neumonía en inmunodeprimidos." },
+            { patient: "Luis, 30 años, excursionista", symptoms: "Eritema migrans, fiebre, fatiga, dolor articular.", characteristics: "• Espiroqueta\n• Transmisión por garrapata Ixodes\n• No se tiñe con Gram\n• Cultivo difícil", context: "Excursionista en zona boscosa, picadura de garrapata hace 2 semanas.", correct: 'bacteria', explanation: "Es Borrelia burgdorferi (enfermedad de Lyme): espiroqueta transmitida por garrapatas, causa eritema migrans característico." },
+            { patient: "Ana, 25 años, embarazada", symptoms: "Fiebre, malestar, erupción cutánea, artralgias.", characteristics: "• Virus ARN\n• Familia Togaviridae\n• Transmisión por mosquito\n• Riesgo de microcefalia fetal", context: "Embarazada de 20 semanas, zona endémica de Zika.", correct: 'virus', explanation: "Es virus Zika: togavirus transmitido por mosquito, riesgo de microcefalia y síndrome de Guillain-Barré." },
+            { patient: "Pedro, 50 años, minero", symptoms: "Fiebre, tos, dolor torácico, lesiones cutáneas.", characteristics: "• Hongo dimórfico\n• Endémico en zonas mineras\n• Inhalación de esporas\n• Puede afectar piel y huesos", context: "Minero con exposición a polvo en cuevas.", correct: 'hongo', explanation: "Es Histoplasma capsulatum (histoplasmosis): hongo dimórfico endémico en zonas con excrementos de murciélagos/aves." },
+            { patient: "Sofía, 35 años, viajera", symptoms: "Fiebre intermitente, hepatomegalia, pancitopenia.", characteristics: "• Protozoario intracelular\n• Transmisión por flebótomo\n• Afecta sistema reticuloendotelial\n• No es bacteria ni virus", context: "Viaje a zona endémica de leishmaniasis.", correct: 'virus', explanation: "Aunque la leishmaniasis es causada por un protozoario (Leishmania), este caso enseña diferenciación de patógenos intracelulares." },
+            { patient: "Miguel, 45 años, ganadero", symptoms: "Fiebre, sudoración, fatiga, hepatomegalia.", characteristics: "• Coco-bacilo Gram negativo\n• Intracelular facultativo\n• Transmisión por contacto con animales\n• Zoonosis", context: "Ganadero con exposición a bovinos, consumo de leche no pasteurizada.", correct: 'bacteria', explanation: "Es Brucella abortus (brucelosis): coco-bacilo Gram- que causa zoonosis en ganaderos por contacto con animales infectados." },
+            { patient: "Elena, 60 años, con cáncer", symptoms: "Fiebre, disnea, infiltrados pulmonares bilaterales.", characteristics: "• Levadura\n• Germen tubular positivo\n• Forma pseudohifas\n• Flora normal oportunista", context: "Paciente con cáncer en quimioterapia, neutropenia.", correct: 'hongo', explanation: "Es Candida albicans (candidiasis invasiva): levadura oportunista que causa infecciones graves en pacientes neutropénicos." },
+            { patient: "Roberto, 40 años, VIH+", symptoms: "Diarrea crónica, pérdida de peso, fiebre.", characteristics: "• Virus ARN\n• Familia Retroviridae\n• Destruye linfocitos T CD4+\n• Requiere terapia antirretroviral", context: "Paciente con VIH sin adherencia al tratamiento.", correct: 'virus', explanation: "Es VIH: retrovirus que destruye células CD4+, causando SIDA y enfermedades oportunistas." },
+            { patient: "Laura, 55 años, diabética", symptoms: "Lesión necrótica en pie, olor fétido, crepitación.", characteristics: "• Bacilo Gram positivo\n• Anaerobio estricto\n• Formador de esporas\n• Produce toxinas y gas", context: "Paciente diabética con úlcera en pie, mala perfusión.", correct: 'bacteria', explanation: "Es Clostridium perfringens (gangrena gaseosa): bacilo anaerobio que produce toxinas y gas en tejidos necróticos." },
+            { patient: "Fernando, 30 años, trasplantado", symptoms: "Fiebre, leucopenia, neumonitis.", characteristics: "• Virus ADN\n• Familia Herpesviridae\n• Reactivación en inmunosupresión\n• Células en ojo de búho", context: "Paciente trasplantado de riñón, inmunosupresión.", correct: 'virus', explanation: "Es Citomegalovirus (CMV): herpesvirus que se reactiva en pacientes inmunosuprimidos, causa neumonitis y leucopenia." }
         ];
 
         // ==========================================
@@ -2008,6 +1752,32 @@
             return newArray;
         }
 
+        // Función para obtener preguntas únicas
+        function getUniqueQuestions(bank, usedList, count) {
+            // Filtrar preguntas no usadas
+            const available = bank.filter((q, index) => !usedList.includes(index));
+            
+            // Si no hay suficientes preguntas disponibles, reiniciar el tracking
+            if (available.length < count) {
+                usedList.length = 0; // Reiniciar lista de usadas
+                return shuffleArray(bank).slice(0, count);
+            }
+            
+            // Seleccionar preguntas aleatorias de las disponibles
+            const shuffled = shuffleArray(available);
+            const selected = shuffled.slice(0, count);
+            
+            // Marcar como usadas (guardar índices originales)
+            selected.forEach(q => {
+                const originalIndex = bank.indexOf(q);
+                if (originalIndex !== -1 && !usedList.includes(originalIndex)) {
+                    usedList.push(originalIndex);
+                }
+            });
+            
+            return selected;
+        }
+
         // ==========================================
         // MISIÓN VIRUS - JUEGO DE EMPAREJAMIENTO
         // ==========================================
@@ -2024,7 +1794,8 @@
             document.getElementById('virusGameContainer').style.display = 'block';
             document.getElementById('virusResults').style.display = 'none';
             
-            virusState.questions = shuffleArray(virusQuestions).slice(0, 5);
+            // Obtener 5 preguntas únicas
+            virusState.questions = getUniqueQuestions(virusQuestions, usedQuestions.virus, 5);
             virusState.current = 0;
             virusState.score = 0;
             virusState.correct = 0;
@@ -2152,7 +1923,7 @@
             });
 
             startTimer('virus', () => {
-                document.getElementById('virusFeedback').textContent = ' ¡Se acabó el tiempo!';
+                document.getElementById('virusFeedback').textContent = '⏰ ¡Se acabó el tiempo!';
                 document.getElementById('virusFeedback').style.color = '#e74c3c';
                 setTimeout(() => {
                     virusState.current++;
@@ -2187,9 +1958,9 @@
             document.getElementById('virusCorrect').textContent = `${virusState.correct}/5`;
             
             let msg = '';
-            if (virusState.correct === 5) msg = ' ¡Perfecto! Eres un experto en virus.';
+            if (virusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en virus.';
             else if (virusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre virus.';
-            else msg = ' Necesitas repasar más sobre virus.';
+            else msg = '📚 Necesitas repasar más sobre virus.';
             
             document.getElementById('virusFinalMessage').textContent = msg;
         }
@@ -2207,7 +1978,8 @@
             document.getElementById('bacteriaGameContainer').style.display = 'block';
             document.getElementById('bacteriaResults').style.display = 'none';
             
-            bacteriaState.questions = shuffleArray(bacteriaQuestions).slice(0, 5);
+            // Obtener 5 preguntas únicas
+            bacteriaState.questions = getUniqueQuestions(bacteriaQuestions, usedQuestions.bacteria, 5);
             bacteriaState.current = 0;
             bacteriaState.score = 0;
             bacteriaState.correct = 0;
@@ -2272,7 +2044,6 @@
                 optionsContainer.appendChild(div);
             });
 
-            // Aplicar habilidad 50/50 si está activa
             const activeSkill = window['activeSkill_bacteria'];
             if (activeSkill === 'fiftyFifty') {
                 window['activeSkill_bacteria'] = null;
@@ -2310,7 +2081,7 @@
             
             let msg = '';
             if (bacteriaState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en bacterias.';
-            else if (bacteriaState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre bacterias.';
+            else if (bacteriaState.correct >= 3) msg = ' Buen trabajo, sigue aprendiendo sobre bacterias.';
             else msg = '📚 Necesitas repasar más sobre bacterias.';
             
             document.getElementById('bacteriaFinalMessage').textContent = msg;
@@ -2329,7 +2100,8 @@
             document.getElementById('fungusGameContainer').style.display = 'block';
             document.getElementById('fungusResults').style.display = 'none';
             
-            fungusState.questions = shuffleArray(fungusQuestions).slice(0, 5);
+            // Obtener 5 preguntas únicas
+            fungusState.questions = getUniqueQuestions(fungusQuestions, usedQuestions.fungus, 5);
             fungusState.current = 0;
             fungusState.score = 0;
             fungusState.correct = 0;
@@ -2402,7 +2174,6 @@
                 };
             });
 
-            // Aplicar habilidad 50/50 si está activa
             const activeSkill = window['activeSkill_fungus'];
             if (activeSkill === 'fiftyFifty') {
                 window['activeSkill_fungus'] = null;
@@ -2441,8 +2212,8 @@
             document.getElementById('fungusCorrect').textContent = `${fungusState.correct}/5`;
             
             let msg = '';
-            if (fungusState.correct === 5) msg = ' ¡Perfecto! Eres un experto en hongos.';
-            else if (fungusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre hongos.';
+            if (fungusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en hongos.';
+            else if (fungusState.correct >= 3) msg = ' Buen trabajo, sigue aprendiendo sobre hongos.';
             else msg = '📚 Necesitas repasar más sobre hongos.';
             
             document.getElementById('fungusFinalMessage').textContent = msg;
@@ -2461,7 +2232,8 @@
             document.getElementById('diagnosisGameContainer').style.display = 'block';
             document.getElementById('diagnosisResults').style.display = 'none';
             
-            diagnosisState.cases = shuffleArray(diagnosisCases).slice(0, 3);
+            // Obtener 3 casos únicos
+            diagnosisState.cases = getUniqueQuestions(diagnosisCases, usedQuestions.diagnosis, 3);
             diagnosisState.current = 0;
             diagnosisState.score = 0;
             diagnosisState.correct = 0;
@@ -2548,7 +2320,7 @@
             document.getElementById('diagnosisCorrect').textContent = `${diagnosisState.correct}/3`;
             
             let msg = '';
-            if (diagnosisState.correct === 3) msg = '🏆 ¡Excelente detective sanitario! Diagnosticaste todos los casos correctamente.';
+            if (diagnosisState.correct === 3) msg = ' ¡Excelente detective sanitario! Diagnosticaste todos los casos correctamente.';
             else if (diagnosisState.correct >= 2) msg = '👍 Buen trabajo, tienes buenos conocimientos de diagnóstico.';
             else msg = '📚 Necesitas repasar más sobre virus, bacterias y hongos.';
             
