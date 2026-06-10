@@ -724,6 +724,16 @@
             font-weight: bold;
         }
 
+        .skill-count {
+            background: #f39c12;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
         .ranking-container {
             background: white;
             border-radius: 15px;
@@ -777,7 +787,7 @@
             color: #2c3e50;
         }
 
-        .active-skills {
+        .in-game-skills {
             background: #fff3cd;
             border: 2px solid #ffc107;
             border-radius: 10px;
@@ -786,19 +796,31 @@
             text-align: center;
         }
 
-        .active-skills h4 {
+        .in-game-skills h4 {
             color: #856404;
             margin-bottom: 10px;
         }
 
-        .skill-badge {
-            display: inline-block;
+        .in-game-skill-btn {
             background: #ffc107;
             color: #856404;
-            padding: 5px 15px;
+            border: none;
+            padding: 8px 15px;
             border-radius: 20px;
             margin: 5px;
+            cursor: pointer;
             font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .in-game-skill-btn:hover:not(:disabled) {
+            background: #ffb300;
+            transform: scale(1.05);
+        }
+
+        .in-game-skill-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         footer {
@@ -809,14 +831,12 @@
             margin-top: 40px;
         }
 
-        /* Responsive para tablets */
         @media (max-width: 1024px) {
             .hero h1 { font-size: 2.5rem; }
             .missions-grid { grid-template-columns: repeat(2, 1fr); }
             .content-section { padding: 30px; }
         }
 
-        /* Responsive para teléfonos */
         @media (max-width: 768px) {
             .navbar { padding: 0.5rem; }
             .nav-menu { gap: 5px; }
@@ -858,8 +878,8 @@
 <body>
     <nav class="navbar">
         <ul class="nav-menu">
-            <li><a href="#" class="nav-link active" data-section="home"> Home</a></li>
-            <li><a href="#" class="nav-link" data-section="virus">🦠 Misión Virus</a></li>
+            <li><a href="#" class="nav-link active" data-section="home">🏠 Home</a></li>
+            <li><a href="#" class="nav-link" data-section="virus"> Misión Virus</a></li>
             <li><a href="#" class="nav-link" data-section="bacteria">🔬 Misión Bacterias</a></li>
             <li><a href="#" class="nav-link" data-section="hongos">🍄 Misión Hongos</a></li>
             <li><a href="#" class="nav-link" data-section="diagnostico">🩺 Zona de Diagnóstico</a></li>
@@ -882,52 +902,49 @@
 
             <div id="gameArea" style="display: none;">
                 <div class="user-info">
-                    <span>👤 <span id="displayUsername"></span></span>
-                    <span> Puntos Globales: <span id="globalPoints">0</span></span>
-                    <button onclick="showSection('home')" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;">Cambiar Usuario</button>
+                    <span> <span id="displayUsername"></span></span>
+                    <span>⭐ Puntos Globales: <span id="globalPoints">0</span></span>
+                    <button onclick="changeUser()" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;">Cambiar Usuario</button>
                 </div>
 
                 <div class="skills-shop">
-                    <h3> Tienda de Habilidades</h3>
-                    <p style="text-align: center; margin-bottom: 20px;">Canjea tus puntos por poderes especiales</p>
+                    <h3>🛒 Tienda de Habilidades</h3>
+                    <p style="text-align: center; margin-bottom: 20px;">Compra habilidades para usar DURANTE el juego</p>
                     <div class="skills-grid">
                         <div class="skill-card" onclick="buySkill('doublePoints')">
                             <h4>⚡ x2 Puntos</h4>
                             <p>Duplica los puntos de la siguiente pregunta</p>
                             <div class="skill-cost">50 pts</div>
+                            <div class="skill-count" id="count-doublePoints">Tienes: 0</div>
                         </div>
                         <div class="skill-card" onclick="buySkill('fiftyFifty')">
-                            <h4> 50/50</h4>
+                            <h4>🎯 50/50</h4>
                             <p>Elimina 2 opciones incorrectas</p>
                             <div class="skill-cost">30 pts</div>
+                            <div class="skill-count" id="count-fiftyFifty">Tienes: 0</div>
                         </div>
                         <div class="skill-card" onclick="buySkill('extraTime')">
                             <h4>⏰ Tiempo Extra</h4>
                             <p>+10 segundos en el timer</p>
                             <div class="skill-cost">20 pts</div>
+                            <div class="skill-count" id="count-extraTime">Tienes: 0</div>
                         </div>
                         <div class="skill-card" onclick="buySkill('hint')">
                             <h4>💡 Pista</h4>
                             <p>Muestra una pista de la respuesta</p>
                             <div class="skill-cost">25 pts</div>
+                            <div class="skill-count" id="count-hint">Tienes: 0</div>
                         </div>
                     </div>
-                </div>
-
-                <div class="active-skills" id="activeSkills" style="display: none;">
-                    <h4>✨ Habilidades Activas</h4>
-                    <div id="activeSkillsList"></div>
                 </div>
 
                 <div class="ranking-container">
                     <h3>🏆 Ranking de Detectives</h3>
                     <ul class="ranking-list" id="rankingList">
-                        <!-- Se genera dinámicamente -->
                     </ul>
                 </div>
 
                 <div class="missions-grid" id="missionsGrid">
-                    <!-- Las tarjetas se generan dinámicamente en orden aleatorio -->
                 </div>
             </div>
         </section>
@@ -949,12 +966,17 @@
                 </div>
 
                 <div id="virusStartScreen" class="start-screen">
-                    <h3>🎮 Juego de Emparejamiento</h3>
+                    <h3> Juego de Emparejamiento</h3>
                     <p>Une cada parte del virus con su función correcta. Tienes 15 segundos para cada pregunta.</p>
                     <button class="btn-start-game" onclick="startVirusGame()">¡Empezar!</button>
                 </div>
 
                 <div id="virusGameContainer" style="display: none;">
+                    <div class="in-game-skills" id="virusSkills">
+                        <h4> Habilidades Disponibles</h4>
+                        <div id="virusSkillButtons"></div>
+                    </div>
+
                     <div class="timer-container">
                         <div class="timer-bar" id="virusTimerBar"></div>
                         <div class="timer-display">⏱️ Tiempo: <span id="virusTimer">15</span>s</div>
@@ -974,7 +996,6 @@
                     <div class="game-container">
                         <h3 id="virusQuestionText">Cargando...</h3>
                         <div class="matching-game" id="virusMatch">
-                            <!-- Se genera dinámicamente -->
                         </div>
                         <p id="virusFeedback" style="margin-top: 20px; font-weight: bold; min-height: 30px;"></p>
                     </div>
@@ -1022,6 +1043,11 @@
                 </div>
 
                 <div id="bacteriaGameContainer" style="display: none;">
+                    <div class="in-game-skills" id="bacteriaSkills">
+                        <h4>⚡ Habilidades Disponibles</h4>
+                        <div id="bacteriaSkillButtons"></div>
+                    </div>
+
                     <div class="timer-container">
                         <div class="timer-bar" id="bacteriaTimerBar"></div>
                         <div class="timer-display">⏱️ Tiempo: <span id="bacteriaTimer">15</span>s</div>
@@ -1041,7 +1067,6 @@
                     <div class="question-box" id="bacteriaQuestionBox">
                         <h3 id="bacteriaQuestionText">Cargando...</h3>
                         <div class="options" id="bacteriaOptionsContainer">
-                            <!-- Se genera dinámicamente -->
                         </div>
                     </div>
                 </div>
@@ -1059,7 +1084,7 @@
                         </div>
                     </div>
                     <p id="bacteriaFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
-                    <button class="btn-retry" onclick="resetBacteriaGame()"> Intentar de Nuevo</button>
+                    <button class="btn-retry" onclick="resetBacteriaGame()">🔄 Intentar de Nuevo</button>
                 </div>
             </div>
         </section>
@@ -1081,15 +1106,20 @@
                 </div>
 
                 <div id="fungusStartScreen" class="start-screen">
-                    <h3>🔍 Detective de Hongos</h3>
+                    <h3> Detective de Hongos</h3>
                     <p>Identifica qué tipo de hongo causa cada problema y en qué condiciones prospera. Tienes 15 segundos por pregunta.</p>
                     <button class="btn-start-game" onclick="startFungusGame()">¡Empezar!</button>
                 </div>
 
                 <div id="fungusGameContainer" style="display: none;">
+                    <div class="in-game-skills" id="fungusSkills">
+                        <h4>⚡ Habilidades Disponibles</h4>
+                        <div id="fungusSkillButtons"></div>
+                    </div>
+
                     <div class="timer-container">
                         <div class="timer-bar" id="fungusTimerBar"></div>
-                        <div class="timer-display">⏱️ Tiempo: <span id="fungusTimer">15</span>s</div>
+                        <div class="timer-display">️ Tiempo: <span id="fungusTimer">15</span>s</div>
                     </div>
 
                     <div class="stats-container">
@@ -1104,7 +1134,6 @@
                     </div>
 
                     <div id="fungusScenarioContainer">
-                        <!-- Se genera dinámicamente -->
                     </div>
                 </div>
 
@@ -1138,6 +1167,11 @@
                 </div>
 
                 <div id="diagnosisGameContainer" style="display: none;">
+                    <div class="in-game-skills" id="diagnosisSkills">
+                        <h4>⚡ Habilidades Disponibles</h4>
+                        <div id="diagnosisSkillButtons"></div>
+                    </div>
+
                     <div class="diagnosis-case">
                         <div class="progress-indicator">
                             <strong>Caso <span id="currentCase">1</span> de <span id="totalCases">3</span></strong>
@@ -1145,10 +1179,10 @@
 
                         <div class="timer-container">
                             <div class="timer-bar" id="diagnosisTimerBar"></div>
-                            <div class="timer-display">️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
+                            <div class="timer-display">⏱️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
                         </div>
                         
-                        <h3> Caso de Estudio Clínico-Ambiental</h3>
+                        <h3>📋 Caso de Estudio Clínico-Ambiental</h3>
                         
                         <div class="case-description" id="caseDescription">
                             Cargando caso...
@@ -1159,7 +1193,7 @@
                         <div class="diagnosis-options">
                             <button class="diagnosis-btn" onclick="checkDiagnosis('virus')">🦠 VIRUS</button>
                             <button class="diagnosis-btn" onclick="checkDiagnosis('bacteria')">🔬 BACTERIA</button>
-                            <button class="diagnosis-btn" onclick="checkDiagnosis('hongo')">🍄 HONGO</button>
+                            <button class="diagnosis-btn" onclick="checkDiagnosis('hongo')"> HONGO</button>
                         </div>
 
                         <div id="diagnosisFeedback" class="feedback">
@@ -1200,11 +1234,11 @@
         // ==========================================
         let currentUser = null;
         let globalPoints = 0;
-        let activeSkills = {
-            doublePoints: false,
-            fiftyFifty: false,
-            extraTime: false,
-            hint: false
+        let inventory = {
+            doublePoints: 0,
+            fiftyFifty: 0,
+            extraTime: 0,
+            hint: 0
         };
 
         function setUsername() {
@@ -1215,11 +1249,19 @@
             }
             
             currentUser = username;
-            localStorage.setItem('currentUser', username);
+            
+            // Registrar usuario en el sistema
+            registerUser(username);
             
             // Cargar puntos existentes o iniciar en 0
             const savedPoints = localStorage.getItem(`points_${username}`);
             globalPoints = savedPoints ? parseInt(savedPoints) : 0;
+            
+            // Cargar inventario
+            const savedInventory = localStorage.getItem(`inventory_${username}`);
+            if (savedInventory) {
+                inventory = JSON.parse(savedInventory);
+            }
             
             document.getElementById('usernameForm').style.display = 'none';
             document.getElementById('gameArea').style.display = 'block';
@@ -1229,21 +1271,36 @@
             renderMissions();
         }
 
+        function registerUser(username) {
+            // Guardar lista de todos los usuarios
+            let users = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            if (!users.includes(username)) {
+                users.push(username);
+                localStorage.setItem('allUsers', JSON.stringify(users));
+            }
+        }
+
+        function changeUser() {
+            currentUser = null;
+            globalPoints = 0;
+            inventory = { doublePoints: 0, fiftyFifty: 0, extraTime: 0, hint: 0 };
+            
+            document.getElementById('usernameForm').style.display = 'block';
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('usernameInput').value = '';
+        }
+
         function updateGlobalPoints() {
             document.getElementById('globalPoints').textContent = globalPoints;
             localStorage.setItem(`points_${currentUser}`, globalPoints);
+            localStorage.setItem(`inventory_${currentUser}`, JSON.stringify(inventory));
             updateRanking();
-            updateSkillCards();
+            updateSkillCounts();
         }
 
         function addPoints(points) {
-            if (activeSkills.doublePoints) {
-                points *= 2;
-                activeSkills.doublePoints = false;
-            }
             globalPoints += points;
             updateGlobalPoints();
-            updateActiveSkillsDisplay();
         }
 
         function buySkill(skillName) {
@@ -1261,87 +1318,89 @@
                 return;
             }
             
-            if (activeSkills[skillName]) {
-                alert('Ya tienes esta habilidad activa');
-                return;
-            }
-            
             globalPoints -= cost;
-            activeSkills[skillName] = true;
+            inventory[skillName]++;
             updateGlobalPoints();
-            updateActiveSkillsDisplay();
             
             const skillNames = {
-                doublePoints: ' x2 Puntos',
-                fiftyFifty: '🎯 50/50',
+                doublePoints: '⚡ x2 Puntos',
+                fiftyFifty: ' 50/50',
                 extraTime: '⏰ Tiempo Extra',
                 hint: '💡 Pista'
             };
             
-            alert(`¡Habilidad "${skillNames[skillName]}" activada! Se usará automáticamente en la siguiente pregunta.`);
+            alert(`¡Habilidad "${skillNames[skillName]}" comprada! Ahora tienes ${inventory[skillName]}. Úsala durante el juego.`);
         }
 
-        function updateActiveSkillsDisplay() {
-            const activeSkillsDiv = document.getElementById('activeSkills');
-            const activeSkillsList = document.getElementById('activeSkillsList');
+        function updateSkillCounts() {
+            document.getElementById('count-doublePoints').textContent = `Tienes: ${inventory.doublePoints}`;
+            document.getElementById('count-fiftyFifty').textContent = `Tienes: ${inventory.fiftyFifty}`;
+            document.getElementById('count-extraTime').textContent = `Tienes: ${inventory.extraTime}`;
+            document.getElementById('count-hint').textContent = `Tienes: ${inventory.hint}`;
+        }
+
+        function useSkill(skillName, section) {
+            if (inventory[skillName] <= 0) {
+                alert('No tienes esta habilidad disponible');
+                return false;
+            }
             
-            const hasActiveSkills = Object.values(activeSkills).some(skill => skill);
+            inventory[skillName]--;
+            updateGlobalPoints();
+            updateInGameSkills(section);
+            return true;
+        }
+
+        function updateInGameSkills(section) {
+            const container = document.getElementById(`${section}SkillButtons`);
+            if (!container) return;
             
-            if (hasActiveSkills) {
-                activeSkillsDiv.style.display = 'block';
+            container.innerHTML = `
+                <button class="in-game-skill-btn" onclick="activateSkill('doublePoints', '${section}')" ${inventory.doublePoints <= 0 ? 'disabled' : ''}>
+                    ⚡ x2 Puntos (${inventory.doublePoints})
+                </button>
+                <button class="in-game-skill-btn" onclick="activateSkill('fiftyFifty', '${section}')" ${inventory.fiftyFifty <= 0 ? 'disabled' : ''}>
+                    🎯 50/50 (${inventory.fiftyFifty})
+                </button>
+                <button class="in-game-skill-btn" onclick="activateSkill('extraTime', '${section}')" ${inventory.extraTime <= 0 ? 'disabled' : ''}>
+                    ⏰ Tiempo Extra (${inventory.extraTime})
+                </button>
+                <button class="in-game-skill-btn" onclick="activateSkill('hint', '${section}')" ${inventory.hint <= 0 ? 'disabled' : ''}>
+                    💡 Pista (${inventory.hint})
+                </button>
+            `;
+        }
+
+        function activateSkill(skillName, section) {
+            if (useSkill(skillName, section)) {
                 const skillNames = {
                     doublePoints: ' x2 Puntos',
                     fiftyFifty: '🎯 50/50',
                     extraTime: '⏰ Tiempo Extra',
                     hint: '💡 Pista'
                 };
+                alert(`${skillNames[skillName]} activada para la siguiente pregunta`);
                 
-                activeSkillsList.innerHTML = Object.keys(activeSkills)
-                    .filter(skill => activeSkills[skill])
-                    .map(skill => `<span class="skill-badge">${skillNames[skill]}</span>`)
-                    .join('');
-            } else {
-                activeSkillsDiv.style.display = 'none';
+                // Marcar habilidad como activa para la próxima pregunta
+                window[`activeSkill_${section}`] = skillName;
             }
-        }
-
-        function updateSkillCards() {
-            const costs = {
-                doublePoints: 50,
-                fiftyFifty: 30,
-                extraTime: 20,
-                hint: 25
-            };
-            
-            document.querySelectorAll('.skill-card').forEach(card => {
-                const skillName = card.onclick.toString().match(/'(\w+)'/)[1];
-                if (globalPoints < costs[skillName] || activeSkills[skillName]) {
-                    card.classList.add('disabled');
-                } else {
-                    card.classList.remove('disabled');
-                }
-            });
         }
 
         function updateRanking() {
             const rankingList = document.getElementById('rankingList');
             
-            // Obtener todos los usuarios y sus puntos
-            const users = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('points_')) {
-                    const username = key.replace('points_', '');
-                    const points = parseInt(localStorage.getItem(key));
-                    users.push({ username, points });
-                }
-            }
+            // Obtener todos los usuarios registrados
+            const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            const users = allUsers.map(username => {
+                const points = parseInt(localStorage.getItem(`points_${username}`) || '0');
+                return { username, points };
+            });
             
             // Ordenar por puntos (descendente)
             users.sort((a, b) => b.points - a.points);
             
-            // Mostrar top 10
-            rankingList.innerHTML = users.slice(0, 10).map((user, index) => `
+            // Mostrar todos los usuarios
+            rankingList.innerHTML = users.map((user, index) => `
                 <li class="ranking-item ${user.username === currentUser ? 'current-user' : ''}">
                     <span class="ranking-position">#${index + 1}</span>
                     <span class="ranking-name">${user.username}</span>
@@ -1377,12 +1436,12 @@
         });
 
         // ==========================================
-        // HOME - TARJETAS ALEATORIAS
+        // HOME - TARJETAS EN ORDEN FIJO
         // ==========================================
         const missionsData = [
             {
                 id: 'virus',
-                icon: '',
+                icon: '🦠',
                 title: 'Misión Virus',
                 description: 'Aprende cómo los virus atacan las células y descubre la importancia de la vacunación',
                 class: 'virus'
@@ -1410,20 +1469,10 @@
             }
         ];
 
-        function shuffleArray(array) {
-            const newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-            }
-            return newArray;
-        }
-
         function renderMissions() {
             const grid = document.getElementById('missionsGrid');
-            const shuffled = shuffleArray(missionsData);
             
-            grid.innerHTML = shuffled.map(mission => `
+            grid.innerHTML = missionsData.map(mission => `
                 <div class="mission-card ${mission.class}" onclick="showSection('${mission.id}')">
                     <div class="mission-icon">${mission.icon}</div>
                     <h3>${mission.title}</h3>
@@ -1439,10 +1488,11 @@
         let timeLeft;
 
         function startTimer(section, callback) {
-            timeLeft = activeSkills.extraTime ? 25 : 15;
-            if (activeSkills.extraTime) {
-                activeSkills.extraTime = false;
-                updateActiveSkillsDisplay();
+            const hasExtraTime = window[`activeSkill_${section}`] === 'extraTime';
+            timeLeft = hasExtraTime ? 25 : 15;
+            
+            if (hasExtraTime) {
+                window[`activeSkill_${section}`] = null;
             }
             
             updateTimerDisplay(section);
@@ -1471,7 +1521,8 @@
             }
             
             if (timerBar) {
-                const percentage = (timeLeft / (activeSkills.extraTime ? 25 : 15)) * 100;
+                const maxTime = window[`activeSkill_${section}`] === 'extraTime' ? 25 : 15;
+                const percentage = (timeLeft / 15) * 100;
                 timerBar.style.width = `${percentage}%`;
             }
         }
@@ -1689,7 +1740,7 @@
         ];
 
         // ==========================================
-        // BANCO DE PREGUNTAS - HONGOS (20 preguntas) - CORREGIDO
+        // BANCO DE PREGUNTAS - HONGOS (20 preguntas)
         // ==========================================
         const fungusQuestions = [
             {
@@ -1701,7 +1752,7 @@
                 explanation: "Los mohos como Penicillium y Aspergillus prosperan en ambientes húmedos (70-90%) y temperaturas de 20-30°C, exactamente las condiciones del pan olvidado."
             },
             {
-                scenario: "👟 Zapatos deportivos usados diariamente sin secar",
+                scenario: " Zapatos deportivos usados diariamente sin secar",
                 description: "Una persona presenta picazón intensa, descamación y mal olor entre los dedos de los pies. Usa zapatos cerrados todo el día.",
                 question: "¿Qué infección fúngica es probable y qué la causa?",
                 options: ["Levadura - exceso de azúcar", "Tiña pedis (pie de atleta) - humedad y oscuridad en zapatos", "Candidiasis oral - exceso de azúcar", "Onicomicosis - solo por edad"],
@@ -1709,7 +1760,7 @@
                 explanation: "El pie de atleta (Tiña pedis) es causado por hongos dermatofitos que prosperan en ambientes húmedos, oscuros y cálidos como el interior de zapatos deportivos."
             },
             {
-                scenario: " Baño compartido con poca ventilación",
+                scenario: "🚿 Baño compartido con poca ventilación",
                 description: "Las paredes del baño presentan manchas negras en las esquinas y juntas de azulejos. Hay condensación constante.",
                 question: "¿Qué tipo de hongo crece aquí y qué factor ambiental lo favorece principalmente?",
                 options: ["Levadura - luz solar", "Trufa - suelo seco", "Moho negro (Stachybotrys) - alta humedad y poca ventilación", "Champignon - refrigeración"],
@@ -1797,7 +1848,7 @@
                 explanation: "Stachybotrys chartarum (moho negro tóxico) crece en materiales orgánicos húmedos y produce micotoxinas dañinas para la salud."
             },
             {
-                scenario: "👶 Bebé con manchas blancas en la boca",
+                scenario: " Bebé con manchas blancas en la boca",
                 description: "Un bebé de 3 meses presenta placas blancas en lengua y mejillas internas que no se quitan fácilmente.",
                 question: "¿Qué infección fúngica es común en bebés?",
                 options: ["Tiña - solo piel", "Candidiasis oral (algodón) - Candida albicans", "Aspergilosis - solo pulmones", "Onicomicosis - solo uñas"],
@@ -1821,7 +1872,7 @@
                 explanation: "Las hifas septadas con pared de quitina son estructuras exclusivas de hongos, diferenciándolos de bacterias que tienen peptidoglicano."
             },
             {
-                scenario: " Setas silvestres en el bosque",
+                scenario: "🍄 Setas silvestres en el bosque",
                 description: "Después de lluvias, aparecen setas en el bosque. Algunas son comestibles, otras mortales.",
                 question: "¿Por qué es peligroso consumir setas silvestres sin conocimiento?",
                 options: ["Todas son venenosas", "Algunas contienen toxinas mortales como amatoxinas", "Ninguna es comestible", "Solo las de colores son malas"],
@@ -1943,10 +1994,19 @@
         // ==========================================
         // VARIABLES GLOBALES DE JUEGO
         // ==========================================
-        let virusState = { questions: [], current: 0, score: 0, correct: 0, timer: null };
-        let bacteriaState = { questions: [], current: 0, score: 0, correct: 0, timer: null };
-        let fungusState = { questions: [], current: 0, score: 0, correct: 0, timer: null };
-        let diagnosisState = { cases: [], current: 0, score: 0, correct: 0, timer: null };
+        let virusState = { questions: [], current: 0, score: 0, correct: 0 };
+        let bacteriaState = { questions: [], current: 0, score: 0, correct: 0 };
+        let fungusState = { questions: [], current: 0, score: 0, correct: 0 };
+        let diagnosisState = { cases: [], current: 0, score: 0, correct: 0 };
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
 
         // ==========================================
         // MISIÓN VIRUS - JUEGO DE EMPAREJAMIENTO
@@ -1969,6 +2029,7 @@
             virusState.score = 0;
             virusState.correct = 0;
             
+            updateInGameSkills('virus');
             loadVirusQuestion();
         }
 
@@ -2013,11 +2074,16 @@
                             if (matchedCount === 3) {
                                 stopTimer();
                                 let points = 5;
+                                const activeSkill = window['activeSkill_virus'];
+                                if (activeSkill === 'doublePoints') {
+                                    points *= 2;
+                                    window['activeSkill_virus'] = null;
+                                }
                                 addPoints(points);
                                 virusState.score += points;
                                 virusState.correct++;
                                 document.getElementById('virusScore').textContent = virusState.score;
-                                document.getElementById('virusFeedback').textContent = '✅ ¡Correcto! +5 puntos';
+                                document.getElementById('virusFeedback').textContent = `✅ ¡Correcto! +${points} puntos`;
                                 document.getElementById('virusFeedback').style.color = '#2ecc71';
                                 setTimeout(() => {
                                     virusState.current++;
@@ -2056,11 +2122,16 @@
                             if (matchedCount === 3) {
                                 stopTimer();
                                 let points = 5;
+                                const activeSkill = window['activeSkill_virus'];
+                                if (activeSkill === 'doublePoints') {
+                                    points *= 2;
+                                    window['activeSkill_virus'] = null;
+                                }
                                 addPoints(points);
                                 virusState.score += points;
                                 virusState.correct++;
                                 document.getElementById('virusScore').textContent = virusState.score;
-                                document.getElementById('virusFeedback').textContent = '✅ ¡Correcto! +5 puntos';
+                                document.getElementById('virusFeedback').textContent = `✅ ¡Correcto! +${points} puntos`;
                                 document.getElementById('virusFeedback').style.color = '#2ecc71';
                                 setTimeout(() => {
                                     virusState.current++;
@@ -2081,7 +2152,7 @@
             });
 
             startTimer('virus', () => {
-                document.getElementById('virusFeedback').textContent = '⏰ ¡Se acabó el tiempo!';
+                document.getElementById('virusFeedback').textContent = ' ¡Se acabó el tiempo!';
                 document.getElementById('virusFeedback').style.color = '#e74c3c';
                 setTimeout(() => {
                     virusState.current++;
@@ -2118,7 +2189,7 @@
             let msg = '';
             if (virusState.correct === 5) msg = ' ¡Perfecto! Eres un experto en virus.';
             else if (virusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre virus.';
-            else msg = '📚 Necesitas repasar más sobre virus.';
+            else msg = ' Necesitas repasar más sobre virus.';
             
             document.getElementById('virusFinalMessage').textContent = msg;
         }
@@ -2141,6 +2212,7 @@
             bacteriaState.score = 0;
             bacteriaState.correct = 0;
             
+            updateInGameSkills('bacteria');
             loadBacteriaQuestion();
         }
 
@@ -2174,6 +2246,11 @@
                     if (opt.isCorrect) {
                         div.classList.add('correct');
                         let points = 5;
+                        const activeSkill = window['activeSkill_bacteria'];
+                        if (activeSkill === 'doublePoints') {
+                            points *= 2;
+                            window['activeSkill_bacteria'] = null;
+                        }
                         addPoints(points);
                         bacteriaState.score += points;
                         bacteriaState.correct++;
@@ -2196,9 +2273,9 @@
             });
 
             // Aplicar habilidad 50/50 si está activa
-            if (activeSkills.fiftyFifty) {
-                activeSkills.fiftyFifty = false;
-                updateActiveSkillsDisplay();
+            const activeSkill = window['activeSkill_bacteria'];
+            if (activeSkill === 'fiftyFifty') {
+                window['activeSkill_bacteria'] = null;
                 
                 const options = document.querySelectorAll('.option');
                 let removed = 0;
@@ -2232,7 +2309,7 @@
             document.getElementById('bacteriaCorrect').textContent = `${bacteriaState.correct}/5`;
             
             let msg = '';
-            if (bacteriaState.correct === 5) msg = ' ¡Perfecto! Eres un experto en bacterias.';
+            if (bacteriaState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en bacterias.';
             else if (bacteriaState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre bacterias.';
             else msg = '📚 Necesitas repasar más sobre bacterias.';
             
@@ -2257,6 +2334,7 @@
             fungusState.score = 0;
             fungusState.correct = 0;
             
+            updateInGameSkills('fungus');
             loadFungusQuestion();
         }
 
@@ -2299,6 +2377,11 @@
                     if (idx === q.correct) {
                         btn.classList.add('correct');
                         let points = 5;
+                        const activeSkill = window['activeSkill_fungus'];
+                        if (activeSkill === 'doublePoints') {
+                            points *= 2;
+                            window['activeSkill_fungus'] = null;
+                        }
                         addPoints(points);
                         fungusState.score += points;
                         fungusState.correct++;
@@ -2320,9 +2403,9 @@
             });
 
             // Aplicar habilidad 50/50 si está activa
-            if (activeSkills.fiftyFifty) {
-                activeSkills.fiftyFifty = false;
-                updateActiveSkillsDisplay();
+            const activeSkill = window['activeSkill_fungus'];
+            if (activeSkill === 'fiftyFifty') {
+                window['activeSkill_fungus'] = null;
                 
                 const buttons = document.querySelectorAll('.fungus-btn');
                 let removed = 0;
@@ -2358,9 +2441,9 @@
             document.getElementById('fungusCorrect').textContent = `${fungusState.correct}/5`;
             
             let msg = '';
-            if (fungusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en hongos.';
+            if (fungusState.correct === 5) msg = ' ¡Perfecto! Eres un experto en hongos.';
             else if (fungusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre hongos.';
-            else msg = ' Necesitas repasar más sobre hongos.';
+            else msg = '📚 Necesitas repasar más sobre hongos.';
             
             document.getElementById('fungusFinalMessage').textContent = msg;
         }
@@ -2383,6 +2466,7 @@
             diagnosisState.score = 0;
             diagnosisState.correct = 0;
             
+            updateInGameSkills('diagnosis');
             loadDiagnosisCase();
         }
 
@@ -2436,12 +2520,17 @@
                 title.textContent = '✅ ¡Correcto!';
                 text.textContent = caseData.explanation;
                 let points = 10;
+                const activeSkill = window['activeSkill_diagnosis'];
+                if (activeSkill === 'doublePoints') {
+                    points *= 2;
+                    window['activeSkill_diagnosis'] = null;
+                }
                 addPoints(points);
                 diagnosisState.score += points;
                 diagnosisState.correct++;
             } else {
                 feedback.className = 'feedback error show';
-                title.textContent = ' Incorrecto';
+                title.textContent = '❌ Incorrecto';
                 text.textContent = `La respuesta correcta es ${caseData.correct.toUpperCase()}. ${caseData.explanation}`;
             }
         }
