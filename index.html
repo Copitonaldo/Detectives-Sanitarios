@@ -92,7 +92,60 @@
 
         .hero p {
             font-size: 1.3rem;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+        }
+
+        .username-form {
+            max-width: 400px;
+            margin: 20px auto;
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .username-form input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .username-form button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .username-form button:hover {
+            transform: scale(1.05);
+            background: #45a049;
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .user-info span {
+            font-size: 1.1rem;
+            font-weight: bold;
         }
 
         .missions-grid {
@@ -110,6 +163,10 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             transition: all 0.3s;
             cursor: pointer;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .mission-card:hover {
@@ -136,6 +193,7 @@
         .mission-card p {
             color: #7f8c8d;
             line-height: 1.6;
+            flex-grow: 1;
         }
 
         .content-section {
@@ -607,6 +665,142 @@
             font-weight: bold;
         }
 
+        .skills-shop {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .skills-shop h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .skill-card:hover:not(.disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .skill-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .skill-card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .skill-card p {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .skill-cost {
+            background: rgba(255,255,255,0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .ranking-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .ranking-container h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .ranking-list {
+            list-style: none;
+        }
+
+        .ranking-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #3498db;
+        }
+
+        .ranking-item.current-user {
+            background: #e3f2fd;
+            border-left-color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .ranking-position {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-right: 15px;
+        }
+
+        .ranking-name {
+            flex-grow: 1;
+        }
+
+        .ranking-points {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .active-skills {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .active-skills h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .skill-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #856404;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-weight: bold;
+        }
+
         footer {
             background: rgba(0,0,0,0.8);
             color: white;
@@ -615,17 +809,56 @@
             margin-top: 40px;
         }
 
+        /* Responsive para tablets */
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 2.5rem; }
+            .missions-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-section { padding: 30px; }
+        }
+
+        /* Responsive para teléfonos */
         @media (max-width: 768px) {
+            .navbar { padding: 0.5rem; }
+            .nav-menu { gap: 5px; }
+            .nav-menu a { padding: 8px 12px; font-size: 0.8rem; }
+            
+            .hero { padding: 40px 15px; }
             .hero h1 { font-size: 2rem; }
-            .nav-menu a { padding: 8px 15px; font-size: 0.8rem; }
+            .hero p { font-size: 1.1rem; }
+            
+            .missions-grid { grid-template-columns: 1fr; gap: 20px; }
+            .mission-card { min-height: 220px; padding: 20px; }
+            
+            .content-section { padding: 20px; }
+            .content-section h2 { font-size: 1.5rem; }
+            
             .matching-game { grid-template-columns: 1fr; }
+            
+            .stats-container { flex-direction: column; gap: 10px; }
+            .stat-box { width: 100%; }
+            
+            .final-stats { flex-direction: column; gap: 15px; }
+            .final-stat { width: 100%; }
+            
+            .fungus-options { grid-template-columns: 1fr; }
+            .diagnosis-options { grid-template-columns: 1fr; }
+            
+            .skills-grid { grid-template-columns: 1fr; }
+            
+            .user-info { flex-direction: column; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 1.8rem; }
+            .nav-menu a { padding: 6px 10px; font-size: 0.75rem; }
+            .mission-icon { font-size: 3rem; }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <ul class="nav-menu">
-            <li><a href="#" class="nav-link active" data-section="home">🏠 Home</a></li>
+            <li><a href="#" class="nav-link active" data-section="home"> Home</a></li>
             <li><a href="#" class="nav-link" data-section="virus">🦠 Misión Virus</a></li>
             <li><a href="#" class="nav-link" data-section="bacteria">🔬 Misión Bacterias</a></li>
             <li><a href="#" class="nav-link" data-section="hongos">🍄 Misión Hongos</a></li>
@@ -639,14 +872,67 @@
             <div class="hero">
                 <h1>🔍 Detectives Sanitarios</h1>
                 <p>Conviértete en detective sanitario para identificar un brote microscópico en la región</p>
+                
+                <div class="username-form" id="usernameForm">
+                    <input type="text" id="usernameInput" placeholder="Ingresa tu nombre para jugar" maxlength="20">
+                    <br>
+                    <button onclick="setUsername()">¡Comenzar Aventura!</button>
+                </div>
             </div>
 
-            <div class="missions-grid" id="missionsGrid">
-                <!-- Las tarjetas se generan dinámicamente en orden aleatorio -->
+            <div id="gameArea" style="display: none;">
+                <div class="user-info">
+                    <span>👤 <span id="displayUsername"></span></span>
+                    <span> Puntos Globales: <span id="globalPoints">0</span></span>
+                    <button onclick="showSection('home')" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer;">Cambiar Usuario</button>
+                </div>
+
+                <div class="skills-shop">
+                    <h3> Tienda de Habilidades</h3>
+                    <p style="text-align: center; margin-bottom: 20px;">Canjea tus puntos por poderes especiales</p>
+                    <div class="skills-grid">
+                        <div class="skill-card" onclick="buySkill('doublePoints')">
+                            <h4>⚡ x2 Puntos</h4>
+                            <p>Duplica los puntos de la siguiente pregunta</p>
+                            <div class="skill-cost">50 pts</div>
+                        </div>
+                        <div class="skill-card" onclick="buySkill('fiftyFifty')">
+                            <h4> 50/50</h4>
+                            <p>Elimina 2 opciones incorrectas</p>
+                            <div class="skill-cost">30 pts</div>
+                        </div>
+                        <div class="skill-card" onclick="buySkill('extraTime')">
+                            <h4>⏰ Tiempo Extra</h4>
+                            <p>+10 segundos en el timer</p>
+                            <div class="skill-cost">20 pts</div>
+                        </div>
+                        <div class="skill-card" onclick="buySkill('hint')">
+                            <h4>💡 Pista</h4>
+                            <p>Muestra una pista de la respuesta</p>
+                            <div class="skill-cost">25 pts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="active-skills" id="activeSkills" style="display: none;">
+                    <h4>✨ Habilidades Activas</h4>
+                    <div id="activeSkillsList"></div>
+                </div>
+
+                <div class="ranking-container">
+                    <h3>🏆 Ranking de Detectives</h3>
+                    <ul class="ranking-list" id="rankingList">
+                        <!-- Se genera dinámicamente -->
+                    </ul>
+                </div>
+
+                <div class="missions-grid" id="missionsGrid">
+                    <!-- Las tarjetas se generan dinámicamente en orden aleatorio -->
+                </div>
             </div>
         </section>
 
-        <!-- 🦠MISIÓN VIRUS -->
+        <!-- MISIÓN VIRUS -->
         <section id="virus" class="section">
             <div class="content-section virus">
                 <h2>🦠 Misión Virus</h2>
@@ -671,7 +957,7 @@
                 <div id="virusGameContainer" style="display: none;">
                     <div class="timer-container">
                         <div class="timer-bar" id="virusTimerBar"></div>
-                        <div class="timer-display">️ Tiempo: <span id="virusTimer">15</span>s</div>
+                        <div class="timer-display">⏱️ Tiempo: <span id="virusTimer">15</span>s</div>
                     </div>
 
                     <div class="stats-container">
@@ -715,7 +1001,7 @@
         <!-- MISIÓN BACTERIAS -->
         <section id="bacteria" class="section">
             <div class="content-section bacteria">
-                <h2> Misión Bacterias</h2>
+                <h2>🔬 Misión Bacterias</h2>
                 
                 <div class="info-box">
                     <h3>Morfología y Utilidad Bacteriana</h3>
@@ -773,7 +1059,7 @@
                         </div>
                     </div>
                     <p id="bacteriaFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
-                    <button class="btn-retry" onclick="resetBacteriaGame()">🔄 Intentar de Nuevo</button>
+                    <button class="btn-retry" onclick="resetBacteriaGame()"> Intentar de Nuevo</button>
                 </div>
             </div>
         </section>
@@ -795,7 +1081,7 @@
                 </div>
 
                 <div id="fungusStartScreen" class="start-screen">
-                    <h3> Detective de Hongos</h3>
+                    <h3>🔍 Detective de Hongos</h3>
                     <p>Identifica qué tipo de hongo causa cada problema y en qué condiciones prospera. Tienes 15 segundos por pregunta.</p>
                     <button class="btn-start-game" onclick="startFungusGame()">¡Empezar!</button>
                 </div>
@@ -846,7 +1132,7 @@
                 <h2>🩺 Zona de Diagnóstico</h2>
 
                 <div id="diagnosisStartScreen" class="start-screen">
-                    <h3>📋 Casos Clínicos Reales</h3>
+                    <h3> Casos Clínicos Reales</h3>
                     <p>Aplica todo lo aprendido para diagnosticar pacientes ficticios. Tienes 15 segundos por caso.</p>
                     <button class="btn-start-game" onclick="startDiagnosisGame()">¡Empezar!</button>
                 </div>
@@ -859,10 +1145,10 @@
 
                         <div class="timer-container">
                             <div class="timer-bar" id="diagnosisTimerBar"></div>
-                            <div class="timer-display">⏱️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
+                            <div class="timer-display">️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
                         </div>
                         
-                        <h3>📋 Caso de Estudio Clínico-Ambiental</h3>
+                        <h3> Caso de Estudio Clínico-Ambiental</h3>
                         
                         <div class="case-description" id="caseDescription">
                             Cargando caso...
@@ -871,7 +1157,7 @@
                         <p style="font-size: 1.2rem; margin: 20px 0;"><strong>¿Cuál es el causante de la infección?</strong></p>
                         
                         <div class="diagnosis-options">
-                            <button class="diagnosis-btn" onclick="checkDiagnosis('virus')"> VIRUS</button>
+                            <button class="diagnosis-btn" onclick="checkDiagnosis('virus')">🦠 VIRUS</button>
                             <button class="diagnosis-btn" onclick="checkDiagnosis('bacteria')">🔬 BACTERIA</button>
                             <button class="diagnosis-btn" onclick="checkDiagnosis('hongo')">🍄 HONGO</button>
                         </div>
@@ -879,7 +1165,7 @@
                         <div id="diagnosisFeedback" class="feedback">
                             <h3 id="feedbackTitle"></h3>
                             <p id="feedbackText"></p>
-                            <button class="btn-next" onclick="nextCase()">️ Siguiente Caso</button>
+                            <button class="btn-next" onclick="nextCase()">➡️ Siguiente Caso</button>
                         </div>
                     </div>
                 </div>
@@ -909,6 +1195,161 @@
     </footer>
 
     <script>
+        // ==========================================
+        // SISTEMA DE USUARIO Y PUNTOS GLOBALES
+        // ==========================================
+        let currentUser = null;
+        let globalPoints = 0;
+        let activeSkills = {
+            doublePoints: false,
+            fiftyFifty: false,
+            extraTime: false,
+            hint: false
+        };
+
+        function setUsername() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (username === '') {
+                alert('Por favor ingresa un nombre para jugar');
+                return;
+            }
+            
+            currentUser = username;
+            localStorage.setItem('currentUser', username);
+            
+            // Cargar puntos existentes o iniciar en 0
+            const savedPoints = localStorage.getItem(`points_${username}`);
+            globalPoints = savedPoints ? parseInt(savedPoints) : 0;
+            
+            document.getElementById('usernameForm').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('displayUsername').textContent = username;
+            updateGlobalPoints();
+            updateRanking();
+            renderMissions();
+        }
+
+        function updateGlobalPoints() {
+            document.getElementById('globalPoints').textContent = globalPoints;
+            localStorage.setItem(`points_${currentUser}`, globalPoints);
+            updateRanking();
+            updateSkillCards();
+        }
+
+        function addPoints(points) {
+            if (activeSkills.doublePoints) {
+                points *= 2;
+                activeSkills.doublePoints = false;
+            }
+            globalPoints += points;
+            updateGlobalPoints();
+            updateActiveSkillsDisplay();
+        }
+
+        function buySkill(skillName) {
+            const costs = {
+                doublePoints: 50,
+                fiftyFifty: 30,
+                extraTime: 20,
+                hint: 25
+            };
+            
+            const cost = costs[skillName];
+            
+            if (globalPoints < cost) {
+                alert(`No tienes suficientes puntos. Necesitas ${cost} puntos.`);
+                return;
+            }
+            
+            if (activeSkills[skillName]) {
+                alert('Ya tienes esta habilidad activa');
+                return;
+            }
+            
+            globalPoints -= cost;
+            activeSkills[skillName] = true;
+            updateGlobalPoints();
+            updateActiveSkillsDisplay();
+            
+            const skillNames = {
+                doublePoints: ' x2 Puntos',
+                fiftyFifty: '🎯 50/50',
+                extraTime: '⏰ Tiempo Extra',
+                hint: '💡 Pista'
+            };
+            
+            alert(`¡Habilidad "${skillNames[skillName]}" activada! Se usará automáticamente en la siguiente pregunta.`);
+        }
+
+        function updateActiveSkillsDisplay() {
+            const activeSkillsDiv = document.getElementById('activeSkills');
+            const activeSkillsList = document.getElementById('activeSkillsList');
+            
+            const hasActiveSkills = Object.values(activeSkills).some(skill => skill);
+            
+            if (hasActiveSkills) {
+                activeSkillsDiv.style.display = 'block';
+                const skillNames = {
+                    doublePoints: ' x2 Puntos',
+                    fiftyFifty: '🎯 50/50',
+                    extraTime: '⏰ Tiempo Extra',
+                    hint: '💡 Pista'
+                };
+                
+                activeSkillsList.innerHTML = Object.keys(activeSkills)
+                    .filter(skill => activeSkills[skill])
+                    .map(skill => `<span class="skill-badge">${skillNames[skill]}</span>`)
+                    .join('');
+            } else {
+                activeSkillsDiv.style.display = 'none';
+            }
+        }
+
+        function updateSkillCards() {
+            const costs = {
+                doublePoints: 50,
+                fiftyFifty: 30,
+                extraTime: 20,
+                hint: 25
+            };
+            
+            document.querySelectorAll('.skill-card').forEach(card => {
+                const skillName = card.onclick.toString().match(/'(\w+)'/)[1];
+                if (globalPoints < costs[skillName] || activeSkills[skillName]) {
+                    card.classList.add('disabled');
+                } else {
+                    card.classList.remove('disabled');
+                }
+            });
+        }
+
+        function updateRanking() {
+            const rankingList = document.getElementById('rankingList');
+            
+            // Obtener todos los usuarios y sus puntos
+            const users = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('points_')) {
+                    const username = key.replace('points_', '');
+                    const points = parseInt(localStorage.getItem(key));
+                    users.push({ username, points });
+                }
+            }
+            
+            // Ordenar por puntos (descendente)
+            users.sort((a, b) => b.points - a.points);
+            
+            // Mostrar top 10
+            rankingList.innerHTML = users.slice(0, 10).map((user, index) => `
+                <li class="ranking-item ${user.username === currentUser ? 'current-user' : ''}">
+                    <span class="ranking-position">#${index + 1}</span>
+                    <span class="ranking-name">${user.username}</span>
+                    <span class="ranking-points">${user.points} pts</span>
+                </li>
+            `).join('');
+        }
+
         // ==========================================
         // NAVEGACIÓN
         // ==========================================
@@ -955,7 +1396,7 @@
             },
             {
                 id: 'hongos',
-                icon: '',
+                icon: '🍄',
                 title: 'Misión Hongos',
                 description: 'Explora cómo los factores ambientales afectan la proliferación de hongos',
                 class: 'fungus'
@@ -991,8 +1432,6 @@
             `).join('');
         }
 
-        renderMissions();
-
         // ==========================================
         // SISTEMA DE TIMER GLOBAL
         // ==========================================
@@ -1000,7 +1439,12 @@
         let timeLeft;
 
         function startTimer(section, callback) {
-            timeLeft = 15;
+            timeLeft = activeSkills.extraTime ? 25 : 15;
+            if (activeSkills.extraTime) {
+                activeSkills.extraTime = false;
+                updateActiveSkillsDisplay();
+            }
+            
             updateTimerDisplay(section);
             
             timerInterval = setInterval(() => {
@@ -1027,7 +1471,7 @@
             }
             
             if (timerBar) {
-                const percentage = (timeLeft / 15) * 100;
+                const percentage = (timeLeft / (activeSkills.extraTime ? 25 : 15)) * 100;
                 timerBar.style.width = `${percentage}%`;
             }
         }
@@ -1245,7 +1689,7 @@
         ];
 
         // ==========================================
-        // BANCO DE PREGUNTAS - HONGOS (20 preguntas)
+        // BANCO DE PREGUNTAS - HONGOS (20 preguntas) - CORREGIDO
         // ==========================================
         const fungusQuestions = [
             {
@@ -1260,150 +1704,152 @@
                 scenario: "👟 Zapatos deportivos usados diariamente sin secar",
                 description: "Una persona presenta picazón intensa, descamación y mal olor entre los dedos de los pies. Usa zapatos cerrados todo el día.",
                 question: "¿Qué infección fúngica es probable y qué la causa?",
-                options: ["Tiña pedis (pie de atleta) - humedad y oscuridad en zapatos", "Candidiasis oral - exceso de azúcar", "Onicomicosis - solo por edad", "Ringworm - solo en mascotas"],
-                correct: 0,
+                options: ["Levadura - exceso de azúcar", "Tiña pedis (pie de atleta) - humedad y oscuridad en zapatos", "Candidiasis oral - exceso de azúcar", "Onicomicosis - solo por edad"],
+                correct: 1,
                 explanation: "El pie de atleta (Tiña pedis) es causado por hongos dermatofitos que prosperan en ambientes húmedos, oscuros y cálidos como el interior de zapatos deportivos."
             },
             {
-                scenario: "🚿 Baño compartido con poca ventilación",
+                scenario: " Baño compartido con poca ventilación",
                 description: "Las paredes del baño presentan manchas negras en las esquinas y juntas de azulejos. Hay condensación constante.",
                 question: "¿Qué tipo de hongo crece aquí y qué factor ambiental lo favorece principalmente?",
-                options: ["Moho negro (Stachybotrys) - alta humedad y poca ventilación", "Levadura - luz solar", "Trufa - suelo seco", "Champignon - refrigeración"],
-                correct: 0,
+                options: ["Levadura - luz solar", "Trufa - suelo seco", "Moho negro (Stachybotrys) - alta humedad y poca ventilación", "Champignon - refrigeración"],
+                correct: 2,
                 explanation: "El moho negro (Stachybotrys chartarum) crece en superficies con humedad constante (>70%) y poca ventilación, común en baños sin extractor."
             },
             {
-                scenario: " Campo de cultivo con lluvia excesiva",
-                question: "Después de semanas de lluvia, los cultivos presentan manchas marrones y polvorientas. ¿Qué hongo afecta plantas y qué lo favorece?",
-                options: ["Royas y mildiu - exceso de humedad foliar", "Levadura de panadería - calor seco", "Penicillium - refrigeración", "Trichoderma - suelo árido"],
-                correct: 0,
+                scenario: "🌾 Campo de cultivo con lluvia excesiva",
+                description: "Después de semanas de lluvia, los cultivos presentan manchas marrones y polvorientas.",
+                question: "¿Qué hongo afecta plantas y qué lo favorece?",
+                options: ["Penicillium - refrigeración", "Trichoderma - suelo árido", "Levadura de panadería - calor seco", "Royas y mildiu - exceso de humedad foliar"],
+                correct: 3,
                 explanation: "Las royas y el mildiu son hongos fitopatógenos que se propagan rápidamente con humedad excesiva en las hojas, causando pérdidas agrícolas."
             },
             {
-                scenario: " Queso azul con vetas características",
+                scenario: "🧀 Queso azul con vetas características",
                 description: "Un queso presenta vetas azul-verdosas internas. Es intencional y comestible.",
                 question: "¿Qué hongo se usa deliberadamente y para qué?",
-                options: ["Penicillium roqueforti - maduración y sabor", "Aspergillus niger - contaminación", "Candida - fermentación alcohólica", "Rhizopus - pan"],
-                correct: 0,
+                options: ["Aspergillus niger - contaminación", "Penicillium roqueforti - maduración y sabor", "Candida - fermentación alcohólica", "Rhizopus - pan"],
+                correct: 1,
                 explanation: "Penicillium roqueforti se usa intencionalmente en quesos como Roquefort y Gorgonzola para dar sabor y textura característica."
             },
             {
                 scenario: "💊 Paciente con sistema inmunológico debilitado",
                 description: "Un paciente en quimioterapia desarrolla fiebre y tos. Los análisis muestran hifas septadas en pulmones.",
                 question: "¿Qué infección fúngica es grave en inmunodeprimidos?",
-                options: ["Aspergilosis - Aspergillus en pulmones", "Pie de atleta - solo en pies", "Tiña capitis - solo en cabello", "Onicomicosis - solo en uñas"],
-                correct: 0,
+                options: ["Candidiasis - solo mucosas", "Aspergilosis - Aspergillus en pulmones", "Pie de atleta - solo en pies", "Tiña capitis - solo en cabello"],
+                correct: 1,
                 explanation: "La aspergilosis es una infección grave causada por Aspergillus que afecta principalmente a personas inmunodeprimidas, pudiendo ser fatal."
             },
             {
                 scenario: "🍞 Masa de pan que duplica su tamaño",
                 description: "Al hacer pan, la masa crece y burbujea después de añadir un ingrediente y esperar.",
                 question: "¿Qué hongo causa la fermentación y qué gas produce?",
-                options: ["Saccharomyces cerevisiae - CO2", "Penicillium - oxígeno", "Aspergillus - nitrógeno", "Candida - metano"],
-                correct: 0,
+                options: ["Penicillium - oxígeno", "Aspergillus - nitrógeno", "Saccharomyces cerevisiae - CO2", "Candida - metano"],
+                correct: 2,
                 explanation: "La levadura Saccharomyces cerevisiae fermenta azúcares produciendo CO2 (que infla la masa) y etanol (que se evapora al hornear)."
             },
             {
-                scenario: " Perro con manchas circulares sin pelo",
+                scenario: "🐕 Perro con manchas circulares sin pelo",
                 description: "Una mascota presenta lesiones circulares con pérdida de pelo en la piel.",
                 question: "¿Qué infección fúngica afecta mascotas y es contagiosa a humanos?",
-                options: ["Dermatofitosis (tiña) - hongos que comen queratina", "Aspergilosis - solo pulmones", "Candidiasis - solo mucosas", "Micetoma - solo tropical"],
-                correct: 0,
+                options: ["Aspergilosis - solo pulmones", "Candidiasis - solo mucosas", "Dermatofitosis (tiña) - hongos que comen queratina", "Micetoma - solo tropical"],
+                correct: 2,
                 explanation: "La dermatofitosis (tiña) es causada por hongos dermatofitos que se alimentan de queratina en piel, pelo y uñas, siendo zoonótica."
             },
             {
                 scenario: "🌡️ Invernadero con 95% de humedad y 35°C",
-                question: "¿Qué sucede con los hongos en estas condiciones extremas?",
-                options: ["Proliferación masiva de mohos y levaduras", "Los hongos mueren todos", "Solo crecen bacterias", "No pasa nada"],
-                correct: 0,
+                description: "Condiciones extremas de humedad y temperatura.",
+                question: "¿Qué sucede con los hongos en estas condiciones?",
+                options: ["Los hongos mueren todos", "Solo crecen bacterias", "No pasa nada", "Proliferación masiva de mohos y levaduras"],
+                correct: 3,
                 explanation: "La combinación de alta humedad (>90%) y temperatura cálida (25-35°C) crea condiciones ideales para proliferación masiva de hongos."
             },
             {
-                scenario: " Uñas amarillas y engrosadas",
+                scenario: "💅 Uñas amarillas y engrosadas",
                 description: "Una persona presenta uñas de los pies amarillas, gruesas y quebradizas después de usar sandalias en gimnasio público.",
                 question: "¿Qué infección fúngica es y cómo se contagió?",
-                options: ["Onicomicosis - contacto con superficies contaminadas", "Tiña corporal - aire", "Candidiasis - alimentos", "Aspergilosis - polvo"],
-                correct: 0,
+                options: ["Tiña corporal - aire", "Candidiasis - alimentos", "Onicomicosis - contacto con superficies contaminadas", "Aspergilosis - polvo"],
+                correct: 2,
                 explanation: "La onicomicosis es infección de uñas por dermatofitos, comúnmente contraída en piscinas, gimnasios y duchas públicas."
             },
             {
                 scenario: "🍺 Fabricación de cerveza artesanal",
                 description: "Se añade un microorganismo al mosto de cebada para producir alcohol.",
                 question: "¿Qué hongo se usa y qué proceso realiza?",
-                options: ["Saccharomyces - fermentación alcohólica", "Penicillium - maduración", "Aspergillus - toxinas", "Rhizopus - putrefacción"],
-                correct: 0,
+                options: ["Penicillium - maduración", "Aspergillus - toxinas", "Rhizopus - putrefacción", "Saccharomyces - fermentación alcohólica"],
+                correct: 3,
                 explanation: "Saccharomyces cerevisiae fermenta los azúcares del mosto produciendo etanol (alcohol) y CO2, proceso esencial en cervecería."
             },
             {
                 scenario: "🏥 Hospital con sistema de aire acondicionado contaminado",
                 description: "Varios pacientes inmunodeprimidos desarrollan infecciones pulmonares similares.",
                 question: "¿Qué hongo oportunista se dispersa por aire acondicionado?",
-                options: ["Aspergillus - esporas en aire", "Candida - solo contacto", "Dermatofitos - solo piel", "Levaduras - solo alimentos"],
-                correct: 0,
+                options: ["Candida - solo contacto", "Aspergillus - esporas en aire", "Dermatofitos - solo piel", "Levaduras - solo alimentos"],
+                correct: 1,
                 explanation: "Aspergillus dispersa esporas por sistemas de ventilación contaminados, causando aspergilosis en pacientes vulnerables."
             },
             {
                 scenario: "🌧️ Casa con inundación reciente",
                 description: "Después de una inundación, las paredes presentan crecimiento negro y olor a moho.",
                 question: "¿Qué hongo peligroso puede crecer y qué riesgo tiene?",
-                options: ["Stachybotrys (moho negro) - produce micotoxinas", "Levadura - inofensiva", "Champignon - comestible", "Liquen - benéfico"],
-                correct: 0,
+                options: ["Levadura - inofensiva", "Champignon - comestible", "Liquen - benéfico", "Stachybotrys (moho negro) - produce micotoxinas"],
+                correct: 3,
                 explanation: "Stachybotrys chartarum (moho negro tóxico) crece en materiales orgánicos húmedos y produce micotoxinas dañinas para la salud."
             },
             {
-                scenario: " Bebé con manchas blancas en la boca",
+                scenario: "👶 Bebé con manchas blancas en la boca",
                 description: "Un bebé de 3 meses presenta placas blancas en lengua y mejillas internas que no se quitan fácilmente.",
                 question: "¿Qué infección fúngica es común en bebés?",
-                options: ["Candidiasis oral (algodón) - Candida albicans", "Tiña - solo piel", "Aspergilosis - solo pulmones", "Onicomicosis - solo uñas"],
-                correct: 0,
+                options: ["Tiña - solo piel", "Candidiasis oral (algodón) - Candida albicans", "Aspergilosis - solo pulmones", "Onicomicosis - solo uñas"],
+                correct: 1,
                 explanation: "La candidiasis oral (algodón) es causada por Candida albicans, común en bebés por su sistema inmunológico inmaduro."
             },
             {
-                scenario: " Granero con granos almacenados húmedos",
+                scenario: "🌽 Granero con granos almacenados húmedos",
                 description: "Granos de maíz almacenados con humedad presentan crecimiento de hongo que produce toxinas.",
                 question: "¿Qué hongo produce aflatoxinas peligrosas?",
-                options: ["Aspergillus flavus - aflatoxinas cancerígenas", "Saccharomyces - fermentación", "Penicillium - antibióticos", "Rhizopus - pan"],
-                correct: 0,
+                options: ["Saccharomyces - fermentación", "Aspergillus flavus - aflatoxinas cancerígenas", "Penicillium - antibióticos", "Rhizopus - pan"],
+                correct: 1,
                 explanation: "Aspergillus flavus produce aflatoxinas, potentes carcinógenos que contaminan granos almacenados en condiciones húmedas."
             },
             {
                 scenario: "🧪 Laboratorio de microbiología",
                 description: "Se observa al microscopio un hongo con hifas septadas y esporas en conidióforos.",
                 question: "¿Qué estructura es exclusiva de hongos y no de bacterias?",
-                options: ["Hifas septadas con quitina", "Pared de peptidoglicano", "Membrana externa", "Flagelos bacterianos"],
-                correct: 0,
+                options: ["Pared de peptidoglicano", "Membrana externa", "Flagelos bacterianos", "Hifas septadas con quitina"],
+                correct: 3,
                 explanation: "Las hifas septadas con pared de quitina son estructuras exclusivas de hongos, diferenciándolos de bacterias que tienen peptidoglicano."
             },
             {
                 scenario: " Setas silvestres en el bosque",
                 description: "Después de lluvias, aparecen setas en el bosque. Algunas son comestibles, otras mortales.",
                 question: "¿Por qué es peligroso consumir setas silvestres sin conocimiento?",
-                options: ["Algunas contienen toxinas mortales como amatoxinas", "Todas son venenosas", "Ninguna es comestible", "Solo las de colores son malas"],
-                correct: 0,
+                options: ["Todas son venenosas", "Algunas contienen toxinas mortales como amatoxinas", "Ninguna es comestible", "Solo las de colores son malas"],
+                correct: 1,
                 explanation: "Muchas setas silvestres contienen toxinas mortales (como amatoxinas en Amanita phalloides) que causan fallo hepático."
             },
             {
                 scenario: "🏋️ Gimnasio con duchas compartidas",
                 description: "Varias personas desarrollan infecciones en la piel después de usar duchas públicas.",
                 question: "¿Qué hongo se transmite en duchas públicas y cómo prevenirlo?",
-                options: ["Dermatofitos - usar sandalias y secar bien", "Levaduras - solo alimentos", "Mohos - solo paredes", "Líquenes - solo árboles"],
-                correct: 0,
+                options: ["Levaduras - solo alimentos", "Mohos - solo paredes", "Líquenes - solo árboles", "Dermatofitos - usar sandalias y secar bien"],
+                correct: 3,
                 explanation: "Los dermatofitos se transmiten en superficies húmedas de duchas públicas. Usar sandalias y secar bien previene infecciones."
             },
             {
                 scenario: "🌡️ Cambio climático y hongos",
                 description: "El calentamiento global está cambiando la distribución de hongos patógenos.",
                 question: "¿Qué efecto tiene el cambio climático en hongos patógenos?",
-                options: ["Expande su rango geográfico a nuevas zonas", "Los elimina todos", "No tiene efecto", "Solo afecta bacterias"],
-                correct: 0,
+                options: ["Los elimina todos", "No tiene efecto", "Solo afecta bacterias", "Expande su rango geográfico a nuevas zonas"],
+                correct: 3,
                 explanation: "El cambio climático permite que hongos patógenos se expandan a zonas previamente demasiado frías, aumentando enfermedades fúngicas."
             },
             {
                 scenario: "💉 Paciente con catéter venoso central",
                 description: "Un paciente hospitalizado con catéter desarrolla fiebre. Cultivos muestran levaduras en sangre.",
                 question: "¿Qué infección fúngica grave puede ocurrir por catéteres?",
-                options: ["Candidemia - Candida en sangre", "Tiña - solo piel", "Aspergilosis - solo aire", "Onicomicosis - solo uñas"],
-                correct: 0,
+                options: ["Tiña - solo piel", "Aspergilosis - solo aire", "Onicomicosis - solo uñas", "Candidemia - Candida en sangre"],
+                correct: 3,
                 explanation: "La candidemia es infección sanguínea por Candida, común en pacientes con catéteres y sistemas inmunológicos comprometidos."
             }
         ];
@@ -1540,7 +1986,6 @@
             const matchContainer = document.getElementById('virusMatch');
             matchContainer.innerHTML = '';
 
-            // Crear pares emparejables
             const pairs = virusMatchPairs.slice(0, 3);
             const leftItems = shuffleArray(pairs.map((p, i) => ({ text: p.term, match: i, side: 'left' })));
             const rightItems = shuffleArray(pairs.map((p, i) => ({ text: p.definition, match: i, side: 'right' })));
@@ -1567,7 +2012,9 @@
                             matchedCount++;
                             if (matchedCount === 3) {
                                 stopTimer();
-                                virusState.score += 5;
+                                let points = 5;
+                                addPoints(points);
+                                virusState.score += points;
                                 virusState.correct++;
                                 document.getElementById('virusScore').textContent = virusState.score;
                                 document.getElementById('virusFeedback').textContent = '✅ ¡Correcto! +5 puntos';
@@ -1608,7 +2055,9 @@
                             matchedCount++;
                             if (matchedCount === 3) {
                                 stopTimer();
-                                virusState.score += 5;
+                                let points = 5;
+                                addPoints(points);
+                                virusState.score += points;
                                 virusState.correct++;
                                 document.getElementById('virusScore').textContent = virusState.score;
                                 document.getElementById('virusFeedback').textContent = '✅ ¡Correcto! +5 puntos';
@@ -1667,7 +2116,7 @@
             document.getElementById('virusCorrect').textContent = `${virusState.correct}/5`;
             
             let msg = '';
-            if (virusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en virus.';
+            if (virusState.correct === 5) msg = ' ¡Perfecto! Eres un experto en virus.';
             else if (virusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre virus.';
             else msg = '📚 Necesitas repasar más sobre virus.';
             
@@ -1708,14 +2157,14 @@
             const optionsContainer = document.getElementById('bacteriaOptionsContainer');
             optionsContainer.innerHTML = '';
 
-            // Mezclar opciones manteniendo track de la correcta
             const optionsWithIndex = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.correct }));
             const shuffledOptions = shuffleArray(optionsWithIndex);
 
-            shuffledOptions.forEach(opt => {
+            shuffledOptions.forEach((opt, idx) => {
                 const div = document.createElement('div');
                 div.className = 'option';
                 div.textContent = opt.text;
+                div.dataset.originalIndex = idx;
                 div.onclick = () => {
                     if (div.classList.contains('disabled')) return;
                     
@@ -1724,7 +2173,9 @@
                     
                     if (opt.isCorrect) {
                         div.classList.add('correct');
-                        bacteriaState.score += 5;
+                        let points = 5;
+                        addPoints(points);
+                        bacteriaState.score += points;
                         bacteriaState.correct++;
                         document.getElementById('bacteriaScore').textContent = bacteriaState.score;
                     } else {
@@ -1743,6 +2194,21 @@
                 };
                 optionsContainer.appendChild(div);
             });
+
+            // Aplicar habilidad 50/50 si está activa
+            if (activeSkills.fiftyFifty) {
+                activeSkills.fiftyFifty = false;
+                updateActiveSkillsDisplay();
+                
+                const options = document.querySelectorAll('.option');
+                let removed = 0;
+                options.forEach(opt => {
+                    if (removed < 2 && !opt.classList.contains('correct')) {
+                        opt.style.visibility = 'hidden';
+                        removed++;
+                    }
+                });
+            }
 
             startTimer('bacteria', () => {
                 document.querySelectorAll('.option').forEach(el => el.classList.add('disabled'));
@@ -1766,9 +2232,9 @@
             document.getElementById('bacteriaCorrect').textContent = `${bacteriaState.correct}/5`;
             
             let msg = '';
-            if (bacteriaState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en bacterias.';
+            if (bacteriaState.correct === 5) msg = ' ¡Perfecto! Eres un experto en bacterias.';
             else if (bacteriaState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre bacterias.';
-            else msg = ' Necesitas repasar más sobre bacterias.';
+            else msg = '📚 Necesitas repasar más sobre bacterias.';
             
             document.getElementById('bacteriaFinalMessage').textContent = msg;
         }
@@ -1832,7 +2298,9 @@
                     
                     if (idx === q.correct) {
                         btn.classList.add('correct');
-                        fungusState.score += 5;
+                        let points = 5;
+                        addPoints(points);
+                        fungusState.score += points;
                         fungusState.correct++;
                         document.getElementById('fungusScore').textContent = fungusState.score;
                         feedback.className = 'feedback success show';
@@ -1851,6 +2319,21 @@
                 };
             });
 
+            // Aplicar habilidad 50/50 si está activa
+            if (activeSkills.fiftyFifty) {
+                activeSkills.fiftyFifty = false;
+                updateActiveSkillsDisplay();
+                
+                const buttons = document.querySelectorAll('.fungus-btn');
+                let removed = 0;
+                buttons.forEach(btn => {
+                    if (removed < 2 && parseInt(btn.dataset.idx) !== q.correct) {
+                        btn.style.visibility = 'hidden';
+                        removed++;
+                    }
+                });
+            }
+
             startTimer('fungus', () => {
                 document.querySelectorAll('.fungus-btn').forEach(b => b.classList.add('disabled'));
                 document.querySelectorAll('.fungus-btn')[q.correct].classList.add('correct');
@@ -1858,7 +2341,7 @@
                 const feedback = document.getElementById('fungusFeedback');
                 feedback.style.display = 'block';
                 feedback.className = 'feedback error show';
-                feedback.innerHTML = `<strong> ¡Se acabó el tiempo!</strong><br>${q.explanation}`;
+                feedback.innerHTML = `<strong>⏰ ¡Se acabó el tiempo!</strong><br>${q.explanation}`;
 
                 setTimeout(() => {
                     fungusState.current++;
@@ -1877,7 +2360,7 @@
             let msg = '';
             if (fungusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en hongos.';
             else if (fungusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre hongos.';
-            else msg = '📚 Necesitas repasar más sobre hongos.';
+            else msg = ' Necesitas repasar más sobre hongos.';
             
             document.getElementById('fungusFinalMessage').textContent = msg;
         }
@@ -1952,11 +2435,13 @@
                 feedback.className = 'feedback success show';
                 title.textContent = '✅ ¡Correcto!';
                 text.textContent = caseData.explanation;
-                diagnosisState.score += 10;
+                let points = 10;
+                addPoints(points);
+                diagnosisState.score += points;
                 diagnosisState.correct++;
             } else {
                 feedback.className = 'feedback error show';
-                title.textContent = '❌ Incorrecto';
+                title.textContent = ' Incorrecto';
                 text.textContent = `La respuesta correcta es ${caseData.correct.toUpperCase()}. ${caseData.explanation}`;
             }
         }
@@ -1985,6 +2470,16 @@
             document.getElementById('diagnosisResults').style.display = 'none';
             document.getElementById('diagnosisStartScreen').style.display = 'block';
         }
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+        window.onload = function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                document.getElementById('usernameInput').value = savedUser;
+            }
+        };
     </script>
 </body>
 </html>
