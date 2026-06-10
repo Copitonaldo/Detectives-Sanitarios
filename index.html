@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detectives Sanitarios - Microbiología Interactiva</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            list-style: none;
+            gap: 10px;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: #2a5298;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background: #4CAF50;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+        }
+
+        .missions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .mission-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .mission-card.virus { border-top: 5px solid #e74c3c; }
+        .mission-card.bacteria { border-top: 5px solid #3498db; }
+        .mission-card.fungus { border-top: 5px solid #9b59b6; }
+        .mission-card.diagnosis { border-top: 5px solid #f39c12; }
+
+        .mission-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .mission-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .mission-card p {
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .content-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .content-section.virus h2 { border-color: #e74c3c; }
+        .content-section.bacteria h2 { border-color: #3498db; }
+        .content-section.fungus h2 { border-color: #9b59b6; }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            margin: 20px 0;
+        }
+
+        .start-screen h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-start-game {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-start-game:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .game-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .timer-container {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background: #f39c12;
+            transition: width 1s linear;
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .matching-game {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .match-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .match-item:hover:not(.correct) {
+            background: #e3f2fd;
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+
+        .match-item.selected {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .match-item.correct {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+            cursor: default;
+        }
+
+        .match-item.wrong {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .question-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .question-box h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            text-align: left;
+        }
+
+        .option:hover:not(.disabled) {
+            background: #e3f2fd;
+            border-color: #3498db;
+        }
+
+        .option.correct {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .option.incorrect {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-box label {
+            display: block;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .stat-box span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .btn-retry {
+            background: #9b59b6;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-retry:hover {
+            background: #8e44ad;
+            transform: scale(1.05);
+        }
+
+        .scenario-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #9b59b6;
+        }
+
+        .scenario-card h3 {
+            color: #9b59b6;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .scenario-image {
+            font-size: 4rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .scenario-description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .fungus-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .fungus-btn {
+            background: white;
+            border: 3px solid #9b59b6;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #9b59b6;
+        }
+
+        .fungus-btn:hover:not(.disabled) {
+            background: #9b59b6;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .fungus-btn.correct {
+            background: #2ecc71;
+            border-color: #27ae60;
+            color: white;
+        }
+
+        .fungus-btn.incorrect {
+            background: #e74c3c;
+            border-color: #c0392b;
+            color: white;
+        }
+
+        .fungus-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .diagnosis-case {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .diagnosis-case h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .case-description {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+
+        .diagnosis-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .diagnosis-btn {
+            background: white;
+            color: #667eea;
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .diagnosis-btn:hover:not(.disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .diagnosis-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .feedback.error {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-next {
+            background: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-next:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .progress-indicator {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .results-container {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            margin: 20px 0;
+        }
+
+        .results-container h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .final-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .final-stat {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+
+        .final-stat label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .final-stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        footer {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .nav-menu a { padding: 8px 15px; font-size: 0.8rem; }
+            .matching-game { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="nav-menu">
+            <li><a href="#" class="nav-link active" data-section="home">🏠 Home</a></li>
+            <li><a href="#" class="nav-link" data-section="virus">🦠 Misión Virus</a></li>
+            <li><a href="#" class="nav-link" data-section="bacteria">🔬 Misión Bacterias</a></li>
+            <li><a href="#" class="nav-link" data-section="hongos">🍄 Misión Hongos</a></li>
+            <li><a href="#" class="nav-link" data-section="diagnostico">🩺 Zona de Diagnóstico</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <!-- HOME -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <h1>🔍 Detectives Sanitarios</h1>
+                <p>Conviértete en detective sanitario para identificar un brote microscópico en la región</p>
+            </div>
+
+            <div class="missions-grid" id="missionsGrid">
+                <!-- Las tarjetas se generan dinámicamente en orden aleatorio -->
+            </div>
+        </section>
+
+        <!-- 🦠MISIÓN VIRUS -->
+        <section id="virus" class="section">
+            <div class="content-section virus">
+                <h2>🦠 Misión Virus</h2>
+                
+                <div class="info-box">
+                    <h3>Estructura y Replicación Viral</h3>
+                    <p>Aprende cómo operan los virus en las células huéspedes y la importancia de la vacunación.</p>
+                    <ul>
+                        <li><strong>¿Qué es un virus?</strong> Agente infeccioso microscópico que solo puede replicarse dentro de las células de otros organismos.</li>
+                        <li><strong>Estructura básica:</strong> Material genético (ADN o ARN) rodeado por una cápside proteica.</li>
+                        <li><strong>Ciclo de replicación:</strong> Adsorción → Penetración → Replicación → Ensamblaje → Liberación.</li>
+                        <li><strong>Importancia de la vacunación:</strong> Entrenamiento del sistema inmunológico para reconocer y combatir virus específicos.</li>
+                    </ul>
+                </div>
+
+                <div id="virusStartScreen" class="start-screen">
+                    <h3>🎮 Juego de Emparejamiento</h3>
+                    <p>Une cada parte del virus con su función correcta. Tienes 15 segundos para cada pregunta.</p>
+                    <button class="btn-start-game" onclick="startVirusGame()">¡Empezar!</button>
+                </div>
+
+                <div id="virusGameContainer" style="display: none;">
+                    <div class="timer-container">
+                        <div class="timer-bar" id="virusTimerBar"></div>
+                        <div class="timer-display">️ Tiempo: <span id="virusTimer">15</span>s</div>
+                    </div>
+
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <label>Pregunta</label>
+                            <span id="virusQuestionNum">1/5</span>
+                        </div>
+                        <div class="stat-box">
+                            <label>Puntos</label>
+                            <span id="virusScore">0</span>
+                        </div>
+                    </div>
+
+                    <div class="game-container">
+                        <h3 id="virusQuestionText">Cargando...</h3>
+                        <div class="matching-game" id="virusMatch">
+                            <!-- Se genera dinámicamente -->
+                        </div>
+                        <p id="virusFeedback" style="margin-top: 20px; font-weight: bold; min-height: 30px;"></p>
+                    </div>
+                </div>
+
+                <div id="virusResults" class="results-container" style="display: none;">
+                    <h2>¡Misión Virus Completada!</h2>
+                    <div class="final-stats">
+                        <div class="final-stat">
+                            <label>Puntuación Final</label>
+                            <div class="final-stat-value" id="virusFinalScore">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <label>Aciertos</label>
+                            <div class="final-stat-value" id="virusCorrect">0/5</div>
+                        </div>
+                    </div>
+                    <p id="virusFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
+                    <button class="btn-retry" onclick="resetVirusGame()">🔄 Intentar de Nuevo</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MISIÓN BACTERIAS -->
+        <section id="bacteria" class="section">
+            <div class="content-section bacteria">
+                <h2> Misión Bacterias</h2>
+                
+                <div class="info-box">
+                    <h3>Morfología y Utilidad Bacteriana</h3>
+                    <p>Clasificación (Gram+ y Gram-), resistencia bacteriana y el peligro de la automedicación con antibióticos.</p>
+                    <ul>
+                        <li><strong>Tinción de Gram:</strong> Método para clasificar bacterias según su pared celular.</li>
+                        <li><strong>Gram positivas:</strong> Pared celular gruesa, se tiñen de morado/violeta.</li>
+                        <li><strong>Gram negativas:</strong> Pared celular delgada con membrana externa, se tiñen de rosa/rojo.</li>
+                        <li><strong>Resistencia bacteriana:</strong> Capacidad de las bacterias para sobrevivir a los antibióticos.</li>
+                        <li><strong>Peligro de automedicación:</strong> Uso incorrecto de antibióticos genera superbacterias resistentes.</li>
+                    </ul>
+                </div>
+
+                <div id="bacteriaStartScreen" class="start-screen">
+                    <h3>⏱️ Trivia Contrarreloj - Médico en Acción</h3>
+                    <p>Eres médico y debes elegir el enfoque correcto para combatir infecciones bacterianas. Tienes 15 segundos por pregunta.</p>
+                    <button class="btn-start-game" onclick="startBacteriaGame()">¡Empezar!</button>
+                </div>
+
+                <div id="bacteriaGameContainer" style="display: none;">
+                    <div class="timer-container">
+                        <div class="timer-bar" id="bacteriaTimerBar"></div>
+                        <div class="timer-display">⏱️ Tiempo: <span id="bacteriaTimer">15</span>s</div>
+                    </div>
+
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <label>Pregunta</label>
+                            <span id="bacteriaQuestionNum">1/5</span>
+                        </div>
+                        <div class="stat-box">
+                            <label>Puntos</label>
+                            <span id="bacteriaScore">0</span>
+                        </div>
+                    </div>
+
+                    <div class="question-box" id="bacteriaQuestionBox">
+                        <h3 id="bacteriaQuestionText">Cargando...</h3>
+                        <div class="options" id="bacteriaOptionsContainer">
+                            <!-- Se genera dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bacteriaResults" class="results-container" style="display: none;">
+                    <h2>¡Misión Bacterias Completada!</h2>
+                    <div class="final-stats">
+                        <div class="final-stat">
+                            <label>Puntuación Final</label>
+                            <div class="final-stat-value" id="bacteriaFinalScore">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <label>Aciertos</label>
+                            <div class="final-stat-value" id="bacteriaCorrect">0/5</div>
+                        </div>
+                    </div>
+                    <p id="bacteriaFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
+                    <button class="btn-retry" onclick="resetBacteriaGame()">🔄 Intentar de Nuevo</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MISIÓN HONGOS -->
+        <section id="hongos" class="section">
+            <div class="content-section fungus">
+                <h2>🍄 Misión Hongos</h2>
+                
+                <div class="info-box">
+                    <h3>Proliferación de Hongos</h3>
+                    <p>Los hongos se reproducen mediante esporas a través de factores ambientales.</p>
+                    <ul>
+                        <li><strong>Humedad:</strong> Los hongos requieren ambientes húmedos para crecer (70-90% humedad relativa).</li>
+                        <li><strong>Temperatura:</strong> La mayoría prospera entre 20-30°C.</li>
+                        <li><strong>Esporas:</strong> Formas de reproducción que se dispersan por el aire, agua o contacto.</li>
+                        <li><strong>Factores de riesgo:</strong> Ventilación deficiente, acumulación de agua, materiales orgánicos.</li>
+                    </ul>
+                </div>
+
+                <div id="fungusStartScreen" class="start-screen">
+                    <h3> Detective de Hongos</h3>
+                    <p>Identifica qué tipo de hongo causa cada problema y en qué condiciones prospera. Tienes 15 segundos por pregunta.</p>
+                    <button class="btn-start-game" onclick="startFungusGame()">¡Empezar!</button>
+                </div>
+
+                <div id="fungusGameContainer" style="display: none;">
+                    <div class="timer-container">
+                        <div class="timer-bar" id="fungusTimerBar"></div>
+                        <div class="timer-display">⏱️ Tiempo: <span id="fungusTimer">15</span>s</div>
+                    </div>
+
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <label>Pregunta</label>
+                            <span id="fungusQuestionNum">1/5</span>
+                        </div>
+                        <div class="stat-box">
+                            <label>Puntos</label>
+                            <span id="fungusScore">0</span>
+                        </div>
+                    </div>
+
+                    <div id="fungusScenarioContainer">
+                        <!-- Se genera dinámicamente -->
+                    </div>
+                </div>
+
+                <div id="fungusResults" class="results-container" style="display: none;">
+                    <h2>¡Misión Hongos Completada!</h2>
+                    <div class="final-stats">
+                        <div class="final-stat">
+                            <label>Puntuación Final</label>
+                            <div class="final-stat-value" id="fungusFinalScore">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <label>Aciertos</label>
+                            <div class="final-stat-value" id="fungusCorrect">0/5</div>
+                        </div>
+                    </div>
+                    <p id="fungusFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
+                    <button class="btn-retry" onclick="resetFungusGame()">🔄 Intentar de Nuevo</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ZONA DE DIAGNÓSTICO -->
+        <section id="diagnostico" class="section">
+            <div class="content-section">
+                <h2>🩺 Zona de Diagnóstico</h2>
+
+                <div id="diagnosisStartScreen" class="start-screen">
+                    <h3>📋 Casos Clínicos Reales</h3>
+                    <p>Aplica todo lo aprendido para diagnosticar pacientes ficticios. Tienes 15 segundos por caso.</p>
+                    <button class="btn-start-game" onclick="startDiagnosisGame()">¡Empezar!</button>
+                </div>
+
+                <div id="diagnosisGameContainer" style="display: none;">
+                    <div class="diagnosis-case">
+                        <div class="progress-indicator">
+                            <strong>Caso <span id="currentCase">1</span> de <span id="totalCases">3</span></strong>
+                        </div>
+
+                        <div class="timer-container">
+                            <div class="timer-bar" id="diagnosisTimerBar"></div>
+                            <div class="timer-display">⏱️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
+                        </div>
+                        
+                        <h3>📋 Caso de Estudio Clínico-Ambiental</h3>
+                        
+                        <div class="case-description" id="caseDescription">
+                            Cargando caso...
+                        </div>
+
+                        <p style="font-size: 1.2rem; margin: 20px 0;"><strong>¿Cuál es el causante de la infección?</strong></p>
+                        
+                        <div class="diagnosis-options">
+                            <button class="diagnosis-btn" onclick="checkDiagnosis('virus')"> VIRUS</button>
+                            <button class="diagnosis-btn" onclick="checkDiagnosis('bacteria')">🔬 BACTERIA</button>
+                            <button class="diagnosis-btn" onclick="checkDiagnosis('hongo')">🍄 HONGO</button>
+                        </div>
+
+                        <div id="diagnosisFeedback" class="feedback">
+                            <h3 id="feedbackTitle"></h3>
+                            <p id="feedbackText"></p>
+                            <button class="btn-next" onclick="nextCase()">️ Siguiente Caso</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="diagnosisResults" class="results-container" style="display: none;">
+                    <h2>¡Zona de Diagnóstico Completada!</h2>
+                    <div class="final-stats">
+                        <div class="final-stat">
+                            <label>Puntuación Final</label>
+                            <div class="final-stat-value" id="diagnosisFinalScore">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <label>Aciertos</label>
+                            <div class="final-stat-value" id="diagnosisCorrect">0/3</div>
+                        </div>
+                    </div>
+                    <p id="diagnosisFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
+                    <button class="btn-retry" onclick="resetDiagnosisGame()">🔄 Intentar de Nuevo</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Módulo IV: Herramientas Tecnológicas para el Entorno Universitario - CAIU I-2026</p>
+        <p>Prof. Engels Arismendi | Detectives Sanitarios - Estado Bolívar</p>
+    </footer>
+
+    <script>
+        // ==========================================
+        // NAVEGACIÓN
+        // ==========================================
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+            
+            window.scrollTo(0, 0);
+        }
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+
+        // ==========================================
+        // HOME - TARJETAS ALEATORIAS
+        // ==========================================
+        const missionsData = [
+            {
+                id: 'virus',
+                icon: '',
+                title: 'Misión Virus',
+                description: 'Aprende cómo los virus atacan las células y descubre la importancia de la vacunación',
+                class: 'virus'
+            },
+            {
+                id: 'bacteria',
+                icon: '🔬',
+                title: 'Misión Bacterias',
+                description: 'Clasificación bacteriana, resistencia a antibióticos y el peligro de la automedicación',
+                class: 'bacteria'
+            },
+            {
+                id: 'hongos',
+                icon: '',
+                title: 'Misión Hongos',
+                description: 'Explora cómo los factores ambientales afectan la proliferación de hongos',
+                class: 'fungus'
+            },
+            {
+                id: 'diagnostico',
+                icon: '🩺',
+                title: 'Zona de Diagnóstico',
+                description: 'Aplica tus conocimientos para resolver casos clínicos reales',
+                class: 'diagnosis'
+            }
+        ];
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function renderMissions() {
+            const grid = document.getElementById('missionsGrid');
+            const shuffled = shuffleArray(missionsData);
+            
+            grid.innerHTML = shuffled.map(mission => `
+                <div class="mission-card ${mission.class}" onclick="showSection('${mission.id}')">
+                    <div class="mission-icon">${mission.icon}</div>
+                    <h3>${mission.title}</h3>
+                    <p>${mission.description}</p>
+                </div>
+            `).join('');
+        }
+
+        renderMissions();
+
+        // ==========================================
+        // SISTEMA DE TIMER GLOBAL
+        // ==========================================
+        let timerInterval;
+        let timeLeft;
+
+        function startTimer(section, callback) {
+            timeLeft = 15;
+            updateTimerDisplay(section);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay(section);
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    callback();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function updateTimerDisplay(section) {
+            const timerElement = document.getElementById(`${section}Timer`);
+            const timerBar = document.getElementById(`${section}TimerBar`);
+            
+            if (timerElement) {
+                timerElement.textContent = timeLeft;
+            }
+            
+            if (timerBar) {
+                const percentage = (timeLeft / 15) * 100;
+                timerBar.style.width = `${percentage}%`;
+            }
+        }
+
+        // ==========================================
+        // BANCO DE PREGUNTAS - VIRUS (20 preguntas)
+        // ==========================================
+        const virusQuestions = [
+            {
+                q: "¿Qué es un virus?",
+                options: ["Un organismo vivo completo", "Un agente infeccioso que necesita huésped", "Una bacteria pequeña", "Un hongo microscópico"],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la estructura básica de un virus?",
+                options: ["Membrana celular y núcleo", "Material genético rodeado de cápside", "Pared celular gruesa", "Hifas y esporas"],
+                correct: 1
+            },
+            {
+                q: "¿Qué tipo de material genético puede tener un virus?",
+                options: ["Solo ADN", "Solo ARN", "ADN o ARN", "Ni ADN ni ARN"],
+                correct: 2
+            },
+            {
+                q: "¿Cuál es el primer paso del ciclo viral?",
+                options: ["Replicación", "Adsorción", "Liberación", "Ensamblaje"],
+                correct: 1
+            },
+            {
+                q: "¿Qué hace la cápside viral?",
+                options: ["Produce energía", "Protege el material genético", "Se reproduce", "Ataca antibióticos"],
+                correct: 1
+            },
+            {
+                q: "¿Por qué los antibióticos no funcionan contra virus?",
+                options: ["Los virus son muy grandes", "Los virus no tienen estructuras que los antibióticos ataquen", "Los virus son resistentes", "Los antibióticos solo funcionan en hongos"],
+                correct: 1
+            },
+            {
+                q: "¿Qué es la vacunación?",
+                options: ["Un tratamiento para virus activos", "Entrenamiento del sistema inmunológico", "Un tipo de antibiótico", "Una cirugía preventiva"],
+                correct: 1
+            },
+            {
+                q: "¿Cuál de estos es un virus?",
+                options: ["E. coli", "Influenza", "Candida", "Streptococcus"],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se replican los virus?",
+                options: ["División celular", "Usando la maquinaria de la célula huésped", "Esporas", "Fragmentación"],
+                correct: 1
+            },
+            {
+                q: "¿Qué tamaño tienen generalmente los virus?",
+                options: ["1-10 milímetros", "20-300 nanómetros", "1-5 centímetros", "100-500 micrómetros"],
+                correct: 1
+            },
+            {
+                q: "¿Qué es un virión?",
+                options: ["Una célula viral", "Partícula viral completa e infecciosa", "Un tipo de bacteria", "Una espora"],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la función de la envoltura viral?",
+                options: ["Producir toxinas", "Ayudar a entrar en la célula huésped", "Almacenar energía", "Reproducirse"],
+                correct: 1
+            },
+            {
+                q: "¿Qué enfermedad causa el VIH?",
+                options: ["Gripe", "SIDA", "Hepatitis", "Dengue"],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se transmite el virus del dengue?",
+                options: ["Aire", "Agua", "Mosquito Aedes aegypti", "Contacto directo"],
+                correct: 2
+            },
+            {
+                q: "¿Qué es un virus bacteriófago?",
+                options: ["Un virus que infecta bacterias", "Una bacteria grande", "Un hongo", "Un parásito"],
+                correct: 0
+            },
+            {
+                q: "¿Cuál es el último paso del ciclo viral?",
+                options: ["Adsorción", "Penetración", "Liberación", "Replicación"],
+                correct: 2
+            },
+            {
+                q: "¿Qué hace el sistema inmunológico contra virus?",
+                options: ["Los ignora", "Produce anticuerpos específicos", "Los come", "Los convierte en bacterias"],
+                correct: 1
+            },
+            {
+                q: "¿Por qué los virus mutan rápidamente?",
+                options: ["Son muy grandes", "Tienen alta tasa de error en replicación", "Comen mucho", "Viven mucho tiempo"],
+                correct: 1
+            },
+            {
+                q: "¿Qué es una pandemia viral?",
+                options: ["Un virus local", "Propagación mundial de un virus", "Un virus que solo afecta animales", "Una vacuna"],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es la mejor prevención contra virus?",
+                options: ["Antibióticos", "Vacunación e higiene", "Cirugía", "Antifúngicos"],
+                correct: 1
+            }
+        ];
+
+        // ==========================================
+        // BANCO DE PREGUNTAS - BACTERIAS (20 preguntas)
+        // ==========================================
+        const bacteriaQuestions = [
+            {
+                q: "¿Qué es una bacteria?",
+                options: ["Un virus grande", "Organismo unicelular procariota", "Un hongo", "Una célula humana"],
+                correct: 1
+            },
+            {
+                q: "¿Qué diferencia a bacterias Gram+ de Gram-?",
+                options: ["El color", "El grosor de la pared celular", "El tamaño", "La forma"],
+                correct: 1
+            },
+            {
+                q: "¿De qué color se tiñen las bacterias Gram positivas?",
+                options: ["Rojo", "Verde", "Morado/violeta", "Azul"],
+                correct: 2
+            },
+            {
+                q: "¿Qué tienen las bacterias Gram negativas adicionalmente?",
+                options: ["Núcleo", "Membrana externa", "Mitocondrias", "Cloroplastos"],
+                correct: 1
+            },
+            {
+                q: "¿Qué es la resistencia bacteriana?",
+                options: ["Bacterias muy grandes", "Capacidad de sobrevivir a antibióticos", "Bacterias que no se mueven", "Bacterias del hielo"],
+                correct: 1
+            },
+            {
+                q: "¿Qué causa la resistencia bacteriana?",
+                options: ["Uso correcto de antibióticos", "Uso incorrecto y excesivo de antibióticos", "Vacunas", "Vitaminas"],
+                correct: 1
+            },
+            {
+                q: "¿Qué descubrió Alexander Fleming?",
+                options: ["La vacuna", "La penicilina", "Los virus", "El microscopio"],
+                correct: 1
+            },
+            {
+                q: "¿Cuál es una forma bacteriana común?",
+                options: ["Cúbica", "Esférica (coco)", "Triangular", "Estrella"],
+                correct: 1
+            },
+            {
+                q: "¿Qué son los bacilos?",
+                options: ["Bacterias esféricas", "Bacterias en forma de bastón", "Bacterias espirales", "Virus"],
+                correct: 1
+            },
+            {
+                q: "¿Dónde se encuentran bacterias benéficas?",
+                options: ["Solo en hospitales", "Intestino y alimentos fermentados", "Solo en el aire", "En ningún lugar"],
+                correct: 1
+            },
+            {
+                q: "¿Qué es una superbacteria?",
+                options: ["Bacteria muy grande", "Bacteria resistente a múltiples antibióticos", "Bacteria que vuela", "Bacteria brillante"],
+                correct: 1
+            },
+            {
+                q: "¿Para qué sirve la pasteurización?",
+                options: ["Añadir bacterias", "Eliminar bacterias dañinas en alimentos", "Congelar", "Secar"],
+                correct: 1
+            },
+            {
+                q: "¿Qué bacteria causa tuberculosis?",
+                options: ["E. coli", "Mycobacterium tuberculosis", "Streptococcus", "Salmonella"],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se reproducen las bacterias?",
+                options: ["Esporas", "Fisión binaria", "Sexualmente", "Por virus"],
+                correct: 1
+            },
+            {
+                q: "¿Qué es un antibiótico de amplio espectro?",
+                options: ["Solo mata un tipo", "Mata muchos tipos de bacterias", "No mata ninguna", "Solo funciona en virus"],
+                correct: 1
+            },
+            {
+                q: "¿Por qué no debes suspender antibióticos antes de tiempo?",
+                options: ["Es caro", "Puede generar resistencia", "Sabe mal", "No tiene razón"],
+                correct: 1
+            },
+            {
+                q: "¿Qué bacteria causa infecciones urinarias comunes?",
+                options: ["E. coli", "Influenza", "Candida", "VIH"],
+                correct: 0
+            },
+            {
+                q: "¿Qué es la flora intestinal?",
+                options: ["Plantas en el intestino", "Comunidad de bacterias benéficas", "Virus digestivos", "Hongos estomacales"],
+                correct: 1
+            },
+            {
+                q: "¿Cómo se transmiten muchas bacterias patógenas?",
+                options: ["Solo por aire", "Agua contaminada, alimentos, contacto", "Solo por sangre", "Solo por insectos"],
+                correct: 1
+            },
+            {
+                q: "¿Qué medida previene infecciones bacterianas?",
+                options: ["Lavado de manos", "Tomar antibióticos preventivos", "Evitar vacunas", "Comer crudo"],
+                correct: 0
+            }
+        ];
+
+        // ==========================================
+        // BANCO DE PREGUNTAS - HONGOS (20 preguntas)
+        // ==========================================
+        const fungusQuestions = [
+            {
+                scenario: "🥖 Pan olvidado en la cocina durante 2 semanas en ambiente húmedo",
+                description: "El pan presenta manchas verdes y negras con textura polvorienta. La cocina tiene 85% de humedad y 25°C.",
+                question: "¿Qué tipo de hongo es más probable que crezca y qué condiciones lo favorecen?",
+                options: ["Moho (Penicillium/Aspergillus) - alta humedad y temperatura moderada", "Levadura - ambiente seco", "Seta comestible - luz solar directa", "Liquen - ambiente marino"],
+                correct: 0,
+                explanation: "Los mohos como Penicillium y Aspergillus prosperan en ambientes húmedos (70-90%) y temperaturas de 20-30°C, exactamente las condiciones del pan olvidado."
+            },
+            {
+                scenario: "👟 Zapatos deportivos usados diariamente sin secar",
+                description: "Una persona presenta picazón intensa, descamación y mal olor entre los dedos de los pies. Usa zapatos cerrados todo el día.",
+                question: "¿Qué infección fúngica es probable y qué la causa?",
+                options: ["Tiña pedis (pie de atleta) - humedad y oscuridad en zapatos", "Candidiasis oral - exceso de azúcar", "Onicomicosis - solo por edad", "Ringworm - solo en mascotas"],
+                correct: 0,
+                explanation: "El pie de atleta (Tiña pedis) es causado por hongos dermatofitos que prosperan en ambientes húmedos, oscuros y cálidos como el interior de zapatos deportivos."
+            },
+            {
+                scenario: "🚿 Baño compartido con poca ventilación",
+                description: "Las paredes del baño presentan manchas negras en las esquinas y juntas de azulejos. Hay condensación constante.",
+                question: "¿Qué tipo de hongo crece aquí y qué factor ambiental lo favorece principalmente?",
+                options: ["Moho negro (Stachybotrys) - alta humedad y poca ventilación", "Levadura - luz solar", "Trufa - suelo seco", "Champignon - refrigeración"],
+                correct: 0,
+                explanation: "El moho negro (Stachybotrys chartarum) crece en superficies con humedad constante (>70%) y poca ventilación, común en baños sin extractor."
+            },
+            {
+                scenario: " Campo de cultivo con lluvia excesiva",
+                question: "Después de semanas de lluvia, los cultivos presentan manchas marrones y polvorientas. ¿Qué hongo afecta plantas y qué lo favorece?",
+                options: ["Royas y mildiu - exceso de humedad foliar", "Levadura de panadería - calor seco", "Penicillium - refrigeración", "Trichoderma - suelo árido"],
+                correct: 0,
+                explanation: "Las royas y el mildiu son hongos fitopatógenos que se propagan rápidamente con humedad excesiva en las hojas, causando pérdidas agrícolas."
+            },
+            {
+                scenario: " Queso azul con vetas características",
+                description: "Un queso presenta vetas azul-verdosas internas. Es intencional y comestible.",
+                question: "¿Qué hongo se usa deliberadamente y para qué?",
+                options: ["Penicillium roqueforti - maduración y sabor", "Aspergillus niger - contaminación", "Candida - fermentación alcohólica", "Rhizopus - pan"],
+                correct: 0,
+                explanation: "Penicillium roqueforti se usa intencionalmente en quesos como Roquefort y Gorgonzola para dar sabor y textura característica."
+            },
+            {
+                scenario: "💊 Paciente con sistema inmunológico debilitado",
+                description: "Un paciente en quimioterapia desarrolla fiebre y tos. Los análisis muestran hifas septadas en pulmones.",
+                question: "¿Qué infección fúngica es grave en inmunodeprimidos?",
+                options: ["Aspergilosis - Aspergillus en pulmones", "Pie de atleta - solo en pies", "Tiña capitis - solo en cabello", "Onicomicosis - solo en uñas"],
+                correct: 0,
+                explanation: "La aspergilosis es una infección grave causada por Aspergillus que afecta principalmente a personas inmunodeprimidas, pudiendo ser fatal."
+            },
+            {
+                scenario: "🍞 Masa de pan que duplica su tamaño",
+                description: "Al hacer pan, la masa crece y burbujea después de añadir un ingrediente y esperar.",
+                question: "¿Qué hongo causa la fermentación y qué gas produce?",
+                options: ["Saccharomyces cerevisiae - CO2", "Penicillium - oxígeno", "Aspergillus - nitrógeno", "Candida - metano"],
+                correct: 0,
+                explanation: "La levadura Saccharomyces cerevisiae fermenta azúcares produciendo CO2 (que infla la masa) y etanol (que se evapora al hornear)."
+            },
+            {
+                scenario: " Perro con manchas circulares sin pelo",
+                description: "Una mascota presenta lesiones circulares con pérdida de pelo en la piel.",
+                question: "¿Qué infección fúngica afecta mascotas y es contagiosa a humanos?",
+                options: ["Dermatofitosis (tiña) - hongos que comen queratina", "Aspergilosis - solo pulmones", "Candidiasis - solo mucosas", "Micetoma - solo tropical"],
+                correct: 0,
+                explanation: "La dermatofitosis (tiña) es causada por hongos dermatofitos que se alimentan de queratina en piel, pelo y uñas, siendo zoonótica."
+            },
+            {
+                scenario: "🌡️ Invernadero con 95% de humedad y 35°C",
+                question: "¿Qué sucede con los hongos en estas condiciones extremas?",
+                options: ["Proliferación masiva de mohos y levaduras", "Los hongos mueren todos", "Solo crecen bacterias", "No pasa nada"],
+                correct: 0,
+                explanation: "La combinación de alta humedad (>90%) y temperatura cálida (25-35°C) crea condiciones ideales para proliferación masiva de hongos."
+            },
+            {
+                scenario: " Uñas amarillas y engrosadas",
+                description: "Una persona presenta uñas de los pies amarillas, gruesas y quebradizas después de usar sandalias en gimnasio público.",
+                question: "¿Qué infección fúngica es y cómo se contagió?",
+                options: ["Onicomicosis - contacto con superficies contaminadas", "Tiña corporal - aire", "Candidiasis - alimentos", "Aspergilosis - polvo"],
+                correct: 0,
+                explanation: "La onicomicosis es infección de uñas por dermatofitos, comúnmente contraída en piscinas, gimnasios y duchas públicas."
+            },
+            {
+                scenario: "🍺 Fabricación de cerveza artesanal",
+                description: "Se añade un microorganismo al mosto de cebada para producir alcohol.",
+                question: "¿Qué hongo se usa y qué proceso realiza?",
+                options: ["Saccharomyces - fermentación alcohólica", "Penicillium - maduración", "Aspergillus - toxinas", "Rhizopus - putrefacción"],
+                correct: 0,
+                explanation: "Saccharomyces cerevisiae fermenta los azúcares del mosto produciendo etanol (alcohol) y CO2, proceso esencial en cervecería."
+            },
+            {
+                scenario: "🏥 Hospital con sistema de aire acondicionado contaminado",
+                description: "Varios pacientes inmunodeprimidos desarrollan infecciones pulmonares similares.",
+                question: "¿Qué hongo oportunista se dispersa por aire acondicionado?",
+                options: ["Aspergillus - esporas en aire", "Candida - solo contacto", "Dermatofitos - solo piel", "Levaduras - solo alimentos"],
+                correct: 0,
+                explanation: "Aspergillus dispersa esporas por sistemas de ventilación contaminados, causando aspergilosis en pacientes vulnerables."
+            },
+            {
+                scenario: "🌧️ Casa con inundación reciente",
+                description: "Después de una inundación, las paredes presentan crecimiento negro y olor a moho.",
+                question: "¿Qué hongo peligroso puede crecer y qué riesgo tiene?",
+                options: ["Stachybotrys (moho negro) - produce micotoxinas", "Levadura - inofensiva", "Champignon - comestible", "Liquen - benéfico"],
+                correct: 0,
+                explanation: "Stachybotrys chartarum (moho negro tóxico) crece en materiales orgánicos húmedos y produce micotoxinas dañinas para la salud."
+            },
+            {
+                scenario: " Bebé con manchas blancas en la boca",
+                description: "Un bebé de 3 meses presenta placas blancas en lengua y mejillas internas que no se quitan fácilmente.",
+                question: "¿Qué infección fúngica es común en bebés?",
+                options: ["Candidiasis oral (algodón) - Candida albicans", "Tiña - solo piel", "Aspergilosis - solo pulmones", "Onicomicosis - solo uñas"],
+                correct: 0,
+                explanation: "La candidiasis oral (algodón) es causada por Candida albicans, común en bebés por su sistema inmunológico inmaduro."
+            },
+            {
+                scenario: " Granero con granos almacenados húmedos",
+                description: "Granos de maíz almacenados con humedad presentan crecimiento de hongo que produce toxinas.",
+                question: "¿Qué hongo produce aflatoxinas peligrosas?",
+                options: ["Aspergillus flavus - aflatoxinas cancerígenas", "Saccharomyces - fermentación", "Penicillium - antibióticos", "Rhizopus - pan"],
+                correct: 0,
+                explanation: "Aspergillus flavus produce aflatoxinas, potentes carcinógenos que contaminan granos almacenados en condiciones húmedas."
+            },
+            {
+                scenario: "🧪 Laboratorio de microbiología",
+                description: "Se observa al microscopio un hongo con hifas septadas y esporas en conidióforos.",
+                question: "¿Qué estructura es exclusiva de hongos y no de bacterias?",
+                options: ["Hifas septadas con quitina", "Pared de peptidoglicano", "Membrana externa", "Flagelos bacterianos"],
+                correct: 0,
+                explanation: "Las hifas septadas con pared de quitina son estructuras exclusivas de hongos, diferenciándolos de bacterias que tienen peptidoglicano."
+            },
+            {
+                scenario: " Setas silvestres en el bosque",
+                description: "Después de lluvias, aparecen setas en el bosque. Algunas son comestibles, otras mortales.",
+                question: "¿Por qué es peligroso consumir setas silvestres sin conocimiento?",
+                options: ["Algunas contienen toxinas mortales como amatoxinas", "Todas son venenosas", "Ninguna es comestible", "Solo las de colores son malas"],
+                correct: 0,
+                explanation: "Muchas setas silvestres contienen toxinas mortales (como amatoxinas en Amanita phalloides) que causan fallo hepático."
+            },
+            {
+                scenario: "🏋️ Gimnasio con duchas compartidas",
+                description: "Varias personas desarrollan infecciones en la piel después de usar duchas públicas.",
+                question: "¿Qué hongo se transmite en duchas públicas y cómo prevenirlo?",
+                options: ["Dermatofitos - usar sandalias y secar bien", "Levaduras - solo alimentos", "Mohos - solo paredes", "Líquenes - solo árboles"],
+                correct: 0,
+                explanation: "Los dermatofitos se transmiten en superficies húmedas de duchas públicas. Usar sandalias y secar bien previene infecciones."
+            },
+            {
+                scenario: "🌡️ Cambio climático y hongos",
+                description: "El calentamiento global está cambiando la distribución de hongos patógenos.",
+                question: "¿Qué efecto tiene el cambio climático en hongos patógenos?",
+                options: ["Expande su rango geográfico a nuevas zonas", "Los elimina todos", "No tiene efecto", "Solo afecta bacterias"],
+                correct: 0,
+                explanation: "El cambio climático permite que hongos patógenos se expandan a zonas previamente demasiado frías, aumentando enfermedades fúngicas."
+            },
+            {
+                scenario: "💉 Paciente con catéter venoso central",
+                description: "Un paciente hospitalizado con catéter desarrolla fiebre. Cultivos muestran levaduras en sangre.",
+                question: "¿Qué infección fúngica grave puede ocurrir por catéteres?",
+                options: ["Candidemia - Candida en sangre", "Tiña - solo piel", "Aspergilosis - solo aire", "Onicomicosis - solo uñas"],
+                correct: 0,
+                explanation: "La candidemia es infección sanguínea por Candida, común en pacientes con catéteres y sistemas inmunológicos comprometidos."
+            }
+        ];
+
+        // ==========================================
+        // BANCO DE CASOS - DIAGNÓSTICO (10 casos)
+        // ==========================================
+        const diagnosisCases = [
+            {
+                patient: "María, 35 años, residente del Estado Bolívar",
+                symptoms: "Fiebre alta (39°C), dolor de cabeza intenso, dolor muscular, erupciones cutáneas, fatiga extrema.",
+                characteristics: "• Tamaño: 150-250 nanómetros\n• Estructura: ARN monocatenario rodeado de cápside icosaédrica\n• Sin pared celular\n• Requiere célula huésped para replicarse\n• Se transmite por mosquito Aedes aegypti",
+                context: "Zona con alta humedad (85%) y temperatura promedio de 28°C, presencia de agua estancada cerca de la vivienda.",
+                correct: 'virus',
+                explanation: "Las características coinciden con un virus del dengue: tamaño nanométrico, ARN con cápside, sin pared celular, transmitido por mosquito. El ambiente favorece al vector Aedes aegypti."
+            },
+            {
+                patient: "Carlos, 45 años, trabajador de construcción",
+                symptoms: "Tos persistente con flema, fiebre moderada (38°C), dolor en el pecho, sudoración nocturna, pérdida de peso.",
+                characteristics: "• Tamaño: 2-4 micrómetros de largo\n• Forma: Bastones (bacilos)\n• Pared celular gruesa con ácido micólico\n• Tinción: Rojo/rosa (ácido-alcohol resistente)\n• Crece lentamente en pulmones",
+                context: "Vive en zona urbana densamente poblada, trabaja en espacios cerrados con poca ventilación.",
+                correct: 'bacteria',
+                explanation: "Es Mycobacterium tuberculosis: bacilo con pared de ácido micólico, ácido-alcohol resistente, afecta pulmones. El hacinamiento favorece transmisión aérea."
+            },
+            {
+                patient: "Ana, 28 años, ama de casa",
+                symptoms: "Picazón intensa en los pies, descamación de la piel, enrojecimiento, mal olor, aparición de ampollas.",
+                characteristics: "• Estructura: Hifas septadas visibles al microscopio\n• Reproducción: Esporas\n• Pared celular de quitina\n• Crece en capas superficiales de la piel\n• Se alimenta de queratina",
+                context: "Usa zapatos cerrados todo el día, vive en zona de alta humedad (88%), comparte toallas en el gimnasio.",
+                correct: 'hongo',
+                explanation: "Es Tiña pedis (pie de atleta): hifas con quitina, se reproduce por esporas, come queratina. Zapatos cerrados y humedad son factores de riesgo."
+            },
+            {
+                patient: "Luis, 8 años, estudiante",
+                symptoms: "Fiebre, dolor de garganta intenso, dificultad para tragar, ganglios inflamados, manchas rojas en el cuerpo.",
+                characteristics: "• Tamaño: 0.5-1 micrómetros\n• Forma: Cocos en cadenas\n• Pared celular gruesa Gram positiva\n• Produce toxinas eritrogénicas\n• Sensible a penicilina",
+                context: "Escuela con brote reciente, contacto cercano con otros niños sintomáticos.",
+                correct: 'bacteria',
+                explanation: "Es Streptococcus pyogenes (faringitis estreptocócica): cocos Gram+ en cadenas, produce toxinas. Muy contagioso en escuelas."
+            },
+            {
+                patient: "Carmen, 65 años, diabética",
+                symptoms: "Placas blancas en boca y lengua, dificultad para comer, ardor bucal.",
+                characteristics: "• Tamaño: 4-6 micrómetros\n• Forma: Levadura ovalada\n• Se reproduce por gemación\n• Forma pseudohifas\n• Parte de flora normal pero oportunista",
+                context: "Paciente diabética con control glucémico deficiente, usa dentadura postiza.",
+                correct: 'hongo',
+                explanation: "Es Candida albicans (candidiasis oral): levadura que forma pseudohifas, oportunista en diabéticos. La glucosa alta favorece su crecimiento."
+            },
+            {
+                patient: "Pedro, 22 años, universitario",
+                symptoms: "Fiebre, fatiga, dolor de cabeza, náuseas, sensibilidad a la luz, rigidez de nuca.",
+                characteristics: "• Tamaño: 100-200 nanómetros\n• Estructura: ARN con envoltura\n• Se transmite por saliva\n• Afecta meninges\n• Prevenir con vacuna",
+                context: "Vive en residencia universitaria compartida, reciente brote en el campus.",
+                correct: 'virus',
+                explanation: "Es virus de la meningitis (posiblemente enterovirus o herpes): ARN con envoltura, se transmite por saliva, afecta meninges. Las vacunas previenen tipos específicos."
+            },
+            {
+                patient: "Rosa, 50 años, agricultora",
+                symptoms: "Lesiones cutáneas nodulares, fiebre, ganglios locales inflamados, lesiones que no cicatrizan.",
+                characteristics: "• Dimórfico: hifas en ambiente, levadura en tejido\n• Temperatura óptima: 25-30°C ambiente\n• Entra por trauma cutáneo\n• Endémico en zonas tropicales",
+                context: "Trabaja con plantas y tierra, reciente herida en mano con espina de rosa.",
+                correct: 'hongo',
+                explanation: "Es Sporothrix schenckii (esporotricosis): hongo dimórfico que entra por heridas con material vegetal. Endémico en zonas tropicales como Venezuela."
+            },
+            {
+                patient: "Diego, 40 años, viajero internacional",
+                symptoms: "Diarrea severa, vómitos, deshidratación, calambres abdominales.",
+                characteristics: "• Tamaño: 1-3 micrómetros\n• Forma: Bacilo curvo (coma)\n• Gram negativo\n• Produce toxina colérica\n• Transmisión fecal-oral",
+                context: "Reciente viaje a zona con saneamiento deficiente, consumió agua no tratada.",
+                correct: 'bacteria',
+                explanation: "Es Vibrio cholerae (cólera): bacilo Gram- curvo, produce toxina colérica, transmisión por agua contaminada. El saneamiento previene."
+            },
+            {
+                patient: "Sofía, 15 años, estudiante",
+                symptoms: "Fiebre, malestar general, erupción maculopapular, inflamación de parótidas.",
+                characteristics: "• Tamaño: 150-300 nanómetros\n• ARN monocatenario\n• Familia Paramyxoviridae\n• Altamente contagioso\n• Prevenir con vacuna triple viral",
+                context: "Escuela con casos similares, no tiene esquema de vacunación completo.",
+                correct: 'virus',
+                explanation: "Es virus de la parotiditis (paperas): paramyxovirus de ARN, altamente contagioso, causa inflamación de parótidas. La vacuna MMR previene."
+            },
+            {
+                patient: "Miguel, 55 años, transplantado",
+                symptoms: "Fiebre persistente, tos seca, dificultad respiratoria, dolor pleural.",
+                characteristics: "• Hifas septadas con ramificación en 45°\n• Produce conidióforos con esporas\n• Angioinvasivo\n• Galactomanano positivo en suero",
+                context: "Paciente transplantado en tratamiento inmunosupresor, obra en construcción cerca de su casa.",
+                correct: 'hongo',
+                explanation: "Es Aspergillus (aspergilosis invasiva): hifas septadas ramificadas, angioinvasivo, afecta inmunodeprimidos. Las obras dispersan esporas."
+            }
+        ];
+
+        // ==========================================
+        // VARIABLES GLOBALES DE JUEGO
+        // ==========================================
+        let virusState = { questions: [], current: 0, score: 0, correct: 0, timer: null };
+        let bacteriaState = { questions: [], current: 0, score: 0, correct: 0, timer: null };
+        let fungusState = { questions: [], current: 0, score: 0, correct: 0, timer: null };
+        let diagnosisState = { cases: [], current: 0, score: 0, correct: 0, timer: null };
+
+        // ==========================================
+        // MISIÓN VIRUS - JUEGO DE EMPAREJAMIENTO
+        // ==========================================
+        const virusMatchPairs = [
+            { term: "Cápside", definition: "Protege el material genético" },
+            { term: "Material Genético", definition: "Contiene información para replicarse" },
+            { term: "Envoltura Viral", definition: "Ayuda a entrar en la célula huésped" },
+            { term: "Adsorción", definition: "Virus se une a la célula" },
+            { term: "Liberación", definition: "Nuevos virus salen de la célula" }
+        ];
+
+        function startVirusGame() {
+            document.getElementById('virusStartScreen').style.display = 'none';
+            document.getElementById('virusGameContainer').style.display = 'block';
+            document.getElementById('virusResults').style.display = 'none';
+            
+            virusState.questions = shuffleArray(virusQuestions).slice(0, 5);
+            virusState.current = 0;
+            virusState.score = 0;
+            virusState.correct = 0;
+            
+            loadVirusQuestion();
+        }
+
+        function loadVirusQuestion() {
+            if (virusState.current >= 5) {
+                showVirusResults();
+                return;
+            }
+
+            const q = virusState.questions[virusState.current];
+            document.getElementById('virusQuestionNum').textContent = `${virusState.current + 1}/5`;
+            document.getElementById('virusQuestionText').textContent = q.q;
+            document.getElementById('virusFeedback').textContent = '';
+
+            const matchContainer = document.getElementById('virusMatch');
+            matchContainer.innerHTML = '';
+
+            // Crear pares emparejables
+            const pairs = virusMatchPairs.slice(0, 3);
+            const leftItems = shuffleArray(pairs.map((p, i) => ({ text: p.term, match: i, side: 'left' })));
+            const rightItems = shuffleArray(pairs.map((p, i) => ({ text: p.definition, match: i, side: 'right' })));
+
+            let selectedLeft = null;
+            let selectedRight = null;
+            let matchedCount = 0;
+
+            leftItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'match-item';
+                div.textContent = item.text;
+                div.dataset.match = item.match;
+                div.dataset.side = 'left';
+                div.onclick = () => {
+                    if (div.classList.contains('correct')) return;
+                    
+                    document.querySelectorAll('.match-item[data-side="left"]').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+                    selectedLeft = div;
+                    
+                    if (selectedLeft && selectedRight) {
+                        checkVirusMatch(selectedLeft, selectedRight, () => {
+                            matchedCount++;
+                            if (matchedCount === 3) {
+                                stopTimer();
+                                virusState.score += 5;
+                                virusState.correct++;
+                                document.getElementById('virusScore').textContent = virusState.score;
+                                document.getElementById('virusFeedback').textContent = '✅ ¡Correcto! +5 puntos';
+                                document.getElementById('virusFeedback').style.color = '#2ecc71';
+                                setTimeout(() => {
+                                    virusState.current++;
+                                    loadVirusQuestion();
+                                }, 1500);
+                            }
+                        }, () => {
+                            document.getElementById('virusFeedback').textContent = '❌ Incorrecto, intenta de nuevo';
+                            document.getElementById('virusFeedback').style.color = '#e74c3c';
+                            selectedLeft.classList.remove('selected');
+                            selectedRight.classList.remove('selected');
+                            selectedLeft = null;
+                            selectedRight = null;
+                        });
+                    }
+                };
+                matchContainer.appendChild(div);
+            });
+
+            rightItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'match-item';
+                div.textContent = item.text;
+                div.dataset.match = item.match;
+                div.dataset.side = 'right';
+                div.onclick = () => {
+                    if (div.classList.contains('correct')) return;
+                    
+                    document.querySelectorAll('.match-item[data-side="right"]').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+                    selectedRight = div;
+                    
+                    if (selectedLeft && selectedRight) {
+                        checkVirusMatch(selectedLeft, selectedRight, () => {
+                            matchedCount++;
+                            if (matchedCount === 3) {
+                                stopTimer();
+                                virusState.score += 5;
+                                virusState.correct++;
+                                document.getElementById('virusScore').textContent = virusState.score;
+                                document.getElementById('virusFeedback').textContent = '✅ ¡Correcto! +5 puntos';
+                                document.getElementById('virusFeedback').style.color = '#2ecc71';
+                                setTimeout(() => {
+                                    virusState.current++;
+                                    loadVirusQuestion();
+                                }, 1500);
+                            }
+                        }, () => {
+                            document.getElementById('virusFeedback').textContent = '❌ Incorrecto, intenta de nuevo';
+                            document.getElementById('virusFeedback').style.color = '#e74c3c';
+                            selectedLeft.classList.remove('selected');
+                            selectedRight.classList.remove('selected');
+                            selectedLeft = null;
+                            selectedRight = null;
+                        });
+                    }
+                };
+                matchContainer.appendChild(div);
+            });
+
+            startTimer('virus', () => {
+                document.getElementById('virusFeedback').textContent = '⏰ ¡Se acabó el tiempo!';
+                document.getElementById('virusFeedback').style.color = '#e74c3c';
+                setTimeout(() => {
+                    virusState.current++;
+                    loadVirusQuestion();
+                }, 1500);
+            });
+        }
+
+        function checkVirusMatch(left, right, onSuccess, onFail) {
+            if (left.dataset.match === right.dataset.match) {
+                left.classList.remove('selected');
+                right.classList.remove('selected');
+                left.classList.add('correct');
+                right.classList.add('correct');
+                onSuccess();
+            } else {
+                left.classList.add('wrong');
+                right.classList.add('wrong');
+                setTimeout(() => {
+                    left.classList.remove('wrong');
+                    right.classList.remove('wrong');
+                }, 500);
+                onFail();
+            }
+        }
+
+        function showVirusResults() {
+            stopTimer();
+            document.getElementById('virusGameContainer').style.display = 'none';
+            document.getElementById('virusResults').style.display = 'block';
+            document.getElementById('virusFinalScore').textContent = virusState.score;
+            document.getElementById('virusCorrect').textContent = `${virusState.correct}/5`;
+            
+            let msg = '';
+            if (virusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en virus.';
+            else if (virusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre virus.';
+            else msg = '📚 Necesitas repasar más sobre virus.';
+            
+            document.getElementById('virusFinalMessage').textContent = msg;
+        }
+
+        function resetVirusGame() {
+            document.getElementById('virusResults').style.display = 'none';
+            document.getElementById('virusStartScreen').style.display = 'block';
+        }
+
+        // ==========================================
+        // MISIÓN BACTERIAS - TRIVIA
+        // ==========================================
+        function startBacteriaGame() {
+            document.getElementById('bacteriaStartScreen').style.display = 'none';
+            document.getElementById('bacteriaGameContainer').style.display = 'block';
+            document.getElementById('bacteriaResults').style.display = 'none';
+            
+            bacteriaState.questions = shuffleArray(bacteriaQuestions).slice(0, 5);
+            bacteriaState.current = 0;
+            bacteriaState.score = 0;
+            bacteriaState.correct = 0;
+            
+            loadBacteriaQuestion();
+        }
+
+        function loadBacteriaQuestion() {
+            if (bacteriaState.current >= 5) {
+                showBacteriaResults();
+                return;
+            }
+
+            const q = bacteriaState.questions[bacteriaState.current];
+            document.getElementById('bacteriaQuestionNum').textContent = `${bacteriaState.current + 1}/5`;
+            document.getElementById('bacteriaQuestionText').textContent = q.q;
+
+            const optionsContainer = document.getElementById('bacteriaOptionsContainer');
+            optionsContainer.innerHTML = '';
+
+            // Mezclar opciones manteniendo track de la correcta
+            const optionsWithIndex = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.correct }));
+            const shuffledOptions = shuffleArray(optionsWithIndex);
+
+            shuffledOptions.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.textContent = opt.text;
+                div.onclick = () => {
+                    if (div.classList.contains('disabled')) return;
+                    
+                    stopTimer();
+                    document.querySelectorAll('.option').forEach(el => el.classList.add('disabled'));
+                    
+                    if (opt.isCorrect) {
+                        div.classList.add('correct');
+                        bacteriaState.score += 5;
+                        bacteriaState.correct++;
+                        document.getElementById('bacteriaScore').textContent = bacteriaState.score;
+                    } else {
+                        div.classList.add('incorrect');
+                        document.querySelectorAll('.option').forEach(el => {
+                            if (el.textContent === q.options[q.correct]) {
+                                el.classList.add('correct');
+                            }
+                        });
+                    }
+
+                    setTimeout(() => {
+                        bacteriaState.current++;
+                        loadBacteriaQuestion();
+                    }, 2000);
+                };
+                optionsContainer.appendChild(div);
+            });
+
+            startTimer('bacteria', () => {
+                document.querySelectorAll('.option').forEach(el => el.classList.add('disabled'));
+                document.querySelectorAll('.option').forEach(el => {
+                    if (el.textContent === q.options[q.correct]) {
+                        el.classList.add('correct');
+                    }
+                });
+                setTimeout(() => {
+                    bacteriaState.current++;
+                    loadBacteriaQuestion();
+                }, 2000);
+            });
+        }
+
+        function showBacteriaResults() {
+            stopTimer();
+            document.getElementById('bacteriaGameContainer').style.display = 'none';
+            document.getElementById('bacteriaResults').style.display = 'block';
+            document.getElementById('bacteriaFinalScore').textContent = bacteriaState.score;
+            document.getElementById('bacteriaCorrect').textContent = `${bacteriaState.correct}/5`;
+            
+            let msg = '';
+            if (bacteriaState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en bacterias.';
+            else if (bacteriaState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre bacterias.';
+            else msg = ' Necesitas repasar más sobre bacterias.';
+            
+            document.getElementById('bacteriaFinalMessage').textContent = msg;
+        }
+
+        function resetBacteriaGame() {
+            document.getElementById('bacteriaResults').style.display = 'none';
+            document.getElementById('bacteriaStartScreen').style.display = 'block';
+        }
+
+        // ==========================================
+        // MISIÓN HONGOS - ESCENARIOS
+        // ==========================================
+        function startFungusGame() {
+            document.getElementById('fungusStartScreen').style.display = 'none';
+            document.getElementById('fungusGameContainer').style.display = 'block';
+            document.getElementById('fungusResults').style.display = 'none';
+            
+            fungusState.questions = shuffleArray(fungusQuestions).slice(0, 5);
+            fungusState.current = 0;
+            fungusState.score = 0;
+            fungusState.correct = 0;
+            
+            loadFungusQuestion();
+        }
+
+        function loadFungusQuestion() {
+            if (fungusState.current >= 5) {
+                showFungusResults();
+                return;
+            }
+
+            const q = fungusState.questions[fungusState.current];
+            document.getElementById('fungusQuestionNum').textContent = `${fungusState.current + 1}/5`;
+
+            const container = document.getElementById('fungusScenarioContainer');
+            container.innerHTML = `
+                <div class="scenario-card">
+                    <div class="scenario-image">${q.scenario.split(' ')[0]}</div>
+                    <h3>${q.scenario.substring(q.scenario.indexOf(' ') + 1)}</h3>
+                    <div class="scenario-description">${q.description || ''}</div>
+                    <p style="font-size: 1.1rem; margin: 20px 0; font-weight: bold;">${q.question}</p>
+                    <div class="fungus-options" id="fungusOptions">
+                        ${q.options.map((opt, idx) => `
+                            <button class="fungus-btn" data-idx="${idx}">${opt}</button>
+                        `).join('')}
+                    </div>
+                    <div id="fungusFeedback" style="margin-top: 20px; padding: 15px; border-radius: 10px; display: none;"></div>
+                </div>
+            `;
+
+            document.querySelectorAll('.fungus-btn').forEach(btn => {
+                btn.onclick = () => {
+                    if (btn.classList.contains('disabled')) return;
+                    
+                    stopTimer();
+                    const idx = parseInt(btn.dataset.idx);
+                    document.querySelectorAll('.fungus-btn').forEach(b => b.classList.add('disabled'));
+                    
+                    const feedback = document.getElementById('fungusFeedback');
+                    feedback.style.display = 'block';
+                    
+                    if (idx === q.correct) {
+                        btn.classList.add('correct');
+                        fungusState.score += 5;
+                        fungusState.correct++;
+                        document.getElementById('fungusScore').textContent = fungusState.score;
+                        feedback.className = 'feedback success show';
+                        feedback.innerHTML = `<strong>✅ ¡Correcto!</strong><br>${q.explanation}`;
+                    } else {
+                        btn.classList.add('incorrect');
+                        document.querySelectorAll('.fungus-btn')[q.correct].classList.add('correct');
+                        feedback.className = 'feedback error show';
+                        feedback.innerHTML = `<strong>❌ Incorrecto</strong><br>${q.explanation}`;
+                    }
+
+                    setTimeout(() => {
+                        fungusState.current++;
+                        loadFungusQuestion();
+                    }, 4000);
+                };
+            });
+
+            startTimer('fungus', () => {
+                document.querySelectorAll('.fungus-btn').forEach(b => b.classList.add('disabled'));
+                document.querySelectorAll('.fungus-btn')[q.correct].classList.add('correct');
+                
+                const feedback = document.getElementById('fungusFeedback');
+                feedback.style.display = 'block';
+                feedback.className = 'feedback error show';
+                feedback.innerHTML = `<strong> ¡Se acabó el tiempo!</strong><br>${q.explanation}`;
+
+                setTimeout(() => {
+                    fungusState.current++;
+                    loadFungusQuestion();
+                }, 4000);
+            });
+        }
+
+        function showFungusResults() {
+            stopTimer();
+            document.getElementById('fungusGameContainer').style.display = 'none';
+            document.getElementById('fungusResults').style.display = 'block';
+            document.getElementById('fungusFinalScore').textContent = fungusState.score;
+            document.getElementById('fungusCorrect').textContent = `${fungusState.correct}/5`;
+            
+            let msg = '';
+            if (fungusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en hongos.';
+            else if (fungusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre hongos.';
+            else msg = '📚 Necesitas repasar más sobre hongos.';
+            
+            document.getElementById('fungusFinalMessage').textContent = msg;
+        }
+
+        function resetFungusGame() {
+            document.getElementById('fungusResults').style.display = 'none';
+            document.getElementById('fungusStartScreen').style.display = 'block';
+        }
+
+        // ==========================================
+        // ZONA DE DIAGNÓSTICO
+        // ==========================================
+        function startDiagnosisGame() {
+            document.getElementById('diagnosisStartScreen').style.display = 'none';
+            document.getElementById('diagnosisGameContainer').style.display = 'block';
+            document.getElementById('diagnosisResults').style.display = 'none';
+            
+            diagnosisState.cases = shuffleArray(diagnosisCases).slice(0, 3);
+            diagnosisState.current = 0;
+            diagnosisState.score = 0;
+            diagnosisState.correct = 0;
+            
+            loadDiagnosisCase();
+        }
+
+        function loadDiagnosisCase() {
+            if (diagnosisState.current >= 3) {
+                showDiagnosisResults();
+                return;
+            }
+
+            const caseData = diagnosisState.cases[diagnosisState.current];
+            document.getElementById('currentCase').textContent = diagnosisState.current + 1;
+            document.getElementById('totalCases').textContent = 3;
+            
+            document.getElementById('caseDescription').innerHTML = `
+                <strong>Paciente:</strong> ${caseData.patient}<br><br>
+                <strong>Síntomas:</strong> ${caseData.symptoms}<br><br>
+                <strong>Características del patógeno (observadas al microscopio):</strong><br>
+                ${caseData.characteristics.replace(/\n/g, '<br>')}<br><br>
+                <strong>Contexto ambiental:</strong> ${caseData.context}
+            `;
+            
+            document.getElementById('diagnosisFeedback').classList.remove('show');
+            document.querySelectorAll('.diagnosis-btn').forEach(btn => {
+                btn.classList.remove('disabled');
+            });
+
+            startTimer('diagnosis', () => {
+                document.querySelectorAll('.diagnosis-btn').forEach(btn => btn.classList.add('disabled'));
+                
+                const feedback = document.getElementById('diagnosisFeedback');
+                const title = document.getElementById('feedbackTitle');
+                const text = document.getElementById('feedbackText');
+                
+                feedback.className = 'feedback error show';
+                title.textContent = '⏰ ¡Se acabó el tiempo!';
+                text.textContent = `La respuesta correcta era: ${caseData.correct.toUpperCase()}. ${caseData.explanation}`;
+            });
+        }
+
+        function checkDiagnosis(answer) {
+            stopTimer();
+            const caseData = diagnosisState.cases[diagnosisState.current];
+            const feedback = document.getElementById('diagnosisFeedback');
+            const title = document.getElementById('feedbackTitle');
+            const text = document.getElementById('feedbackText');
+            
+            document.querySelectorAll('.diagnosis-btn').forEach(btn => btn.classList.add('disabled'));
+            
+            if (answer === caseData.correct) {
+                feedback.className = 'feedback success show';
+                title.textContent = '✅ ¡Correcto!';
+                text.textContent = caseData.explanation;
+                diagnosisState.score += 10;
+                diagnosisState.correct++;
+            } else {
+                feedback.className = 'feedback error show';
+                title.textContent = '❌ Incorrecto';
+                text.textContent = `La respuesta correcta es ${caseData.correct.toUpperCase()}. ${caseData.explanation}`;
+            }
+        }
+
+        function nextCase() {
+            diagnosisState.current++;
+            loadDiagnosisCase();
+        }
+
+        function showDiagnosisResults() {
+            stopTimer();
+            document.getElementById('diagnosisGameContainer').style.display = 'none';
+            document.getElementById('diagnosisResults').style.display = 'block';
+            document.getElementById('diagnosisFinalScore').textContent = diagnosisState.score;
+            document.getElementById('diagnosisCorrect').textContent = `${diagnosisState.correct}/3`;
+            
+            let msg = '';
+            if (diagnosisState.correct === 3) msg = '🏆 ¡Excelente detective sanitario! Diagnosticaste todos los casos correctamente.';
+            else if (diagnosisState.correct >= 2) msg = '👍 Buen trabajo, tienes buenos conocimientos de diagnóstico.';
+            else msg = '📚 Necesitas repasar más sobre virus, bacterias y hongos.';
+            
+            document.getElementById('diagnosisFinalMessage').textContent = msg;
+        }
+
+        function resetDiagnosisGame() {
+            document.getElementById('diagnosisResults').style.display = 'none';
+            document.getElementById('diagnosisStartScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
