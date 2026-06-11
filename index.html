@@ -826,7 +826,7 @@
 
         .video-container {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
             max-width: 100%;
@@ -993,9 +993,9 @@
             <div class="content-section">
                 <div class="intro-content">
                     <h2>📚 Clase Introductoria</h2>
-                    <p>Bienvenido a Detectives Sanitarios. Antes de comenzar tu aventura, mira este video introductorio para conocer los conceptos básicos sobre virus, bacterias y hongos.</p>
                     
-                    <div class="video-container">
+                    <!-- Video -->
+                    <div class="video-container" style="margin-bottom: 40px;">
                         <iframe 
                             src="https://www.youtube.com/embed/sjXegsXg7V8" 
                             title="Clase Introductoria - Detectives Sanitarios" 
@@ -1003,6 +1003,99 @@
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
+                    </div>
+
+                    <!-- Bienvenida -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                        <h3 style="font-size: 1.8rem; margin-bottom: 15px;">¡Bienvenidos a Detectives Sanitarios!</h3>
+                        <p style="font-size: 1.2rem; line-height: 1.6;">
+                            El objetivo de esta página es ayudarte a explorar el mundo de los microbios de una forma divertida y diferente. 
+                            Aquí te convertirás en un auténtico detective para aprender a investigar, reconocer y diferenciar fácilmente 
+                            a las bacterias, los virus y los hongos. 
+                            <strong>¡Prepárate para resolver el misterio de lo invisible!</strong>
+                        </p>
+                    </div>
+
+                    <!-- Contenido Principal -->
+                    <div style="background: #f8f9fa; padding: 30px; border-radius: 15px; margin-bottom: 30px;">
+                        <h3 style="color: #9b59b6; font-size: 1.6rem; margin-bottom: 20px; text-align: center;">
+                            ¡Bienvenidos a su primera misión, Detectives!
+                        </h3>
+                        
+                        <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 20px;">
+                            Antes de salir al campo a investigar, un buen detective necesita conocer a sus "sospechosos". 
+                            En el mundo de la microbiología (la ciencia que estudia lo que no podemos ver a simple vista), 
+                            hay tres personajes principales que suelen causar confusión.
+                        </p>
+                        
+                        <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 30px; font-weight: bold; color: #2c3e50;">
+                            Aunque todos son diminutos, ¡son completamente diferentes! Vamos a identificarlos:
+                        </p>
+
+                        <!-- Las 3 Tarjetas de Microorganismos -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin: 30px 0;">
+                            <!-- Bacterias -->
+                            <div style="background: white; padding: 25px; border-radius: 15px; border-top: 5px solid #3498db; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                                <div style="font-size: 3rem; text-align: center; margin-bottom: 15px;">🦠</div>
+                                <h4 style="color: #3498db; font-size: 1.4rem; margin-bottom: 15px; text-align: center;">1. Las Bacterias: Las vecinas independientes</h4>
+                                <p style="line-height: 1.7; margin-bottom: 15px;">
+                                    Las bacterias son criaturas vivas formadas por una sola célula. Son como pequeñas fábricas independientes: 
+                                    pueden comer, reproducirse y vivir casi en cualquier lugar.
+                                </p>
+                                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; border-left: 4px solid #3498db;">
+                                    <strong style="color: #1976d2;">💡 Dato curioso:</strong> 
+                                    <span style="color: #555;"> No todas son las "malas de la película". Muchas son buenísimas y nos ayudan a digerir la comida o a fabricar yogur.</span>
+                                </div>
+                            </div>
+
+                            <!-- Virus -->
+                            <div style="background: white; padding: 25px; border-radius: 15px; border-top: 5px solid #e74c3c; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                                <div style="font-size: 3rem; text-align: center; margin-bottom: 15px;">🚀</div>
+                                <h4 style="color: #e74c3c; font-size: 1.4rem; margin-bottom: 15px; text-align: center;">2. Los Virus: Los invasores astutos</h4>
+                                <p style="line-height: 1.7; margin-bottom: 15px;">
+                                    Los virus no están técnicamente "vivos" porque no pueden hacer nada por sí mismos. 
+                                    Son como pequeños paquetes de información que necesitan entrar a la célula de otro ser vivo 
+                                    (como nosotros) para activarse y multiplicarse.
+                                </p>
+                                <div style="background: #ffebee; padding: 15px; border-radius: 10px; border-left: 4px solid #e74c3c;">
+                                    <strong style="color: #c62828;">💡 Dato curioso:</strong> 
+                                    <span style="color: #555;"> Son muchísimo más pequeños que las bacterias. Si una bacteria fuera del tamaño de un estadio de fútbol, ¡un virus sería el balón!</span>
+                                </div>
+                            </div>
+
+                            <!-- Hongos -->
+                            <div style="background: white; padding: 25px; border-radius: 15px; border-top: 5px solid #9b59b6; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                                <div style="font-size: 3rem; text-align: center; margin-bottom: 15px;">🍄</div>
+                                <h4 style="color: #9b59b6; font-size: 1.4rem; margin-bottom: 15px; text-align: center;">3. Los Hongos: Los recicladores de la naturaleza</h4>
+                                <p style="line-height: 1.7; margin-bottom: 15px;">
+                                    A diferencia de los virus y bacterias, los hongos pueden ser microscópicos o gigantes. 
+                                    No producen su propio alimento como las plantas, sino que absorben los nutrientes de lo que les rodea.
+                                </p>
+                                <div style="background: #f3e5f5; padding: 15px; border-radius: 10px; border-left: 4px solid #9b59b6;">
+                                    <strong style="color: #7b1fa2;">💡 Dato curioso:</strong> 
+                                    <span style="color: #555;"> Son los mejores limpiadores del planeta, ya que se alimentan de la materia orgánica en descomposición para devolverle los nutrientes a la tierra.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pista Final -->
+                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 15px; margin: 30px 0; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                            <h4 style="font-size: 1.5rem; margin-bottom: 15px;">🔍 Tu primera pista de Detective:</h4>
+                            <p style="font-size: 1.2rem; line-height: 1.8; font-weight: bold;">
+                                Recuerda esto para tus misiones: Las bacterias están vivas y son independientes, 
+                                los virus necesitan un huésped para activarse, y los hongos se encargan de deshacer y reciclar lo que ya no sirve.
+                            </p>
+                        </div>
+
+                        <!-- Call to Action -->
+                        <div style="text-align: center; margin-top: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                            <p style="font-size: 1.3rem; color: #2c3e50; margin-bottom: 20px; font-weight: bold;">
+                                ¿Estás listo para empezar a investigar?
+                            </p>
+                            <button onclick="showSection('virus')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border: none; border-radius: 50px; font-size: 1.2rem; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                ¡Haz clic aquí y que comience la búsqueda! 🚀
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
