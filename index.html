@@ -994,18 +994,7 @@
                 <div class="intro-content">
                     <h2>📚 Clase Introductoria</h2>
                     
-                    <!-- Video -->
-                    <div class="video-container" style="margin-bottom: 40px;">
-                        <iframe 
-                            src="https://www.youtube.com/embed/sjXegsXg7V8" 
-                            title="Clase Introductoria - Detectives Sanitarios" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-
-                    <!-- Bienvenida -->
+                    <!-- PRIMERO: Mensaje de Bienvenida -->
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                         <h3 style="font-size: 1.8rem; margin-bottom: 15px;">¡Bienvenidos a Detectives Sanitarios!</h3>
                         <p style="font-size: 1.2rem; line-height: 1.6;">
@@ -1016,7 +1005,18 @@
                         </p>
                     </div>
 
-                    <!-- Contenido Principal -->
+                    <!-- SEGUNDO: Video -->
+                    <div class="video-container" style="margin-bottom: 40px;">
+                        <iframe 
+                            src="https://www.youtube.com/embed/sjXegsXg7V8" 
+                            title="Clase Introductoria - Detectives Sanitarios" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+
+                    <!-- TERCERO: Contenido Principal -->
                     <div style="background: #f8f9fa; padding: 30px; border-radius: 15px; margin-bottom: 30px;">
                         <h3 style="color: #9b59b6; font-size: 1.6rem; margin-bottom: 20px; text-align: center;">
                             ¡Bienvenidos a su primera misión, Detectives!
@@ -1393,7 +1393,6 @@
             hint: 0
         };
 
-        // Sistema de tracking de preguntas usadas
         let usedQuestions = {
             virus: [],
             bacteria: [],
@@ -1419,7 +1418,6 @@
                 inventory = JSON.parse(savedInventory);
             }
             
-            // Cargar preguntas usadas
             const savedUsedQuestions = localStorage.getItem(`usedQuestions_${username}`);
             if (savedUsedQuestions) {
                 usedQuestions = JSON.parse(savedUsedQuestions);
@@ -1911,22 +1909,17 @@
             return newArray;
         }
 
-        // Función para obtener preguntas únicas
         function getUniqueQuestions(bank, usedList, count) {
-            // Filtrar preguntas no usadas
             const available = bank.filter((q, index) => !usedList.includes(index));
             
-            // Si no hay suficientes preguntas disponibles, reiniciar el tracking
             if (available.length < count) {
-                usedList.length = 0; // Reiniciar lista de usadas
+                usedList.length = 0;
                 return shuffleArray(bank).slice(0, count);
             }
             
-            // Seleccionar preguntas aleatorias de las disponibles
             const shuffled = shuffleArray(available);
             const selected = shuffled.slice(0, count);
             
-            // Marcar como usadas (guardar índices originales)
             selected.forEach(q => {
                 const originalIndex = bank.indexOf(q);
                 if (originalIndex !== -1 && !usedList.includes(originalIndex)) {
@@ -1938,7 +1931,7 @@
         }
 
         // ==========================================
-        // MISIÓN VIRUS - JUEGO DE EMPAREJAMIENTO
+        // MISIÓN VIRUS
         // ==========================================
         const virusMatchPairs = [
             { term: "Cápside", definition: "Protege el material genético" },
@@ -1953,7 +1946,6 @@
             document.getElementById('virusGameContainer').style.display = 'block';
             document.getElementById('virusResults').style.display = 'none';
             
-            // Obtener 5 preguntas únicas
             virusState.questions = getUniqueQuestions(virusQuestions, usedQuestions.virus, 5);
             virusState.current = 0;
             virusState.score = 0;
@@ -2130,14 +2122,13 @@
         }
 
         // ==========================================
-        // MISIÓN BACTERIAS - TRIVIA
+        // MISIÓN BACTERIAS
         // ==========================================
         function startBacteriaGame() {
             document.getElementById('bacteriaStartScreen').style.display = 'none';
             document.getElementById('bacteriaGameContainer').style.display = 'block';
             document.getElementById('bacteriaResults').style.display = 'none';
             
-            // Obtener 5 preguntas únicas
             bacteriaState.questions = getUniqueQuestions(bacteriaQuestions, usedQuestions.bacteria, 5);
             bacteriaState.current = 0;
             bacteriaState.score = 0;
@@ -2252,14 +2243,13 @@
         }
 
         // ==========================================
-        // MISIÓN HONGOS - ESCENARIOS
+        // MISIÓN HONGOS
         // ==========================================
         function startFungusGame() {
             document.getElementById('fungusStartScreen').style.display = 'none';
             document.getElementById('fungusGameContainer').style.display = 'block';
             document.getElementById('fungusResults').style.display = 'none';
             
-            // Obtener 5 preguntas únicas
             fungusState.questions = getUniqueQuestions(fungusQuestions, usedQuestions.fungus, 5);
             fungusState.current = 0;
             fungusState.score = 0;
@@ -2391,7 +2381,6 @@
             document.getElementById('diagnosisGameContainer').style.display = 'block';
             document.getElementById('diagnosisResults').style.display = 'none';
             
-            // Obtener 3 casos únicos
             diagnosisState.cases = getUniqueQuestions(diagnosisCases, usedQuestions.diagnosis, 3);
             diagnosisState.current = 0;
             diagnosisState.score = 0;
