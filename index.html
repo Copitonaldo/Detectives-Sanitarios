@@ -1466,7 +1466,7 @@ timerBar.style.width = `${percentage}%`;
 }
 }
 // ==========================================
-// BANCO DE PREGUNTAS - VIRUS (TUS PREGUNTAS NUEVAS)
+// BANCO DE PREGUNTAS - VIRUS (TUS PREGUNTAS NUEVAS CON RESPUESTAS CORRECTAS)
 // ==========================================
 const virusQuestions = [
   { q: "¿Por qué los virus no son seres vivos?", options: ["Porque no tienen material genético en su estructura básica.", "Porque no pueden cumplir con la función vital de reproducción por sí mismos.", "Porque son microscópicos y ningún organismo vivo puede ser así de pequeño.", "Porque mueren inmediatamente al entrar en contacto con el aire."], correct: 1 },
@@ -1476,8 +1476,9 @@ const virusQuestions = [
   { q: "¿Cuál es el orden cronológico correcto de las etapas en el ciclo de replicación viral?", options: ["Penetración → Adsorción → Ensamblaje → Replicación → Liberación.", "Adsorción → Replicación → Penetración → Liberación → Ensamblaje.", "Adsorción → Penetración → Replicación → Ensamblaje → Liberación.", "Replicación → Ensamblaje → Adsorción → Penetración → Liberación."], correct: 2 },
   { q: "En relación con la estructura básica de un virus y el propósito de las vacunas, ¿cuál de las siguientes afirmaciones es correcta?", options: ["Los virus poseen una estructura compleja con orgánulos celulares, y las vacunas destruyen directamente su cápside proteica.", "El virus está compuesto solo por proteínas libres, y la vacunación sirve para mutar de forma segura su material genético.", "La estructura básica consta de material genético (ADN o ARN) rodeado por una cápside proteica, y la vacunación entrena al sistema inmunológico para reconocerlo y combatirlo.", "El virus está formado exclusivamente por ADN bicatenario, y las vacunas impiden mecánicamente su adsorción en la piel."], correct: 2 }
 ];
+
 // ==========================================
-// BANCO DE PREGUNTAS - BACTERIAS (TUS PREGUNTAS NUEVAS)
+// BANCO DE PREGUNTAS - BACTERIAS (TUS PREGUNTAS NUEVAS CON RESPUESTAS CORRECTAS)
 // ==========================================
 const bacteriaQuestions = [
   { q: "¿Cuál es la característica fundamental de las bacterias en cuanto a su núcleo y tipo de célula?", options: ["Son células eucariotas con un núcleo bien protegido por una membrana.", "Son seres pluricelulares con núcleos ramificados en hilos.", "Son células procariotas, lo que significa que no tienen núcleo.", "No poseen células y su material genético flota fuera de la membrana."], correct: 2 },
@@ -1485,10 +1486,11 @@ const bacteriaQuestions = [
   { q: "¿Qué grave consecuencia produce si se realiza un mal uso de los antibióticos?", options: ["Que las bacterias se transformen de inmediato en hongos pluricelulares.", "Que el cuerpo humano deje de producir glóbulos rojos.", "Que se generen bacterias resistentes contra las que no haya cura.", "Que los virus muten y adquieran flagelos para desplazarse."], correct: 2 },
   { q: "¿Cuál es la diferencia estructural y de tinción entre las bacterias Gram positivas y las Gram negativas según el método de Tinción de Gram?", options: ["Las Gram positivas tienen una pared celular delgada y se tiñen de rosa/rojo, mientras que las Gram negativas tienen una pared gruesa y se tiñen de morado/violeta.", "Las Gram positivas tienen una pared celular gruesa y se tiñen de morado/violeta, mientras que las Gram negativas tienen una pared delgada con membrana externa y se tiñen de rosa/rojo.", "Ambos tipos de bacterias tienen la misma estructura celular, pero las Gram positivas se tiñen de verde y las Gram negativas de azul.", "Las Gram positivas carecen de pared celular y se tiñen de morado, mientras que las Gram negativas tienen una membrana doble y no se tiñen."], correct: 1 },
   { q: "¿Qué se entiende por resistencia bacteriana?", options: ["La capacidad de los antibióticos para destruir cualquier tipo de bacteria en pocos minutos.", "El mecanismo por el cual el cuerpo humano rechaza de forma natural las infecciones por hongos.", "La capacidad de las bacterias para sobrevivir a los efectos de los antibióticos.", "El proceso de división celular acelerado que ocurre cuando las bacterias entran en contacto con el agua."], correct: 2 },
-  { q: "¿Cuál es el peligro principal de la automedicación con antibióticos?", options: ["El uso incorrecto de estos medicamentos debilita los músculos e impide que la tinción de Gram funcione.", "Provoca una disminución inmediata en el grosor de la pared celular de todas las bacterias Gram positivas.", "El uso incorrecto de antibióticos estimula la creación de vacunas naturales dentro de la membrana bacteriana externa.", "El uso incorrecto de antibióticos genera superbacterias resistentes."], correct: 3 }
+  { q: "¿cuál es el peligro principal de la automedicación con antibióticos?", options: ["El uso incorrecto de estos medicamentos debilita los músculos e impide que la tinción de Gram funcione.", "Provoca una disminución inmediata en el grosor de la pared celular de todas las bacterias Gram positivas.", "El uso incorrecto de antibióticos estimula la creación de vacunas naturales dentro de la membrana bacteriana externa.", "El uso incorrecto de antibióticos genera superbacterias resistentes."], correct: 3 }
 ];
+
 // ==========================================
-// BANCO DE PREGUNTAS - HONGOS (TUS PREGUNTAS NUEVAS)
+// BANCO DE PREGUNTAS - HONGOS (TUS PREGUNTAS NUEVAS CON RESPUESTAS CORRECTAS)
 // ==========================================
 const fungusQuestions = [
   { scenario: "🍄 Reino Fungi", description: "Pregunta sobre la clasificación de los hongos.", question: "¿Por qué el reino de los hongos (Fungi) se clasifica de forma independiente a los animales y los vegetales?", options: ["Porque son los únicos microorganismos que no tienen ninguna célula.", "Porque son organismos no vivos que carecen de funciones de relación.", "Porque sus células son procariotas y se alimentan mediante la fotosíntesis.", "Porque tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila."], correct: 3, explanation: "Los hongos tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila, lo que los diferencia de animales y vegetales." },
