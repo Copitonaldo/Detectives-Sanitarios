@@ -802,7 +802,7 @@
         <div id="home" class="section active">
             <div class="hero">
                 <h1>Detectives Sanitarios</h1>
-                <p>¡Bienvenido al laboratorio central! Conviértete en un experto en microbiología y resuelve los casos médicos más complejos.</p>
+                <p>¡Bienvenido al laboratorio central! Conviértete en un expert@ en microbiología y resuelve los casos médicos más complejos.</p>
                 
                 <div id="login-form" class="username-form">
                     <input type="text" id="username-input" placeholder="Introduce tu nombre de Detective">
@@ -833,6 +833,33 @@
                         <h3>Misión Hongos</h3>
                         <p>Explora el Reino Fungi, identifica hifas y esporas, y analiza los riesgos ambientales.</p>
                     </div>
+                </div>
+
+                <div class="skills-shop">
+                    <h3>Tienda de Habilidades Científicas</h3>
+                    <div class="skills-grid">
+                        <div class="skill-card" onclick="buySkill('pista')">
+                            <h4>Reactivo de Pista</h4>
+                            <p>Elimina una opción incorrecta en la trivia.</p>
+                            <span class="skill-cost">10 🧪</span>
+                            <br><span id="count-pista" class="skill-count">Disponibles: 0</span>
+                        </div>
+                        <div class="skill-card" onclick="buySkill('tiempo')">
+                            <h4>Estabilizador Temporal</h4>
+                            <p>Añade 10 segundos extra al análisis actual.</p>
+                            <span class="skill-cost">15 🧪</span>
+                            <br><span id="count-tiempo" class="skill-count">Disponibles: 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ranking-container">
+                    <h3>Clasificación General de Investigadores</h3>
+                    <ul class="ranking-list" id="ranking-list-box">
+                        <li class="ranking-item"><span class="ranking-position">1</span><span class="ranking-name">Dra. Pasteur</span><span class="ranking-points">250 pts</span></li>
+                        <li class="ranking-item"><span class="ranking-position">2</span><span class="ranking-name">Dr. Fleming</span><span class="ranking-points">210 pts</span></li>
+                        <li class="ranking-item current-user" id="user-ranking-row"><span class="ranking-position">3</span><span class="ranking-name" id="user-ranking-name">Tú</span><span class="ranking-points" id="user-ranking-points">0 pts</span></li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -880,19 +907,23 @@
             quizIndex: 0,
             quizPoints: 0,
             timer: null,
-            timeLeft: 0
+            timeLeft: 0,
+            skills: {
+                pista: 0,
+                tiempo: 0
+            }
         };
 
-        // BANCO DE PREGUNTAS ACTUALIZADO
+        // BANCO DE PREGUNTAS SUSTITUIDO EXACTAMENTE CON TUS DATOS
         const quizzes = {
             virus: [
                 {
                     q: "¿Por qué los virus no son seres vivos?",
                     options: [
-                        "Porque no tienen material genético en su estructura básica.",
-                        "Porque no pueden cumplir con la función vital de reproducción por sí mismos.",
-                        "Porque son microscópicos y ningún organismo vivo puede ser así de pequeño.",
-                        "Porque mueren inmediatamente al entrar en contacto con el aire."
+                        "A) Porque no tienen material genético en su estructura básica.",
+                        "B) Porque no pueden cumplir con la función vital de reproducción por sí mismos.",
+                        "C) Porque son microscópicos y ningún organismo vivo puede ser así de pequeño.",
+                        "D) Porque mueren inmediatamente al entrar en contacto con el aire."
                     ],
                     correct: 1,
                     points: 10
@@ -900,10 +931,10 @@
                 {
                     q: "¿Cómo se compone la estructura básica de un virus?",
                     options: [
-                        "Por una pared celular rígida y cloroplastos.",
-                        "Por flagelos libres dispersos en una sustancia líquida.",
-                        "Por una cubierta exterior llamada cápside y material genético en el interior.",
-                        "Por una membrana celular que rodea a múltiples ribosomas y un núcleo celular."
+                        "A) Por una pared celular rígida y cloroplastos.",
+                        "B) Por flagelos libres dispersos en una sustancia líquida.",
+                        "C) Por una cubierta exterior llamada cápside y material genético en el interior.",
+                        "D) Por una membrana celular que rodea a múltiples ribosomas y un núcleo celular."
                     ],
                     correct: 2,
                     points: 10
@@ -911,10 +942,10 @@
                 {
                     q: "¿Cuál es el mejor método de prevención médica para enseñar al sistema inmune a reconocer los virus?",
                     options: [
-                        "Las vacunas.",
-                        "Los antibióticos.",
-                        "Los geles hidroalcohólicos únicamente.",
-                        "Los analgésicos comunes."
+                        "A) Las vacunas.",
+                        "B) Los antibióticos.",
+                        "C) Los geles hidroalcohólicos únicamente.",
+                        "D) Los analgésicos comunes."
                     ],
                     correct: 0,
                     points: 15
@@ -922,10 +953,10 @@
                 {
                     q: "¿Cuál de las siguientes opciones define correctamente a un virus y su principal característica de reproducción?",
                     options: [
-                        "Es un microorganismo celular que se divide de forma independiente en cualquier medio.",
-                        "Es un agente infeccioso microscópico que solo puede replicarse dentro de las células de otros organismos.",
-                        "Es una toxina bacteriana que se multiplica únicamente en ambientes exteriores y secos.",
-                        "Es un parásito macroscópico que requiere de la luz solar para completar su ciclo celular."
+                        "A) Es un microorganismo celular que se divide de forma independiente en cualquier medio.",
+                        "B) Es un agente infeccioso microscópico que solo puede replicarse dentro de las células de otros organismos.",
+                        "C) Es una toxina bacteriana que se multiplica únicamente en ambientes exteriores y secos.",
+                        "D) Es un parásito macroscópico que requiere de la luz solar para completar su ciclo celular."
                     ],
                     correct: 1,
                     points: 15
@@ -933,21 +964,21 @@
                 {
                     q: "¿Cuál es el orden cronológico correcto de las etapas en el ciclo de replicación viral?",
                     options: [
-                        "Penetración → Adsorción → Ensamblaje → Replicación → Liberación.",
-                        "Adsorción → Replicación → Penetración → Liberación → Ensamblaje.",
-                        "Adsorción → Penetración → Replicación → Ensamblaje → Liberación.",
-                        "Replicación → Ensamblaje → Adsorción → Penetración → Liberación."
+                        "A) Penetración → Adsorción → Ensamblaje → Replicación → Liberación.",
+                        "B) Adsorción → Replicación → Penetración → Liberación → Ensamblaje.",
+                        "C) Adsorción → Penetración → Replicación → Ensamblaje → Liberación.",
+                        "D) Replicación → Ensamblaje → Adsorción → Penetración → Liberación."
                     ],
                     correct: 2,
                     points: 20
                 },
                 {
-                    q: "En relación con la estructura básica de un virus y el propósito de las vacunas, ¿cuál de las siguientes afirmaciones is correcta?",
+                    q: "En relación con la estructura básica de un virus y el propósito de las vacunas, ¿cuál de las siguientes afirmaciones es correcta?",
                     options: [
-                        "Los virus poseen una estructura compleja con orgánulos celulares, y las vacunas destruyen directamente su cápside proteica.",
-                        "El virus está compuesto solo por proteínas libres, y la vacunación sirve para mutar de forma segura su material genético.",
-                        "La estructura básica consta de material genético (ADN o ARN) rodeado por una cápside proteica, y la vacunación entrena al sistema inmunológico para reconocerlo y combatirlo.",
-                        "El virus está formado exclusivamente por ADN bicatenario, y las vacunas impiden mecánicamente su adsorción en la piel."
+                        "A) Los virus poseen una estructura compleja con orgánulos celulares, y las vacunas destruyen directamente su cápside proteica.",
+                        "B) El virus está compuesto solo por proteínas libres, y la vacunación sirve para mutar de forma segura su material genético.",
+                        "C) La estructura básica consta de material genético (ADN o ARN) rodeado por una cápside proteica, y la vacunación entrena al sistema inmunológico para reconocerlo y combatirlo.",
+                        "D) El virus está formado exclusivamente por ADN bicatenario, y las vacunas impiden mecánicamente su adsorción en la piel."
                     ],
                     correct: 2,
                     points: 20
@@ -957,10 +988,10 @@
                 {
                     q: "¿Cuál es la característica fundamental de las bacterias en cuanto a su núcleo y tipo de célula?",
                     options: [
-                        "Son células eucariotas con un núcleo bien protegido por una membrana.",
-                        "Son seres pluricelulares con núcleos ramificados en hilos.",
-                        "Son células procariotas, lo que significa que no tienen núcleo.",
-                        "No poseen células y su material genético flota fuera de la membrana."
+                        "A) Son células eucariotas con un núcleo bien protegido por una membrana.",
+                        "B) Son seres pluricelulares con núcleos ramificados en hilos.",
+                        "C) Son células procariotas, lo que significa que no tienen núcleo.",
+                        "D) No poseen células y su material genético flota fuera de la membrana."
                     ],
                     correct: 2,
                     points: 10
@@ -968,10 +999,10 @@
                 {
                     q: "¿Cómo se clasifican las bacterias de acuerdo con sus diferentes formas estructurales?",
                     options: [
-                        "En levaduras, setas y mohos.",
-                        "En bacilos (alargados), cocos (redondeados) y espirales.",
-                        "En bacterias vegetales, animales y humanas.",
-                        "En virus patógenos y vectores acuáticos."
+                        "A) En levaduras, setas y mohos.",
+                        "B) En bacilos (alargados), cocos (redondeados) y espirales.",
+                        "C) En bacterias vegetales, animales y humanas.",
+                        "D) En virus patógenos y vectores acuáticos."
                     ],
                     correct: 1,
                     points: 10
@@ -979,10 +1010,10 @@
                 {
                     q: "¿Qué grave consecuencia produce si se realiza un mal uso de los antibióticos?",
                     options: [
-                        "Que las bacterias se transformen de inmediato en hongos pluricelulares.",
-                        "Que el cuerpo humano deje de producir glóbulos rojos.",
-                        "Que se generen bacterias resistentes contra las que no haya cura.",
-                        "Que los virus muten y adquieran flagelos para desplazarse."
+                        "A) Que las bacterias se transformen de inmediato en hongos pluricelulares.",
+                        "B) Que el cuerpo humano deje de producir glóbulos rojos.",
+                        "C) Que se generen bacterias resistentes contra las que no haya cura.",
+                        "D) Que los virus muten y adquieran flagelos para desplazarse."
                     ],
                     correct: 2,
                     points: 15
@@ -990,10 +1021,10 @@
                 {
                     q: "¿Cuál es la diferencia estructural y de tinción entre las bacterias Gram positivas y las Gram negativas según el método de Tinción de Gram?",
                     options: [
-                        "Las Gram positivas tienen una pared celular delgada y se tiñen de rosa/rojo, mientras que las Gram negativas tienen una pared gruesa y se tiñen de morado/violeta.",
-                        "Las Gram positivas tienen una pared celular gruesa y se tiñen de morado/violeta, mientras que las Gram negativas tienen una pared delgada con membrana externa y se tiñen de rosa/rojo.",
-                        "Ambos tipos de bacterias tienen la misma estructura celular, pero las Gram positivas se tiñen de verde y las Gram negativas de azul.",
-                        "Las Gram positivas carecen de pared celular y se tiñen de morado, mientras que las Gram negativas tienen una membrana doble y no se tiñen."
+                        "A) Las Gram positivas tienen una pared celular delgada y se tiñen de rosa/rojo, mientras que las Gram negativas tienen una pared gruesa y se tiñen de morado/violeta.",
+                        "B) Las Gram positivas tienen una pared celular gruesa y se tiñen de morado/violeta, mientras que las Gram negativas tienen una pared delgada con membrana externa y se tiñen de rosa/rojo.",
+                        "C) Ambos tipos de bacterias tienen la misma estructura celular, pero las Gram positivas se tiñen de verde y las Gram negativas de azul.",
+                        "D) Las Gram positivas carecen de pared celular y se tiñen de morado, mientras que las Gram negativas tienen una membrana doble y no se tiñen."
                     ],
                     correct: 1,
                     points: 15
@@ -1001,10 +1032,10 @@
                 {
                     q: "¿Qué se entiende por resistencia bacteriana?",
                     options: [
-                        "La capacidad de los antibióticos para destruir cualquier tipo de bacteria en pocos minutos.",
-                        "El mecanismo por el cual el cuerpo humano rechaza de forma natural las infecciones por hongos.",
-                        "La capacidad de las bacterias para sobrevivir a los efectos de los antibióticos.",
-                        "El proceso de división celular acelerado que ocurre cuando las bacterias entran en contacto con el agua."
+                        "A) La capacidad de los antibióticos para destruir cualquier tipo de bacteria en pocos minutos.",
+                        "B) El mecanismo por el cual el cuerpo humano rechaza de forma natural las infecciones por hongos.",
+                        "C) La capacidad de las bacterias para sobrevivir a los efectos de los antibióticos.",
+                        "D) El proceso de división celular acelerado que ocurre cuando las bacterias entran en contacto con el agua."
                     ],
                     correct: 2,
                     points: 20
@@ -1012,10 +1043,10 @@
                 {
                     q: "¿cuál es el peligro principal de la automedicación con antibióticos?",
                     options: [
-                        "El uso incorrecto de estos medicamentos debilita los músculos e impide que la tinción de Gram funcione.",
-                        "Provoca una disminución inmediata en el grosor de la pared celular de todas las bacterias Gram positivas.",
-                        "El uso incorrecto de antibióticos estimula la creación de vacunas naturales dentro de la membrana bacteriana externa.",
-                        "El uso incorrecto de antibióticos genera superbacterias resistentes."
+                        "A) El uso incorrecto de estos medicamentos debilita los músculos e impide que la tinción de Gram funcione.",
+                        "B) Provoca una disminución inmediata en el grosor de la pared celular de todas las bacterias Gram positivas.",
+                        "C) El uso incorrecto de antibióticos de forma indirecta estimula la creación de vacunas naturales dentro de la membrana bacteriana externa.",
+                        "D) El uso incorrecto de antibióticos genera superbacterias resistentes."
                     ],
                     correct: 3,
                     points: 20
@@ -1025,10 +1056,10 @@
                 {
                     q: "¿Por qué el reino de los hongos (Fungi) se clasifica de forma independiente a los animales y los vegetales?",
                     options: [
-                        "Porque son los únicos microorganismos que no tienen ninguna célula.",
-                        "Porque son organismos no vivos que carecen de funciones de relación.",
-                        "Porque sus células son procariotas y se alimentan mediante la fotosíntesis.",
-                        "Porque tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila."
+                        "A) Porque son los únicos microorganismos que no tienen ninguna célula.",
+                        "B) Porque son organismos no vivos que carecen de funciones de relación.",
+                        "C) Porque sus células son procariotas y se alimentan mediante la fotosíntesis.",
+                        "D) Porque tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila."
                     ],
                     correct: 3,
                     points: 10
@@ -1036,10 +1067,10 @@
                 {
                     q: "Cuando un hongo es pluricelular, ¿cómo se denominan los hilos largos y finos que componen su estructura?",
                     options: [
-                        "Cápsides.",
-                        "Hifas.",
-                        "Flagelos.",
-                        "Esporas."
+                        "A) Cápsides.",
+                        "B) Hifas.",
+                        "C) Flagelos.",
+                        "D) Esporas."
                     ],
                     correct: 1,
                     points: 10
@@ -1047,10 +1078,10 @@
                 {
                     q: "¿Qué importante utilidad médica de los hongos se destaca en el video, haciendo mención al descubrimiento de Alexander Fleming?",
                     options: [
-                        "La producción de sustancias antibióticas como la penicilina para combatir infecciones bacterianas.",
-                        "La síntesis de vacunas universales anuales contra la gripe.",
-                        "La creación de geles hidroalcohólicos a base de moho de fruta.",
-                        "El desarrollo de nutrientes artificiales para acelerar la fotosíntesis de las plantas."
+                        "A) La producción de sustancias antibióticas como la penicilina para combatir infecciones bacterianas.",
+                        "B) La síntesis de vacunas universales anuales contra la gripe.",
+                        "C) La creación de geles hidroalcohólicos a base de moho de fruta.",
+                        "D) El desarrollo de nutrientes artificiales para acelerar la fotosíntesis de las plantas."
                     ],
                     correct: 0,
                     points: 15
@@ -1058,10 +1089,10 @@
                 {
                     q: "¿Cuáles son las condiciones óptimas de humedad relativa y temperatura que la mayoría de los hongos requieren para prosperar?",
                     options: [
-                        "Humedad relativa entre 10-30% y temperatura entre 0-10°C.",
-                        "Humedad relativa entre 70-90% y temperatura entre 20-30°C.",
-                        "Humedad relativa menor al 50% y temperatura superior a los 50°C.",
-                        "Humedad relativa del 100% y temperatura bajo cero."
+                        "A) Humedad relativa entre 10-30% y temperatura entre 0-10°C.",
+                        "B) Humedad relativa entre 70-90% y temperatura entre 20-30°C.",
+                        "C) Humedad relativa menor al 50% y temperatura superior a los 50°C.",
+                        "D) Humedad relativa del 100% y temperatura bajo cero."
                     ],
                     correct: 1,
                     points: 15
@@ -1069,10 +1100,10 @@
                 {
                     q: "¿qué son las esporas y cómo se dispersan principalmente?",
                     options: [
-                        "Son raíces subterráneas que se extienden únicamente a través de suelos áridos.",
-                        "Son células muertas que se eliminan exclusivamente mediante la luz solar directa.",
-                        "Son fragmentos de tejido muscular que se propagan por vectores animales e insectos.",
-                        "Son formas de reproducción que se dispersan por el aire, el agua o el contacto."
+                        "A) Son raíces subterráneas que se extienden únicamente a través de suelos áridos.",
+                        "B) Son células muertas que se eliminan exclusivamente mediante la luz solar directa.",
+                        "C) Son fragmentos de tejido muscular que se propagan por vectores animales e insectos.",
+                        "D) Son formas de reproducción que se dispersan por el aire, el agua o el contacto."
                     ],
                     correct: 3,
                     points: 20
@@ -1080,10 +1111,10 @@
                 {
                     q: "¿Cuál de las siguientes opciones agrupa correctamente los factores de riesgo ambientales que facilitan la aparición y proliferación de hongos?",
                     options: [
-                        "Ventilación deficiente, acumulación de agua y materiales orgánicos.",
-                        "Uso de desinfectantes, flujo constante de aire seco y materiales sintéticos.",
-                        "Exposición a la radiación ultravioleta, ambientes sellados al vacío y metales puros.",
-                        "Altas corrientes de aire filtrado, drenaje óptimo y ausencia de nutrientes."
+                        "A) Ventilación deficiente, acumulación de agua y materiales orgánicos.",
+                        "B) Uso de desinfectantes, flujo constante de aire seco y materiales sintéticos.",
+                        "C) Exposición a la radiación ultravioleta, ambientes sellados al vacío y metales puros.",
+                        "D) Altas corrientes de aire filtrado, drenaje óptimo y ausencia de nutrientes."
                     ],
                     correct: 0,
                     points: 20
@@ -1092,21 +1123,21 @@
             diagnosis: [
                 {
                     case: "Caso 1: El Brote Escolar",
-                    desc: "En una escuela primaria, 15 niños presentan fiebre alta, dolor de cabeza y pequeñas erupciones en la piel en un lapso de 48 horas. El médico escolar indica que el patógeno no posee células, sino una cubierta de proteínas que protege su ARN, y que los antibióticos no surtirán ningún efecto.",
+                    desc: "En una escuela primaria, 15 niños presentan fever alta, dolor de cabeza y pequeñas erupciones en la piel. El médico escolar indica que el patógeno no posee células, sino una cubierta de proteínas que protege su ARN, y que los antibióticos no surtirán ningún efecto.",
                     options: ["Virus", "Bacteria", "Hongo"],
                     correct: 0,
-                    feedback: "¡Excelente diagnóstico! Al tratarse de un agente acelular (sin células) con cápside proteica y genoma de ARN, estamos ante un Virus. Los antibióticos no actúan sobre ellos."
+                    feedback: "¡Excelente diagnóstico! Al tratarse de un agente acelular con cápside proteica y genoma de ARN, estamos ante un Virus. Los antibióticos no actúan sobre ellos."
                 },
                 {
                     case: "Caso 2: La Infección de la Herida",
-                    desc: "Un paciente llega a urgencias con una herida inflamada que produce pus de color verdoso. La muestra de laboratorio revela células unicelulares sin núcleo definido (procariotas) que al teñirse con la técnica de Gram retienen un color rosado/rojo debido a su delgada pared celular.",
+                    desc: "Un paciente llega a urgencias con una herida inflamada que produce pus. La muestra de laboratorio revela células unicelulares sin núcleo definido (procariotas) que al teñirse con la técnica de Gram retienen un color rosado/rojo debido a su delgada pared celular.",
                     options: ["Bacteria Gram Positiva", "Bacteria Gram Negativa", "Hongo Pluricelular"],
                     correct: 1,
                     feedback: "¡Brillante! Las células procariotas sin núcleo son bacterias. Al teñirse de rosa/rojo por tener una pared delgada y membrana externa, se clasifican firmemente como Bacterias Gram Negativas."
                 },
                 {
                     case: "Caso 3: Humedad en el Sótano",
-                    desc: "Un trabajador de mantenimiento de un edificio antiguo desarrolla problemas respiratorios tras limpiar un sótano húmedo (85% humedad relativa) y mal ventilado. En las paredes se observaban manchas oscuras formadas por estructuras filamentosas microscópicas en forma de hilos (hifas) que liberaban millones de esporas al aire.",
+                    desc: "Un trabajador desarrolla problemas respiratorios tras limpiar un sótano húmedo y mal ventilado. En las paredes se observaban manchas oscuras formadas por estructuras filamentosas microscópicas en forma de hilos (hifas) que liberaban millones de esporas al aire.",
                     options: ["Virus Respiratorio", "Bacteria Espiral", "Hongo (Moho)"],
                     correct: 2,
                     feedback: "¡Diagnóstico perfecto! La presencia de hifas (estructuras en hilos), la reproducción por esporas y su proliferación en ambientes con alta humedad y mala ventilación son características exclusivas de los Hongos."
@@ -1114,7 +1145,7 @@
             ]
         };
 
-        // NAVEGACIÓN Y LOGUEO
+        // REGISTRO Y ENLACE DE DATOS DE USUARIO
         function registerUser() {
             const nameInput = document.getElementById('username-input').value.trim();
             if (nameInput === "") {
@@ -1123,10 +1154,10 @@
             }
             gameState.user = nameInput;
             document.getElementById('user-display-name').innerText = nameInput;
+            document.getElementById('user-ranking-name').innerText = nameInput + " (Tú)";
             document.getElementById('login-form').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             updateStats();
-            initMissions();
         }
 
         function switchSection(sectionId) {
@@ -1152,9 +1183,79 @@
         function updateStats() {
             document.getElementById('user-points').innerText = gameState.points;
             document.getElementById('user-coins').innerText = gameState.coins;
+            document.getElementById('user-ranking-points').innerText = gameState.points + " pts";
+            document.getElementById('count-pista').innerText = "Disponibles: " + gameState.skills.pista;
+            document.getElementById('count-tiempo').innerText = "Disponibles: " + gameState.skills.tiempo;
+            reorderRanking();
         }
 
-        // CONTROLADOR DE TRIVIAS (VIRUS, BACTERIAS, HONGOS)
+        // CONTROLADOR DE TIENDA DE HABILIDADES (SKILLS SHOP)
+        function buySkill(type) {
+            if (type === 'pista' && gameState.coins >= 10) {
+                gameState.coins -= 10;
+                gameState.skills.pista++;
+                alert("¡Compraste un Reactivo de Pista!");
+            } else if (type === 'tiempo' && gameState.coins >= 15) {
+                gameState.coins -= 15;
+                gameState.skills.tiempo++;
+                alert("¡Compraste un Estabilizador Temporal!");
+            } else {
+                alert("No tienes suficientes monedas de bioanálisis 🧪");
+            }
+            updateStats();
+        }
+
+        function useSkill(type) {
+            if (type === 'pista') {
+                if (gameState.skills.pista > 0) {
+                    const currentQ = quizzes[gameState.currentQuiz][gameState.quizIndex];
+                    const optionsButtons = document.querySelectorAll('.option');
+                    let removed = false;
+                    for (let i = 0; i < optionsButtons.length; i++) {
+                        if (i !== currentQ.correct && !optionsButtons[i].classList.contains('disabled')) {
+                            optionsButtons[i].style.opacity = "0.3";
+                            optionsButtons[i].classList.add('disabled');
+                            removed = true;
+                            break;
+                        }
+                    }
+                    if (removed) {
+                        gameState.skills.pista--;
+                        updateStats();
+                        document.getElementById('use-pista-btn').style.display = 'none';
+                    }
+                } else {
+                    alert("No tienes consumibles de Pista disponibles.");
+                }
+            } else if (type === 'tiempo') {
+                if (gameState.skills.tiempo > 0) {
+                    gameState.timeLeft += 10;
+                    document.getElementById('timer-display').innerText = gameState.timeLeft;
+                    gameState.skills.tiempo--;
+                    updateStats();
+                    document.getElementById('use-tiempo-btn').style.display = 'none';
+                } else {
+                    alert("No tienes consumibles de Tiempo disponibles.");
+                }
+            }
+        }
+
+        function reorderRanking() {
+            const list = document.getElementById('ranking-list-box');
+            const items = Array.from(list.children);
+            items.sort((a, b) => {
+                const ptsA = parseInt(a.querySelector('.ranking-points').innerText);
+                const ptsB = parseInt(b.querySelector('.ranking-points').innerText);
+                return ptsB - ptsA;
+            });
+            list.innerHTML = "";
+            items.forEach((item, index) => {
+                item.querySelector('.ranking-position').innerText = index + 1;
+                list.appendChild(item);
+            });
+        }
+
+        // CONTROLADOR DE TRIVIAS
         function startQuizMission(type) {
             gameState.currentQuiz = type;
             gameState.quizIndex = 0;
@@ -1167,7 +1268,6 @@
             const questions = quizzes[gameState.currentQuiz];
 
             if (gameState.quizIndex >= questions.length) {
-                // Misión completada
                 const rewardCoins = Math.floor(gameState.quizPoints / 5);
                 gameState.points += gameState.quizPoints;
                 gameState.coins += rewardCoins;
@@ -1197,6 +1297,13 @@
             
             container.innerHTML = `
                 <div class="progress-indicator">Muestra Científica: ${gameState.quizIndex + 1} de ${questions.length}</div>
+                
+                <div class="in-game-skills">
+                    <h4>Ayudas de Laboratorio</h4>
+                    <button id="use-pista-btn" class="btn-retry" style="margin-top:0; margin-right:10px; padding:8px 15px; font-size:0.9rem;" onclick="useSkill('pista')">Usar Pista (${gameState.skills.pista})</button>
+                    <button id="use-tiempo-btn" class="btn-retry" style="margin-top:0; padding:8px 15px; font-size:0.9rem; background:#3498db;" onclick="useSkill('tiempo')">Usar +10s (${gameState.skills.tiempo})</button>
+                </div>
+
                 <div class="timer-container">
                     Tiempo de Análisis Restante: <span id="timer-display">20</span>s
                     <div id="timer-bar" class="timer-bar" style="width: 100%;"></div>
@@ -1222,8 +1329,11 @@
         }
 
         function checkQuizAnswer(selectedIndex) {
-            clearInterval(gameState.timer);
             const currentQ = quizzes[gameState.currentQuiz][gameState.quizIndex];
+            const clickedBtn = document.querySelectorAll('.option')[selectedIndex];
+            if (clickedBtn.classList.contains('disabled')) return;
+
+            clearInterval(gameState.timer);
             disableOptions();
 
             const optionsButtons = document.querySelectorAll('.option');
@@ -1247,6 +1357,8 @@
 
         function disableOptions() {
             document.querySelectorAll('.option').forEach(btn => btn.classList.add('disabled'));
+            document.getElementById('use-pista-btn').classList.add('disabled');
+            document.getElementById('use-tiempo-btn').classList.add('disabled');
         }
 
         function nextQuizQuestion() {
@@ -1333,19 +1445,18 @@
             renderDiagnosisCase();
         }
 
-        // FUNCIONES DE SOPORTE: TEMPORIZADOR Y FEEDBACK
+        // AUXILIARES
         function startTimer(seconds, onTimeout) {
             gameState.timeLeft = seconds;
             const display = document.getElementById('timer-display');
             const bar = document.getElementById('timer-bar');
-            display.innerText = gameState.timeLeft;
-            
-            bar.style.width = '100%';
+            if (display) display.innerText = gameState.timeLeft;
+            if (bar) bar.style.width = '100%';
 
             gameState.timer = setInterval(() => {
                 gameState.timeLeft--;
-                display.innerText = gameState.timeLeft;
-                bar.style.width = `${(gameState.timeLeft / seconds) * 100}%`;
+                if (display) display.innerText = gameState.timeLeft;
+                if (bar) bar.style.width = `${(gameState.timeLeft / seconds) * 100}%`;
 
                 if (gameState.timeLeft <= 0) {
                     clearInterval(gameState.timer);
@@ -1356,12 +1467,10 @@
 
         function showFeedback(isSuccess, message) {
             const feedbackDiv = document.getElementById('quiz-feedback');
-            feedbackDiv.className = `feedback show ${isSuccess ? 'success' : 'error'}`;
-            feedbackDiv.innerText = message;
-        }
-
-        function initMissions() {
-            // Inicialización de misiones vacías en el dashboard listo
+            if (feedbackDiv) {
+                feedbackDiv.className = `feedback show ${isSuccess ? 'success' : 'error'}`;
+                feedbackDiv.innerText = message;
+            }
         }
     </script>
 </body>
