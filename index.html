@@ -174,6 +174,7 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
 
+        .mission-card.intro { border-top: 5px solid #9b59b6; }
         .mission-card.virus { border-top: 5px solid #e74c3c; }
         .mission-card.bacteria { border-top: 5px solid #3498db; }
         .mission-card.fungus { border-top: 5px solid #9b59b6; }
@@ -823,6 +824,43 @@
             cursor: not-allowed;
         }
 
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+        }
+
+        .intro-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .intro-content h2 {
+            color: #9b59b6;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .intro-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
         footer {
             background: rgba(0,0,0,0.8);
             color: white;
@@ -879,7 +917,8 @@
     <nav class="navbar">
         <ul class="nav-menu">
             <li><a href="#" class="nav-link active" data-section="home">🏠 Home</a></li>
-            <li><a href="#" class="nav-link" data-section="virus"> Misión Virus</a></li>
+            <li><a href="#" class="nav-link" data-section="intro">📚 Clase Introductoria</a></li>
+            <li><a href="#" class="nav-link" data-section="virus">🦠 Misión Virus</a></li>
             <li><a href="#" class="nav-link" data-section="bacteria">🔬 Misión Bacterias</a></li>
             <li><a href="#" class="nav-link" data-section="hongos">🍄 Misión Hongos</a></li>
             <li><a href="#" class="nav-link" data-section="diagnostico">🩺 Zona de Diagnóstico</a></li>
@@ -890,7 +929,7 @@
         <!-- HOME -->
         <section id="home" class="section active">
             <div class="hero">
-                <h1> Detectives Sanitarios</h1>
+                <h1>🔍 Detectives Sanitarios</h1>
                 <p>Conviértete en detective sanitario para identificar un brote microscópico en la región</p>
                 
                 <div class="username-form" id="usernameForm">
@@ -949,10 +988,30 @@
             </div>
         </section>
 
+        <!-- CLASE INTRODUCTORIA -->
+        <section id="intro" class="section">
+            <div class="content-section">
+                <div class="intro-content">
+                    <h2>📚 Clase Introductoria</h2>
+                    <p>Bienvenido a Detectives Sanitarios. Antes de comenzar tu aventura, mira este video introductorio para conocer los conceptos básicos sobre virus, bacterias y hongos.</p>
+                    
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/sjXegsXg7V8" 
+                            title="Clase Introductoria - Detectives Sanitarios" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- MISIÓN VIRUS -->
         <section id="virus" class="section">
             <div class="content-section virus">
-                <h2> Misión Virus</h2>
+                <h2>🦠 Misión Virus</h2>
                 
                 <div class="info-box">
                     <h3>Estructura y Replicación Viral</h3>
@@ -966,14 +1025,14 @@
                 </div>
 
                 <div id="virusStartScreen" class="start-screen">
-                    <h3> Juego de Emparejamiento</h3>
+                    <h3>🎮 Juego de Emparejamiento</h3>
                     <p>Une cada parte del virus con su función correcta. Tienes 15 segundos para cada pregunta.</p>
                     <button class="btn-start-game" onclick="startVirusGame()">¡Empezar!</button>
                 </div>
 
                 <div id="virusGameContainer" style="display: none;">
                     <div class="in-game-skills" id="virusSkills">
-                        <h4> Habilidades Disponibles</h4>
+                        <h4>⚡ Habilidades Disponibles</h4>
                         <div id="virusSkillButtons"></div>
                     </div>
 
@@ -1014,7 +1073,7 @@
                         </div>
                     </div>
                     <p id="virusFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
-                    <button class="btn-retry" onclick="resetVirusGame()"> Intentar de Nuevo</button>
+                    <button class="btn-retry" onclick="resetVirusGame()">🔄 Intentar de Nuevo</button>
                 </div>
             </div>
         </section>
@@ -1084,7 +1143,7 @@
                         </div>
                     </div>
                     <p id="bacteriaFinalMessage" style="font-size: 1.2rem; margin: 20px 0;"></p>
-                    <button class="btn-retry" onclick="resetBacteriaGame()"> Intentar de Nuevo</button>
+                    <button class="btn-retry" onclick="resetBacteriaGame()">🔄 Intentar de Nuevo</button>
                 </div>
             </div>
         </section>
@@ -1158,7 +1217,7 @@
         <!-- ZONA DE DIAGNÓSTICO -->
         <section id="diagnostico" class="section">
             <div class="content-section">
-                <h2> Zona de Diagnóstico</h2>
+                <h2>🩺 Zona de Diagnóstico</h2>
 
                 <div id="diagnosisStartScreen" class="start-screen">
                     <h3>📋 Casos Clínicos Reales</h3>
@@ -1168,7 +1227,7 @@
 
                 <div id="diagnosisGameContainer" style="display: none;">
                     <div class="in-game-skills" id="diagnosisSkills">
-                        <h4> Habilidades Disponibles</h4>
+                        <h4>⚡ Habilidades Disponibles</h4>
                         <div id="diagnosisSkillButtons"></div>
                     </div>
 
@@ -1179,7 +1238,7 @@
 
                         <div class="timer-container">
                             <div class="timer-bar" id="diagnosisTimerBar"></div>
-                            <div class="timer-display">️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
+                            <div class="timer-display">⏱️ Tiempo: <span id="diagnosisTimer">15</span>s</div>
                         </div>
                         
                         <h3>📋 Caso de Estudio Clínico-Ambiental</h3>
@@ -1386,7 +1445,7 @@
             if (useSkill(skillName, section)) {
                 const skillNames = {
                     doublePoints: '⚡ x2 Puntos',
-                    fiftyFifty: ' 50/50',
+                    fiftyFifty: '🎯 50/50',
                     extraTime: '⏰ Tiempo Extra',
                     hint: '💡 Pista'
                 };
@@ -1444,6 +1503,13 @@
         // HOME - TARJETAS EN ORDEN FIJO
         // ==========================================
         const missionsData = [
+            {
+                id: 'intro',
+                icon: '📚',
+                title: 'Clase Introductoria',
+                description: 'Mira el video introductorio antes de comenzar',
+                class: 'intro'
+            },
             {
                 id: 'virus',
                 icon: '🦠',
@@ -1655,26 +1721,26 @@
             { scenario: "💊 Paciente con sistema inmunológico debilitado", description: "Un paciente en quimioterapia desarrolla fiebre y tos. Los análisis muestran hifas septadas en pulmones.", question: "¿Qué infección fúngica es grave en inmunodeprimidos?", options: ["Candidiasis - solo mucosas", "Aspergilosis - Aspergillus en pulmones", "Pie de atleta - solo en pies", "Tiña capitis - solo en cabello"], correct: 1, explanation: "La aspergilosis es una infección grave causada por Aspergillus que afecta principalmente a personas inmunodeprimidas, pudiendo ser fatal." },
             { scenario: "🍞 Masa de pan que duplica su tamaño", description: "Al hacer pan, la masa crece y burbujea después de añadir un ingrediente y esperar.", question: "¿Qué hongo causa la fermentación y qué gas produce?", options: ["Penicillium - oxígeno", "Aspergillus - nitrógeno", "Saccharomyces cerevisiae - CO2", "Candida - metano"], correct: 2, explanation: "La levadura Saccharomyces cerevisiae fermenta azúcares produciendo CO2 (que infla la masa) y etanol (que se evapora al hornear)." },
             { scenario: "🐕 Perro con manchas circulares sin pelo", description: "Una mascota presenta lesiones circulares con pérdida de pelo en la piel.", question: "¿Qué infección fúngica afecta mascotas y es contagiosa a humanos?", options: ["Aspergilosis - solo pulmones", "Candidiasis - solo mucosas", "Dermatofitosis (tiña) - hongos que comen queratina", "Micetoma - solo tropical"], correct: 2, explanation: "La dermatofitosis (tiña) es causada por hongos dermatofitos que se alimentan de queratina en piel, pelo y uñas, siendo zoonótica." },
-            { scenario: "️ Invernadero con 95% de humedad y 35°C", description: "Condiciones extremas de humedad y temperatura.", question: "¿Qué sucede con los hongos en estas condiciones?", options: ["Los hongos mueren todos", "Solo crecen bacterias", "No pasa nada", "Proliferación masiva de mohos y levaduras"], correct: 3, explanation: "La combinación de alta humedad (>90%) y temperatura cálida (25-35°C) crea condiciones ideales para proliferación masiva de hongos." },
-            { scenario: " Uñas amarillas y engrosadas", description: "Una persona presenta uñas de los pies amarillas, gruesas y quebradizas después de usar sandalias en gimnasio público.", question: "¿Qué infección fúngica es y cómo se contagió?", options: ["Tiña corporal - aire", "Candidiasis - alimentos", "Onicomicosis - contacto con superficies contaminadas", "Aspergilosis - polvo"], correct: 2, explanation: "La onicomicosis es infección de uñas por dermatofitos, comúnmente contraída en piscinas, gimnasios y duchas públicas." },
+            { scenario: "🌡️ Invernadero con 95% de humedad y 35°C", description: "Condiciones extremas de humedad y temperatura.", question: "¿Qué sucede con los hongos en estas condiciones?", options: ["Los hongos mueren todos", "Solo crecen bacterias", "No pasa nada", "Proliferación masiva de mohos y levaduras"], correct: 3, explanation: "La combinación de alta humedad (>90%) y temperatura cálida (25-35°C) crea condiciones ideales para proliferación masiva de hongos." },
+            { scenario: "💅 Uñas amarillas y engrosadas", description: "Una persona presenta uñas de los pies amarillas, gruesas y quebradizas después de usar sandalias en gimnasio público.", question: "¿Qué infección fúngica es y cómo se contagió?", options: ["Tiña corporal - aire", "Candidiasis - alimentos", "Onicomicosis - contacto con superficies contaminadas", "Aspergilosis - polvo"], correct: 2, explanation: "La onicomicosis es infección de uñas por dermatofitos, comúnmente contraída en piscinas, gimnasios y duchas públicas." },
             { scenario: "🍺 Fabricación de cerveza artesanal", description: "Se añade un microorganismo al mosto de cebada para producir alcohol.", question: "¿Qué hongo se usa y qué proceso realiza?", options: ["Penicillium - maduración", "Aspergillus - toxinas", "Rhizopus - putrefacción", "Saccharomyces - fermentación alcohólica"], correct: 3, explanation: "Saccharomyces cerevisiae fermenta los azúcares del mosto produciendo etanol (alcohol) y CO2, proceso esencial en cervecería." },
             { scenario: "🏥 Hospital con sistema de aire acondicionado contaminado", description: "Varios pacientes inmunodeprimidos desarrollan infecciones pulmonares similares.", question: "¿Qué hongo oportunista se dispersa por aire acondicionado?", options: ["Candida - solo contacto", "Aspergillus - esporas en aire", "Dermatofitos - solo piel", "Levaduras - solo alimentos"], correct: 1, explanation: "Aspergillus dispersa esporas por sistemas de ventilación contaminados, causando aspergilosis en pacientes vulnerables." },
-            { scenario: "️ Casa con inundación reciente", description: "Después de una inundación, las paredes presentan crecimiento negro y olor a moho.", question: "¿Qué hongo peligroso puede crecer y qué riesgo tiene?", options: ["Levadura - inofensiva", "Champignon - comestible", "Liquen - benéfico", "Stachybotrys (moho negro) - produce micotoxinas"], correct: 3, explanation: "Stachybotrys chartarum (moho negro tóxico) crece en materiales orgánicos húmedos y produce micotoxinas dañinas para la salud." },
+            { scenario: "🌧️ Casa con inundación reciente", description: "Después de una inundación, las paredes presentan crecimiento negro y olor a moho.", question: "¿Qué hongo peligroso puede crecer y qué riesgo tiene?", options: ["Levadura - inofensiva", "Champignon - comestible", "Liquen - benéfico", "Stachybotrys (moho negro) - produce micotoxinas"], correct: 3, explanation: "Stachybotrys chartarum (moho negro tóxico) crece en materiales orgánicos húmedos y produce micotoxinas dañinas para la salud." },
             { scenario: "👶 Bebé con manchas blancas en la boca", description: "Un bebé de 3 meses presenta placas blancas en lengua y mejillas internas que no se quitan fácilmente.", question: "¿Qué infección fúngica es común en bebés?", options: ["Tiña - solo piel", "Candidiasis oral (algodón) - Candida albicans", "Aspergilosis - solo pulmones", "Onicomicosis - solo uñas"], correct: 1, explanation: "La candidiasis oral (algodón) es causada por Candida albicans, común en bebés por su sistema inmunológico inmaduro." },
             { scenario: "🌽 Granero con granos almacenados húmedos", description: "Granos de maíz almacenados con humedad presentan crecimiento de hongo que produce toxinas.", question: "¿Qué hongo produce aflatoxinas peligrosas?", options: ["Saccharomyces - fermentación", "Aspergillus flavus - aflatoxinas cancerígenas", "Penicillium - antibióticos", "Rhizopus - pan"], correct: 1, explanation: "Aspergillus flavus produce aflatoxinas, potentes carcinógenos que contaminan granos almacenados en condiciones húmedas." },
             { scenario: "🧪 Laboratorio de microbiología", description: "Se observa al microscopio un hongo con hifas septadas y esporas en conidióforos.", question: "¿Qué estructura es exclusiva de hongos y no de bacterias?", options: ["Pared de peptidoglicano", "Membrana externa", "Flagelos bacterianos", "Hifas septadas con quitina"], correct: 3, explanation: "Las hifas septadas con pared de quitina son estructuras exclusivas de hongos, diferenciándolos de bacterias que tienen peptidoglicano." },
             { scenario: "🍄 Setas silvestres en el bosque", description: "Después de lluvias, aparecen setas en el bosque. Algunas son comestibles, otras mortales.", question: "¿Por qué es peligroso consumir setas silvestres sin conocimiento?", options: ["Todas son venenosas", "Algunas contienen toxinas mortales como amatoxinas", "Ninguna es comestible", "Solo las de colores son malas"], correct: 1, explanation: "Muchas setas silvestres contienen toxinas mortales (como amatoxinas en Amanita phalloides) que causan fallo hepático." },
             { scenario: "🏋️ Gimnasio con duchas compartidas", description: "Varias personas desarrollan infecciones en la piel después de usar duchas públicas.", question: "¿Qué hongo se transmite en duchas públicas y cómo prevenirlo?", options: ["Levaduras - solo alimentos", "Mohos - solo paredes", "Líquenes - solo árboles", "Dermatofitos - usar sandalias y secar bien"], correct: 3, explanation: "Los dermatofitos se transmiten en superficies húmedas de duchas públicas. Usar sandalias y secar bien previene infecciones." },
-            { scenario: "️ Cambio climático y hongos", description: "El calentamiento global está cambiando la distribución de hongos patógenos.", question: "¿Qué efecto tiene el cambio climático en hongos patógenos?", options: ["Los elimina todos", "No tiene efecto", "Solo afecta bacterias", "Expande su rango geográfico a nuevas zonas"], correct: 3, explanation: "El cambio climático permite que hongos patógenos se expandan a zonas previamente demasiado frías, aumentando enfermedades fúngicas." },
+            { scenario: "🌡️ Cambio climático y hongos", description: "El calentamiento global está cambiando la distribución de hongos patógenos.", question: "¿Qué efecto tiene el cambio climático en hongos patógenos?", options: ["Los elimina todos", "No tiene efecto", "Solo afecta bacterias", "Expande su rango geográfico a nuevas zonas"], correct: 3, explanation: "El cambio climático permite que hongos patógenos se expandan a zonas previamente demasiado frías, aumentando enfermedades fúngicas." },
             { scenario: "💉 Paciente con catéter venoso central", description: "Un paciente hospitalizado con catéter desarrolla fiebre. Cultivos muestran levaduras en sangre.", question: "¿Qué infección fúngica grave puede ocurrir por catéteres?", options: ["Tiña - solo piel", "Aspergilosis - solo aire", "Onicomicosis - solo uñas", "Candidemia - Candida en sangre"], correct: 3, explanation: "La candidemia es infección sanguínea por Candida, común en pacientes con catéteres y sistemas inmunológicos comprometidos." },
             { scenario: "🍷 Vino con sabor avinagrado", description: "Un vino casero presenta sabor y olor desagradable después de la fermentación.", question: "¿Qué hongo puede contaminar la fermentación del vino?", options: ["Saccharomyces - fermentación normal", "Brettanomyces - produce sabores indeseables", "Penicillium - antibióticos", "Aspergillus - toxinas"], correct: 1, explanation: "Brettanomyces es una levadura que puede contaminar vinos produciendo sabores y olores indeseables como 'caballo' o 'band-aid'." },
-            { scenario: " Árbol con hojas manchadas de negro", description: "Un árbol en el jardín presenta manchas negras en las hojas que se expanden rápidamente.", question: "¿Qué enfermedad fúngica afecta plantas ornamentales?", options: ["Royas - manchas naranjas", "Mildiu - manchas blancas", "Antracnosis - manchas negras", "Oídio - polvo blanco"], correct: 2, explanation: "La antracnosis es causada por hongos como Colletotrichum que producen manchas negras necróticas en hojas, tallos y frutos." },
+            { scenario: "🌳 Árbol con hojas manchadas de negro", description: "Un árbol en el jardín presenta manchas negras en las hojas que se expanden rápidamente.", question: "¿Qué enfermedad fúngica afecta plantas ornamentales?", options: ["Royas - manchas naranjas", "Mildiu - manchas blancas", "Antracnosis - manchas negras", "Oídio - polvo blanco"], correct: 2, explanation: "La antracnosis es causada por hongos como Colletotrichum que producen manchas negras necróticas en hojas, tallos y frutos." },
             { scenario: "🧴 Crema antimicótica en la farmacia", description: "Un paciente compra crema con clotrimazol para tratar una infección en la piel.", question: "¿Cómo actúan los antifúngicos azoles?", options: ["Destruyen la pared celular", "Inhiben la síntesis de ergosterol", "Matan las esporas", "Bloquean la reproducción"], correct: 1, explanation: "Los antifúngicos azoles como el clotrimazol inhiben la síntesis de ergosterol, componente esencial de la membrana celular fúngica." },
             { scenario: "🍄 Trufa negra en restaurante gourmet", description: "Un chef paga miles de dólares por trufas negras italianas para un plato especial.", question: "¿Qué hace especiales a las trufas y cómo crecen?", options: ["Son raíces de árboles", "Son hongos subterráneos en simbiosis con árboles", "Son tubérculos comestibles", "Son algas modificadas"], correct: 1, explanation: "Las trufas son cuerpos fructíferos de hongos ascomicetos que crecen bajo tierra en simbiosis micorrícica con raíces de árboles." },
-            { scenario: " Paciente con VIH y candidiasis esofágica", description: "Un paciente con SIDA presenta dificultad para tragar y dolor al comer.", question: "¿Por qué los pacientes con VIH son susceptibles a candidiasis?", options: ["El VIH mata hongos", "El VIH debilita el sistema inmunológico", "El VIH alimenta hongos", "El VIH no tiene relación"], correct: 1, explanation: "El VIH destruye células CD4, debilitando el sistema inmunológico y permitiendo que Candida, normalmente controlada, cause infecciones oportunistas." },
+            { scenario: "👨‍🦰 Paciente con VIH y candidiasis esofágica", description: "Un paciente con SIDA presenta dificultad para tragar y dolor al comer.", question: "¿Por qué los pacientes con VIH son susceptibles a candidiasis?", options: ["El VIH mata hongos", "El VIH debilita el sistema inmunológico", "El VIH alimenta hongos", "El VIH no tiene relación"], correct: 1, explanation: "El VIH destruye células CD4, debilitando el sistema inmunológico y permitiendo que Candida, normalmente controlada, cause infecciones oportunistas." },
             { scenario: "🌾 Cosecha de trigo con polvo rojizo", description: "Campesinos observan un polvo rojizo en los tallos de trigo que reduce el rendimiento.", question: "¿Qué hongo causa la roya del trigo y qué impacto tiene?", options: ["Aspergillus - toxinas", "Puccinia graminis - reduce cosechas", "Penicillium - antibióticos", "Saccharomyces - fermentación"], correct: 1, explanation: "Puccinia graminis causa la roya negra del trigo, una enfermedad devastadora que puede destruir cosechas enteras y causar hambrunas." },
             { scenario: "🧫 Cultivo de Penicillium en laboratorio", description: "Científicos cultivan Penicillium chrysogenum para producir un medicamento importante.", question: "¿Qué medicamento se produce a partir de Penicillium?", options: ["Aspirina", "Penicilina (antibiótico)", "Insulina", "Vacuna"], correct: 1, explanation: "La penicilina, el primer antibiótico descubierto por Fleming, se produce a partir del hongo Penicillium chrysogenum." },
-            { scenario: " Casa con problemas de asma", description: "Una familia presenta síntomas de asma que mejoran cuando salen de vacaciones.", question: "¿Qué hongo doméstico puede agravar el asma?", options: ["Levadura de pan", "Mohos como Alternaria y Cladosporium", "Setas comestibles", "Líquenes"], correct: 1, explanation: "Mohos como Alternaria y Cladosporium producen esporas que son alérgenos comunes que pueden desencadenar o agravar el asma." },
+            { scenario: "🏠 Casa con problemas de asma", description: "Una familia presenta síntomas de asma que mejoran cuando salen de vacaciones.", question: "¿Qué hongo doméstico puede agravar el asma?", options: ["Levadura de pan", "Mohos como Alternaria y Cladosporium", "Setas comestibles", "Líquenes"], correct: 1, explanation: "Mohos como Alternaria y Cladosporium producen esporas que son alérgenos comunes que pueden desencadenar o agravar el asma." },
             { scenario: "🍫 Chocolate con manchas blancas", description: "Una tableta de chocolate presenta una capa blanca en la superficie después de meses.", question: "¿Es esto un hongo o un proceso natural del chocolate?", options: ["Moho peligroso", "Bloom de grasa (proceso natural)", "Bacterias", "Levadura"], correct: 1, explanation: "El 'bloom' de grasa es un proceso natural donde la manteca de cacao migra a la superficie, no es moho y es seguro consumir." },
             { scenario: "🌿 Planta de interior con manchas blancas polvorientas", description: "Una planta de interior presenta un polvo blanco en las hojas que se extiende rápidamente.", question: "¿Qué enfermedad fúngica afecta plantas de interior?", options: ["Mildiu - necesita humedad", "Oídio - polvo blanco característico", "Roya - manchas naranjas", "Antracnosis - manchas negras"], correct: 1, explanation: "El oídio es causado por hongos como Erysiphe que producen un característico polvo blanco en hojas, tallos y flores." },
             { scenario: "🧀 Queso Camembert con corteza blanca", description: "Un queso Camembert presenta una corteza blanca aterciopelada en la superficie.", question: "¿Qué hongo forma la corteza del Camembert?", options: ["Penicillium roqueforti", "Penicillium camemberti", "Aspergillus niger", "Rhizopus stolonifer"], correct: 1, explanation: "Penicillium camemberti (o P. candidum) forma la característica corteza blanca del queso Camembert y Brie." },
@@ -1683,17 +1749,17 @@
             { scenario: "🍇 Uvas con polvo blanco para vino dulce", description: "Viñedos especiales cultivan uvas con 'podredumbre noble' para vinos dulces premium.", question: "¿Qué hongo causa la podredumbre noble beneficiosa?", options: ["Botrytis cinerea", "Penicillium", "Aspergillus", "Rhizopus"], correct: 0, explanation: "Botrytis cinerea causa la 'podredumbre noble' que concentra azúcares en uvas, produciendo vinos dulces como Sauternes y Tokaji." },
             { scenario: "🦷 Infección bucal con placas blancas", description: "Un paciente diabético presenta placas blancas en encías y paladar.", question: "¿Qué hongo causa candidiasis oral en diabéticos?", options: ["Aspergillus niger", "Candida albicans", "Penicillium", "Mucor"], correct: 1, explanation: "Candida albicans es parte de la flora normal pero causa infecciones oportunistas en diabéticos por niveles elevados de glucosa." },
             { scenario: "🌲 Bosque con árboles muertos", description: "Un bosque presenta árboles muertos con hongos en forma de oreja en los troncos.", question: "¿Qué hongo causa pudrición de madera?", options: ["Levadura", "Hongos de pudrición blanca y marrón", "Mohos", "Líquenes"], correct: 1, explanation: "Hongos como Trametes y Ganoderma causan pudrición de madera, descomponiendo lignina y celulosa en bosques." },
-            { scenario: " Shampoo anticaspa en el baño", description: "Una persona usa shampoo con ketoconazol para tratar caspa severa.", question: "¿Qué hongo causa la caspa?", options: ["Candida albicans", "Malassezia furfur", "Aspergillus", "Penicillium"], correct: 1, explanation: "Malassezia furfur es una levadura que vive en el cuero cabelludo y puede causar caspa y dermatitis seborreica." },
+            { scenario: "🧴 Shampoo anticaspa en el baño", description: "Una persona usa shampoo con ketoconazol para tratar caspa severa.", question: "¿Qué hongo causa la caspa?", options: ["Candida albicans", "Malassezia furfur", "Aspergillus", "Penicillium"], correct: 1, explanation: "Malassezia furfur es una levadura que vive en el cuero cabelludo y puede causar caspa y dermatitis seborreica." },
             { scenario: "🍄 Hongo bioluminiscente en bosque nocturno", description: "Excursionistas ven hongos que brillan en la oscuridad del bosque.", question: "¿Por qué algunos hongos son bioluminiscentes?", options: ["Para atraer insectos que dispersan esporas", "Por radiación", "Por químicos tóxicos", "Es una enfermedad"], correct: 0, explanation: "La bioluminiscencia en hongos como Omphalotus atrae insectos nocturnos que ayudan a dispersar sus esporas." },
-            { scenario: " Cosecha de maní con hongos", description: "Cosecha de maní almacenada en condiciones húmedas desarrolla hongos.", question: "¿Qué riesgo tiene el maní con hongos?", options: ["Mejor sabor", "Producción de aflatoxinas cancerígenas", "Más nutrientes", "No tiene riesgo"], correct: 1, explanation: "El maní contaminado con Aspergillus flavus produce aflatoxinas, potentes carcinógenos hepáticos." },
+            { scenario: "🥜 Cosecha de maní con hongos", description: "Cosecha de maní almacenada en condiciones húmedas desarrolla hongos.", question: "¿Qué riesgo tiene el maní con hongos?", options: ["Mejor sabor", "Producción de aflatoxinas cancerígenas", "Más nutrientes", "No tiene riesgo"], correct: 1, explanation: "El maní contaminado con Aspergillus flavus produce aflatoxinas, potentes carcinógenos hepáticos." },
             { scenario: "🧫 Laboratorio con cultivo de levaduras", description: "Científicos estudian levaduras para producir biocombustibles.", question: "¿Qué ventaja tienen las levaduras para biocombustibles?", options: ["Producen oxígeno", "Fermentan azúcares en etanol", "Absorben CO2", "Producen hidrógeno"], correct: 1, explanation: "Levaduras como Saccharomyces fermentan azúcares produciendo etanol, usado como biocombustible renovable." },
             { scenario: "🌿 Liquen en rocas de montaña", description: "Excursionistas observan organismos en rocas que parecen musgo pero son diferentes.", question: "¿Qué es un liquen?", options: ["Un hongo solo", "Simbiosis entre hongo y alga/cianobacteria", "Una planta", "Un musgo"], correct: 1, explanation: "Los líquenes son simbiosis entre un hongo (micobionte) y un alga o cianobacteria (fotobionte)." },
             { scenario: "🍞 Pan con moho verde", description: "Una familia encuentra moho verde en el pan y discute si cortar la parte afectada es seguro.", question: "¿Es seguro comer pan con moho cortando la parte visible?", options: ["Sí, solo la superficie está afectada", "No, las hifas penetran todo el pan", "Depende del color", "Solo si se calienta"], correct: 1, explanation: "Las hifas del moho penetran profundamente en alimentos blandos como el pan, por lo que debe desecharse completo." },
             { scenario: "🦠 Paciente trasplantado con fiebre", description: "Un paciente trasplantado de médula ósea desarrolla fiebre persistente.", question: "¿Qué infección fúngica es común en trasplantados?", options: ["Pie de atleta", "Aspergilosis invasiva", "Caspa", "Tiña"], correct: 1, explanation: "La aspergilosis invasiva es una infección grave y frecuente en pacientes inmunosuprimidos como trasplantados." },
             { scenario: "🌾 Campo de arroz con enfermedad", description: "Cultivos de arroz presentan lesiones en hojas que reducen la producción.", question: "¿Qué hongo causa la piricularia del arroz?", options: ["Magnaporthe oryzae", "Aspergillus", "Penicillium", "Fusarium"], correct: 0, explanation: "Magnaporthe oryzae causa la piricularia del arroz, una de las enfermedades más destructivas de este cultivo esencial." },
             { scenario: "🧴 Crema para hongos en pies", description: "Una persona compra terbinafina en crema para tratar hongos en los pies.", question: "¿Cómo actúa la terbinafina?", options: ["Inhibe síntesis de ergosterol", "Inhibe escualeno epoxidasa", "Destruye pared celular", "Bloquea ADN"], correct: 1, explanation: "La terbinafina inhibe la escualeno epoxidasa, enzima clave en la síntesis de ergosterol de la membrana fúngica." },
-            { scenario: " Setas alucinógenas en festival", description: "Jóvenes en un festival consumen setas 'mágicas' buscando efectos alucinógenos.", question: "¿Qué compuesto produce efectos alucinógenos en algunas setas?", options: ["Ergotamina", "Psilocibina", "Aflatoxina", "Penicilina"], correct: 1, explanation: "La psilocibina es el compuesto psicoactivo en setas 'mágicas' como Psilocybe cubensis, con efectos alucinógenos." },
-            { scenario: " Árbol con enfermedad del olmo", description: "Olmos en un parque mueren rápidamente por una enfermedad fúngica.", question: "¿Qué hongo causa la grafiosis del olmo?", options: ["Ophiostoma ulmi", "Aspergillus", "Penicillium", "Fusarium"], correct: 0, explanation: "Ophiostoma ulmi causa la grafiosis del olmo, transmitida por escarabajos, devastando poblaciones de olmos." },
+            { scenario: "🍄 Setas alucinógenas en festival", description: "Jóvenes en un festival consumen setas 'mágicas' buscando efectos alucinógenos.", question: "¿Qué compuesto produce efectos alucinógenos en algunas setas?", options: ["Ergotamina", "Psilocibina", "Aflatoxina", "Penicilina"], correct: 1, explanation: "La psilocibina es el compuesto psicoactivo en setas 'mágicas' como Psilocybe cubensis, con efectos alucinógenos." },
+            { scenario: "🌳 Árbol con enfermedad del olmo", description: "Olmos en un parque mueren rápidamente por una enfermedad fúngica.", question: "¿Qué hongo causa la grafiosis del olmo?", options: ["Ophiostoma ulmi", "Aspergillus", "Penicillium", "Fusarium"], correct: 0, explanation: "Ophiostoma ulmi causa la grafiosis del olmo, transmitida por escarabajos, devastando poblaciones de olmos." },
             { scenario: "🧫 Cultivo de Aspergillus para industria", description: "Industria farmacéutica cultiva Aspergillus niger a gran escala.", question: "¿Qué produce industrialmente Aspergillus niger?", options: ["Penicilina", "Ácido cítrico", "Etanol", "Insulina"], correct: 1, explanation: "Aspergillus niger se usa industrialmente para producir ácido cítrico, ampliamente usado en alimentos y bebidas." },
             { scenario: "🍇 Viñedo con mildiu", description: "Viñedos presentan manchas amarillas en el haz y moho blanco en el envés de hojas.", question: "¿Qué hongo causa el mildiu de la vid?", options: ["Erysiphe necator", "Plasmopara viticola", "Botrytis cinerea", "Guignardia bidwellii"], correct: 1, explanation: "Plasmopara viticola causa el mildiu de la vid, una enfermedad devastadora que requiere tratamiento con fungicidas." },
             { scenario: "🦠 Paciente con histoplasmosis", description: "Un agricultor presenta síntomas respiratorios después de limpiar un gallinero.", question: "¿Qué hongo causa histoplasmosis y dónde se encuentra?", options: ["Coccidioides - desiertos", "Histoplasma capsulatum - excrementos de aves/murciélagos", "Blastomyces - suelo", "Paracoccidioides - selva"], correct: 1, explanation: "Histoplasma capsulatum vive en suelos con excrementos de aves o murciélagos, causando histoplasmosis al inhalar esporas." }
@@ -2081,7 +2147,7 @@
             
             let msg = '';
             if (bacteriaState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en bacterias.';
-            else if (bacteriaState.correct >= 3) msg = ' Buen trabajo, sigue aprendiendo sobre bacterias.';
+            else if (bacteriaState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre bacterias.';
             else msg = '📚 Necesitas repasar más sobre bacterias.';
             
             document.getElementById('bacteriaFinalMessage').textContent = msg;
@@ -2213,7 +2279,7 @@
             
             let msg = '';
             if (fungusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en hongos.';
-            else if (fungusState.correct >= 3) msg = ' Buen trabajo, sigue aprendiendo sobre hongos.';
+            else if (fungusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre hongos.';
             else msg = '📚 Necesitas repasar más sobre hongos.';
             
             document.getElementById('fungusFinalMessage').textContent = msg;
@@ -2320,7 +2386,7 @@
             document.getElementById('diagnosisCorrect').textContent = `${diagnosisState.correct}/3`;
             
             let msg = '';
-            if (diagnosisState.correct === 3) msg = ' ¡Excelente detective sanitario! Diagnosticaste todos los casos correctamente.';
+            if (diagnosisState.correct === 3) msg = '🏆 ¡Excelente detective sanitario! Diagnosticaste todos los casos correctamente.';
             else if (diagnosisState.correct >= 2) msg = '👍 Buen trabajo, tienes buenos conocimientos de diagnóstico.';
             else msg = '📚 Necesitas repasar más sobre virus, bacterias y hongos.';
             
