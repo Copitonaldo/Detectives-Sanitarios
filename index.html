@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Detectives Sanitarios - Microbiología Interactiva</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * {
 margin: 0;
@@ -976,7 +977,7 @@ los virus necesitan un huésped para activarse, y los hongos se encargan de desh
 </div>
 <div id="virusStartScreen" class="start-screen">
 <h3>🎮 Juego de Emparejamiento</h3>
-<p>Une cada concepto sobre virus con su definición correcta. Tienes 15 segundos para cada pregunta.</p>
+<p>Une cada parte del virus con su función correcta. Tienes 15 segundos para cada pregunta.</p>
 <button class="btn-start-game" onclick="startVirusGame()">¡Empezar!</button>
 </div>
 <div id="virusGameContainer" style="display: none;">
@@ -1205,334 +1206,303 @@ Cargando caso...
 </footer>
 <script>
 // ==========================================
-// SISTEMA DE USUARIO Y PUNTOS GLOBALES
+// CONFIGURACIÓN DE SUPABASE
+// ==========================================
+const SUPABASE_URL = 'https://ujhiqrbqgpfdmdrzgcwg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_kSbhMN4eX6r2LsrqEYr9fw_pB3o0SIz';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ==========================================
+// SISTEMA DE USUARIO Y PUNTOS (CON SUPABASE)
 // ==========================================
 let currentUser = null;
+let currentUserId = null;
 let globalPoints = 0;
-let inventory = {
-doublePoints: 0,
-fiftyFifty: 0,
-extraTime: 0,
-hint: 0
-};
-let usedQuestions = {
-virus: [],
-bacteria: [],
-fungus: [],
-diagnosis: []
-};
-function setUsername() {
-const username = document.getElementById('usernameInput').value.trim();
-if (username === '') {
-alert('Por favor ingresa un nombre para jugar');
-return;
+let inventory = { doublePoints: 0, fiftyFifty: 0, extraTime: 0, hint: 0 };
+let usedQuestions = { virus: [], bacteria: [], fungus: [], diagnosis: [] };
+
+async function setUsername() {
+  const username = document.getElementById('usernameInput').value.trim();
+  if (username === '') {
+    alert('Por favor ingresa un nombre para jugar');
+    return;
+  }
+  
+  try {
+    // Buscar si el usuario ya existe
+    let { data: existingUser, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      // Si no existe, crearlo
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert([{ username: username, total_points: 0 }])
+        .select()
+        .single();
+      
+      if (insertError) throw insertError;
+      existingUser = newUser;
+    }
+    
+    currentUser = username;
+    currentUserId = existingUser.id;
+    globalPoints = existingUser.total_points;
+    
+    // Cargar inventario
+    const { data: invData } = await supabase
+      .from('inventory')
+      .select('*')
+      .eq('user_id', currentUserId);
+    
+    if (invData) {
+      inventory = { doublePoints: 0, fiftyFifty: 0, extraTime: 0, hint: 0 };
+      invData.forEach(item => { inventory[item.skill_name] = item.quantity; });
+    }
+    
+    // Cargar progreso (preguntas usadas)
+    const { data: progressData } = await supabase
+      .from('game_progress')
+      .select('*')
+      .eq('user_id', currentUserId);
+    
+    if (progressData) {
+      usedQuestions = { virus: [], bacteria: [], fungus: [], diagnosis: [] };
+      progressData.forEach(p => { usedQuestions[p.section] = p.used_questions || []; });
+    }
+    
+    document.getElementById('usernameForm').style.display = 'none';
+    document.getElementById('gameArea').style.display = 'block';
+    document.getElementById('displayUsername').textContent = username;
+    updateGlobalPoints();
+    await updateRanking();
+    renderMissions();
+    
+  } catch (err) {
+    console.error('Error:', err);
+    alert('Error al conectar con la base de datos: ' + err.message);
+  }
 }
-currentUser = username;
-registerUser(username);
-const savedPoints = localStorage.getItem(`points_${username}`);
-globalPoints = savedPoints ? parseInt(savedPoints) : 0;
-const savedInventory = localStorage.getItem(`inventory_${username}`);
-if (savedInventory) {
-inventory = JSON.parse(savedInventory);
+
+async function updateGlobalPoints() {
+  document.getElementById('globalPoints').textContent = globalPoints;
+  
+  // Guardar puntos en Supabase
+  await supabase
+    .from('users')
+    .update({ total_points: globalPoints })
+    .eq('id', currentUserId);
+  
+  // Guardar inventario
+  for (const [skill, qty] of Object.entries(inventory)) {
+    await supabase
+      .from('inventory')
+      .upsert({ user_id: currentUserId, skill_name: skill, quantity: qty }, { onConflict: 'user_id,skill_name' });
+  }
+  
+  // Guardar progreso
+  for (const [section, questions] of Object.entries(usedQuestions)) {
+    await supabase
+      .from('game_progress')
+      .upsert({ user_id: currentUserId, section: section, used_questions: questions }, { onConflict: 'user_id,section' });
+  }
+  
+  await updateRanking();
+  updateSkillCounts();
 }
-const savedUsedQuestions = localStorage.getItem(`usedQuestions_${username}`);
-if (savedUsedQuestions) {
-usedQuestions = JSON.parse(savedUsedQuestions);
+
+async function updateRanking() {
+  const rankingList = document.getElementById('rankingList');
+  
+  const { data: users, error } = await supabase
+    .from('users')
+    .select('id, username, total_points')
+    .order('total_points', { ascending: false })
+    .limit(50);
+  
+  if (error) {
+    console.error('Error al cargar ranking:', error);
+    return;
+  }
+  
+  rankingList.innerHTML = users.map((user, index) => `
+    <li class="ranking-item ${user.id === currentUserId ? 'current-user' : ''}">
+      <span class="ranking-position">#${index + 1}</span>
+      <span class="ranking-name">${user.username}</span>
+      <span class="ranking-points">${user.total_points} pts</span>
+    </li>
+  `).join('');
 }
-document.getElementById('usernameForm').style.display = 'none';
-document.getElementById('gameArea').style.display = 'block';
-document.getElementById('displayUsername').textContent = username;
-updateGlobalPoints();
-updateRanking();
-renderMissions();
-}
-function registerUser(username) {
-let users = JSON.parse(localStorage.getItem('allUsers') || '[]');
-if (!users.includes(username)) {
-users.push(username);
-localStorage.setItem('allUsers', JSON.stringify(users));
-}
-}
-function changeUser() {
-currentUser = null;
-globalPoints = 0;
-inventory = { doublePoints: 0, fiftyFifty: 0, extraTime: 0, hint: 0 };
-usedQuestions = { virus: [], bacteria: [], fungus: [], diagnosis: [] };
-document.getElementById('usernameForm').style.display = 'block';
-document.getElementById('gameArea').style.display = 'none';
-document.getElementById('usernameInput').value = '';
-}
-function updateGlobalPoints() {
-document.getElementById('globalPoints').textContent = globalPoints;
-localStorage.setItem(`points_${currentUser}`, globalPoints);
-localStorage.setItem(`inventory_${currentUser}`, JSON.stringify(inventory));
-localStorage.setItem(`usedQuestions_${currentUser}`, JSON.stringify(usedQuestions));
-updateRanking();
-updateSkillCounts();
-}
+
 function addPoints(points) {
-globalPoints += points;
-updateGlobalPoints();
+  globalPoints += points;
+  updateGlobalPoints();
 }
+
 function buySkill(skillName) {
-const costs = {
-doublePoints: 50,
-fiftyFifty: 30,
-extraTime: 20,
-hint: 25
-};
-const cost = costs[skillName];
-if (globalPoints < cost) {
-alert(`No tienes suficientes puntos. Necesitas ${cost} puntos.`);
-return;
+  const costs = { doublePoints: 50, fiftyFifty: 30, extraTime: 20, hint: 25 };
+  const cost = costs[skillName];
+  if (globalPoints < cost) {
+    alert(`No tienes suficientes puntos. Necesitas ${cost} puntos.`);
+    return;
+  }
+  globalPoints -= cost;
+  inventory[skillName]++;
+  updateGlobalPoints();
+  const skillNames = { doublePoints: '⚡ x2 Puntos', fiftyFifty: '🎯 50/50', extraTime: '⏰ Tiempo Extra', hint: '💡 Pista' };
+  alert(`¡Habilidad "${skillNames[skillName]}" comprada! Ahora tienes ${inventory[skillName]}. Úsala durante el juego.`);
 }
-globalPoints -= cost;
-inventory[skillName]++;
-updateGlobalPoints();
-const skillNames = {
-doublePoints: '⚡ x2 Puntos',
-fiftyFifty: '🎯 50/50',
-extraTime: '⏰ Tiempo Extra',
-hint: '💡 Pista'
-};
-alert(`¡Habilidad "${skillNames[skillName]}" comprada! Ahora tienes ${inventory[skillName]}. Úsala durante el juego.`);
-}
+
 function updateSkillCounts() {
-document.getElementById('count-doublePoints').textContent = `Tienes: ${inventory.doublePoints}`;
-document.getElementById('count-fiftyFifty').textContent = `Tienes: ${inventory.fiftyFifty}`;
-document.getElementById('count-extraTime').textContent = `Tienes: ${inventory.extraTime}`;
-document.getElementById('count-hint').textContent = `Tienes: ${inventory.hint}`;
+  document.getElementById('count-doublePoints').textContent = `Tienes: ${inventory.doublePoints}`;
+  document.getElementById('count-fiftyFifty').textContent = `Tienes: ${inventory.fiftyFifty}`;
+  document.getElementById('count-extraTime').textContent = `Tienes: ${inventory.extraTime}`;
+  document.getElementById('count-hint').textContent = `Tienes: ${inventory.hint}`;
 }
-function useSkill(skillName, section) {
-if (inventory[skillName] <= 0) {
-alert('No tienes esta habilidad disponible');
-return false;
+
+function changeUser() {
+  currentUser = null;
+  currentUserId = null;
+  globalPoints = 0;
+  inventory = { doublePoints: 0, fiftyFifty: 0, extraTime: 0, hint: 0 };
+  usedQuestions = { virus: [], bacteria: [], fungus: [], diagnosis: [] };
+  document.getElementById('usernameForm').style.display = 'block';
+  document.getElementById('gameArea').style.display = 'none';
+  document.getElementById('usernameInput').value = '';
 }
-inventory[skillName]--;
-updateGlobalPoints();
-updateInGameSkills(section);
-return true;
-}
-function updateInGameSkills(section) {
-const container = document.getElementById(`${section}SkillButtons`);
-if (!container) return;
-container.innerHTML = `
-<button class="in-game-skill-btn" onclick="activateSkill('doublePoints', '${section}')" ${inventory.doublePoints <= 0 ? 'disabled' : ''}>
-⚡ x2 Puntos (${inventory.doublePoints})
-</button>
-<button class="in-game-skill-btn" onclick="activateSkill('fiftyFifty', '${section}')" ${inventory.fiftyFifty <= 0 ? 'disabled' : ''}>
-🎯 50/50 (${inventory.fiftyFifty})
-</button>
-<button class="in-game-skill-btn" onclick="activateSkill('extraTime', '${section}')" ${inventory.extraTime <= 0 ? 'disabled' : ''}>
-⏰ Tiempo Extra (${inventory.extraTime})
-</button>
-<button class="in-game-skill-btn" onclick="activateSkill('hint', '${section}')" ${inventory.hint <= 0 ? 'disabled' : ''}>
-💡 Pista (${inventory.hint})
-</button>
-`;
-}
-function activateSkill(skillName, section) {
-if (useSkill(skillName, section)) {
-const skillNames = {
-doublePoints: '⚡ x2 Puntos',
-fiftyFifty: '🎯 50/50',
-extraTime: '⏰ Tiempo Extra',
-hint: '💡 Pista'
-};
-alert(`${skillNames[skillName]} activada para la siguiente pregunta`);
-window[`activeSkill_${section}`] = skillName;
-}
-}
-function updateRanking() {
-const rankingList = document.getElementById('rankingList');
-const allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
-const users = allUsers.map(username => {
-const points = parseInt(localStorage.getItem(`points_${username}`) || '0');
-return { username, points };
-});
-users.sort((a, b) => b.points - a.points);
-rankingList.innerHTML = users.map((user, index) => `
-<li class="ranking-item ${user.username === currentUser ? 'current-user' : ''}">
-<span class="ranking-position">#${index + 1}</span>
-<span class="ranking-name">${user.username}</span>
-<span class="ranking-points">${user.points} pts</span>
-</li>
-`).join('');
-}
+
 // ==========================================
 // NAVEGACIÓN
 // ==========================================
 function showSection(sectionId) {
-document.querySelectorAll('.section').forEach(section => {
-section.classList.remove('active');
-});
-document.querySelectorAll('.nav-link').forEach(link => {
-link.classList.remove('active');
-});
-document.getElementById(sectionId).classList.add('active');
-document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
-window.scrollTo(0, 0);
+  document.querySelectorAll('.section').forEach(section => {
+    section.classList.remove('active');
+  });
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.remove('active');
+  });
+  document.getElementById(sectionId).classList.add('active');
+  document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+  window.scrollTo(0, 0);
 }
+
 document.querySelectorAll('.nav-link').forEach(link => {
-link.addEventListener('click', (e) => {
-e.preventDefault();
-const sectionId = link.getAttribute('data-section');
-showSection(sectionId);
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const sectionId = link.getAttribute('data-section');
+    showSection(sectionId);
+  });
 });
-});
+
 // ==========================================
 // HOME - TARJETAS EN ORDEN FIJO
 // ==========================================
 const missionsData = [
-{
-id: 'intro',
-icon: '📚',
-title: 'Clase Introductoria',
-description: 'Mira el video introductorio antes de comenzar',
-class: 'intro'
-},
-{
-id: 'virus',
-icon: '🦠',
-title: 'Misión Virus',
-description: 'Aprende cómo los virus atacan las células y descubre la importancia de la vacunación',
-class: 'virus'
-},
-{
-id: 'bacteria',
-icon: '🔬',
-title: 'Misión Bacterias',
-description: 'Clasificación bacteriana, resistencia a antibióticos y el peligro de la automedicación',
-class: 'bacteria'
-},
-{
-id: 'hongos',
-icon: '🍄',
-title: 'Misión Hongos',
-description: 'Explora cómo los factores ambientales afectan la proliferación de hongos',
-class: 'fungus'
-},
-{
-id: 'diagnostico',
-icon: '🩺',
-title: 'Zona de Diagnóstico',
-description: 'Aplica tus conocimientos para resolver casos clínicos reales',
-class: 'diagnosis'
-}
+  { id: 'intro', icon: '📚', title: 'Clase Introductoria', description: 'Mira el video introductorio antes de comenzar', class: 'intro' },
+  { id: 'virus', icon: '🦠', title: 'Misión Virus', description: 'Aprende cómo los virus atacan las células y descubre la importancia de la vacunación', class: 'virus' },
+  { id: 'bacteria', icon: '🔬', title: 'Misión Bacterias', description: 'Clasificación bacteriana, resistencia a antibióticos y el peligro de la automedicación', class: 'bacteria' },
+  { id: 'hongos', icon: '🍄', title: 'Misión Hongos', description: 'Explora cómo los factores ambientales afectan la proliferación de hongos', class: 'fungus' },
+  { id: 'diagnostico', icon: '🩺', title: 'Zona de Diagnóstico', description: 'Aplica tus conocimientos para resolver casos clínicos reales', class: 'diagnosis' }
 ];
+
 function renderMissions() {
-const grid = document.getElementById('missionsGrid');
-grid.innerHTML = missionsData.map(mission => `
-<div class="mission-card ${mission.class}" onclick="showSection('${mission.id}')">
-<div class="mission-icon">${mission.icon}</div>
-<h3>${mission.title}</h3>
-<p>${mission.description}</p>
-</div>
-`).join('');
+  const grid = document.getElementById('missionsGrid');
+  grid.innerHTML = missionsData.map(mission => `
+    <div class="mission-card ${mission.class}" onclick="showSection('${mission.id}')">
+      <div class="mission-icon">${mission.icon}</div>
+      <h3>${mission.title}</h3>
+      <p>${mission.description}</p>
+    </div>
+  `).join('');
 }
+
 // ==========================================
 // SISTEMA DE TIMER GLOBAL
 // ==========================================
 let timerInterval;
 let timeLeft;
+
 function startTimer(section, callback) {
-const hasExtraTime = window[`activeSkill_${section}`] === 'extraTime';
-timeLeft = hasExtraTime ? 25 : 15;
-if (hasExtraTime) {
-window[`activeSkill_${section}`] = null;
+  const hasExtraTime = window[`activeSkill_${section}`] === 'extraTime';
+  timeLeft = hasExtraTime ? 25 : 15;
+  if (hasExtraTime) {
+    window[`activeSkill_${section}`] = null;
+  }
+  updateTimerDisplay(section);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay(section);
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      callback();
+    }
+  }, 1000);
 }
-updateTimerDisplay(section);
-timerInterval = setInterval(() => {
-timeLeft--;
-updateTimerDisplay(section);
-if (timeLeft <= 0) {
-clearInterval(timerInterval);
-callback();
-}
-}, 1000);
-}
+
 function stopTimer() {
-clearInterval(timerInterval);
+  clearInterval(timerInterval);
 }
+
 function updateTimerDisplay(section) {
-const timerElement = document.getElementById(`${section}Timer`);
-const timerBar = document.getElementById(`${section}TimerBar`);
-if (timerElement) {
-timerElement.textContent = timeLeft;
+  const timerElement = document.getElementById(`${section}Timer`);
+  const timerBar = document.getElementById(`${section}TimerBar`);
+  if (timerElement) {
+    timerElement.textContent = timeLeft;
+  }
+  if (timerBar) {
+    const percentage = (timeLeft / 15) * 100;
+    timerBar.style.width = `${percentage}%`;
+  }
 }
-if (timerBar) {
-const percentage = (timeLeft / 15) * 100;
-timerBar.style.width = `${percentage}%`;
-}
-}
+
 // ==========================================
-// BANCO DE PREGUNTAS - VIRUS (NUEVAS PREGUNTAS EN FORMATO MATCHING)
+// BANCO DE PREGUNTAS - VIRUS
 // ==========================================
 const virusMatchPairs = [
-{ term: "¿Por qué los virus no son seres vivos?", definition: "Porque no pueden cumplir con la función vital de reproducción por sí mismos" },
-{ term: "Estructura básica de un virus", definition: "Cubierta exterior llamada cápside y material genético en el interior" },
-{ term: "Mejor método de prevención", definition: "Las vacunas" },
-{ term: "Definición correcta de virus", definition: "Agente infeccioso microscópico que solo puede replicarse dentro de las células" },
-{ term: "Orden del ciclo viral", definition: "Adsorción → Penetración → Replicación → Ensamblaje → Liberación" },
-{ term: "Estructura y propósito de vacunas", definition: "Material genético rodeado por cápside proteica; vacunación entrena al sistema inmunológico" }
+  { term: "¿Por qué los virus no son seres vivos?", definition: "Porque no pueden cumplir con la función vital de reproducción por sí mismos" },
+  { term: "Estructura básica de un virus", definition: "Cubierta exterior llamada cápside y material genético en el interior" },
+  { term: "Mejor método de prevención", definition: "Las vacunas" },
+  { term: "Definición correcta de virus", definition: "Agente infeccioso microscópico que solo puede replicarse dentro de las células" },
+  { term: "Orden del ciclo viral", definition: "Adsorción → Penetración → Replicación → Ensamblaje → Liberación" },
+  { term: "Estructura y propósito de vacunas", definition: "Material genético rodeado por cápside proteica; vacunación entrena al sistema inmunológico" }
 ];
+
 // ==========================================
-// BANCO DE PREGUNTAS - BACTERIAS (NUEVAS PREGUNTAS)
+// BANCO DE PREGUNTAS - BACTERIAS
 // ==========================================
 const bacteriaQuestions = [
-{ q: "¿Cuál es la característica fundamental de las bacterias en cuanto a su núcleo y tipo de célula?", options: ["Son células eucariotas con un núcleo bien protegido por una membrana.", "Son seres pluricelulares con núcleos ramificados en hilos.", "Son células procariotas, lo que significa que no tienen núcleo.", "No poseen células y su material genético flota fuera de la membrana."], correct: 2 },
-{ q: "¿Cómo se clasifican las bacterias de acuerdo con sus diferentes formas estructurales?", options: ["En levaduras, setas y mohos.", "En bacilos (alargados), cocos (redondeados) y espirales.", "En bacterias vegetales, animales y humanas.", "En virus patógenos y vectores acuáticos."], correct: 1 },
-{ q: "¿Qué grave consecuencia produce si se realiza un mal uso de los antibióticos?", options: ["Que las bacterias se transformen de inmediato en hongos pluricelulares.", "Que el cuerpo humano deje de producir glóbulos rojos.", "Que se generen bacterias resistentes contra las que no haya cura.", "Que los virus muten y adquieran flagelos para desplazarse."], correct: 2 },
-{ q: "¿Cuál es la diferencia estructural y de tinción entre las bacterias Gram positivas y las Gram negativas según el método de Tinción de Gram?", options: ["Las Gram positivas tienen una pared celular delgada y se tiñen de rosa/rojo, mientras que las Gram negativas tienen una pared gruesa y se tiñen de morado/violeta.", "Las Gram positivas tienen una pared celular gruesa y se tiñen de morado/violeta, mientras que las Gram negativas tienen una pared delgada con membrana externa y se tiñen de rosa/rojo.", "Ambos tipos de bacterias tienen la misma estructura celular, pero las Gram positivas se tiñen de verde y las Gram negativas de azul.", "Las Gram positivas carecen de pared celular y se tiñen de morado, mientras que las Gram negativas tienen una membrana doble y no se tiñen."], correct: 1 },
-{ q: "¿Qué se entiende por resistencia bacteriana?", options: ["La capacidad de los antibióticos para destruir cualquier tipo de bacteria en pocos minutos.", "El mecanismo por el cual el cuerpo humano rechaza de forma natural las infecciones por hongos.", "La capacidad de las bacterias para sobrevivir a los efectos de los antibióticos.", "El proceso de división celular acelerado que ocurre cuando las bacterias entran en contacto con el agua."], correct: 2 },
-{ q: "¿Cuál es el peligro principal de la automedicación con antibióticos?", options: ["El uso incorrecto de estos medicamentos debilita los músculos e impide que la tinción de Gram funcione.", "Provoca una disminución inmediata en el grosor de la pared celular de todas las bacterias Gram positivas.", "El uso incorrecto de antibióticos estimula la creación de vacunas naturales dentro de la membrana bacteriana externa.", "El uso incorrecto de antibióticos genera superbacterias resistentes."], correct: 3 }
+  { q: "¿Cuál es la característica fundamental de las bacterias en cuanto a su núcleo y tipo de célula?", options: ["Son células eucariotas con un núcleo bien protegido por una membrana.", "Son seres pluricelulares con núcleos ramificados en hilos.", "Son células procariotas, lo que significa que no tienen núcleo.", "No poseen células y su material genético flota fuera de la membrana."], correct: 2 },
+  { q: "¿Cómo se clasifican las bacterias de acuerdo con sus diferentes formas estructurales?", options: ["En levaduras, setas y mohos.", "En bacilos (alargados), cocos (redondeados) y espirales.", "En bacterias vegetales, animales y humanas.", "En virus patógenos y vectores acuáticos."], correct: 1 },
+  { q: "¿Qué grave consecuencia produce si se realiza un mal uso de los antibióticos?", options: ["Que las bacterias se transformen de inmediato en hongos pluricelulares.", "Que el cuerpo humano deje de producir glóbulos rojos.", "Que se generen bacterias resistentes contra las que no haya cura.", "Que los virus muten y adquieran flagelos para desplazarse."], correct: 2 },
+  { q: "¿Cuál es la diferencia estructural y de tinción entre las bacterias Gram positivas y las Gram negativas según el método de Tinción de Gram?", options: ["Las Gram positivas tienen una pared celular delgada y se tiñen de rosa/rojo, mientras que las Gram negativas tienen una pared gruesa y se tiñen de morado/violeta.", "Las Gram positivas tienen una pared celular gruesa y se tiñen de morado/violeta, mientras que las Gram negativas tienen una pared delgada con membrana externa y se tiñen de rosa/rojo.", "Ambos tipos de bacterias tienen la misma estructura celular, pero las Gram positivas se tiñen de verde y las Gram negativas de azul.", "Las Gram positivas carecen de pared celular y se tiñen de morado, mientras que las Gram negativas tienen una membrana doble y no se tiñen."], correct: 1 },
+  { q: "¿Qué se entiende por resistencia bacteriana?", options: ["La capacidad de los antibióticos para destruir cualquier tipo de bacteria en pocos minutos.", "El mecanismo por el cual el cuerpo humano rechaza de forma natural las infecciones por hongos.", "La capacidad de las bacterias para sobrevivir a los efectos de los antibióticos.", "El proceso de división celular acelerado que ocurre cuando las bacterias entran en contacto con el agua."], correct: 2 },
+  { q: "¿Cuál es el peligro principal de la automedicación con antibióticos?", options: ["El uso incorrecto de estos medicamentos debilita los músculos e impide que la tinción de Gram funcione.", "Provoca una disminución inmediata en el grosor de la pared celular de todas las bacterias Gram positivas.", "El uso incorrecto de antibióticos estimula la creación de vacunas naturales dentro de la membrana bacteriana externa.", "El uso incorrecto de antibióticos genera superbacterias resistentes."], correct: 3 }
 ];
+
 // ==========================================
-// BANCO DE PREGUNTAS - HONGOS (NUEVAS PREGUNTAS)
+// BANCO DE PREGUNTAS - HONGOS
 // ==========================================
 const fungusQuestions = [
-{ scenario: "🍄 Reino Fungi", description: "Pregunta sobre la clasificación de los hongos.", question: "¿Por qué el reino de los hongos (Fungi) se clasifica de forma independiente a los animales y los vegetales?", options: ["Porque son los únicos microorganismos que no tienen ninguna célula.", "Porque son organismos no vivos que carecen de funciones de relación.", "Porque sus células son procariotas y se alimentan mediante la fotosíntesis.", "Porque tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila."], correct: 3, explanation: "Los hongos tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila, lo que los diferencia de animales y vegetales." },
-{ scenario: "🍄 Estructura Fúngica", description: "Pregunta sobre la estructura de los hongos pluricelulares.", question: "Cuando un hongo es pluricelular, ¿cómo se denominan los hilos largos y finos que componen su estructura?", options: ["Cápsides.", "Hifas.", "Flagelos.", "Esporas."], correct: 1, explanation: "Los hilos largos y finos que componen la estructura de los hongos pluricelulares se denominan hifas." },
-{ scenario: "🍄 Utilidad Médica", description: "Pregunta sobre el descubrimiento de Alexander Fleming.", question: "¿Qué importante utilidad médica de los hongos se destaca en el video, haciendo mención al descubrimiento de Alexander Fleming?", options: ["La producción de sustancias antibióticas como la penicilina para combatir infecciones bacterianas.", "La síntesis de vacunas universales anuales contra la gripe.", "La creación de geles hidroalcohólicos a base de moho de fruta.", "El desarrollo de nutrientes artificiales para acelerar la fotosíntesis de las plantas."], correct: 0, explanation: "Alexander Fleming descubrió la penicilina, un antibiótico producido por el hongo Penicillium, revolucionando el combate a infecciones bacterianas." },
-{ scenario: "🍄 Condiciones Ambientales", description: "Pregunta sobre las condiciones óptimas para los hongos.", question: "¿Cuáles son las condiciones óptimas de humedad relativa y temperatura que la mayoría de los hongos requieren para prosperar?", options: ["Humedad relativa entre 10-30% y temperatura entre 0-10°C.", "Humedad relativa entre 70-90% y temperatura entre 20-30°C.", "Humedad relativa menor al 50% y temperatura superior a los 50°C.", "Humedad relativa del 100% y temperatura bajo cero."], correct: 1, explanation: "La mayoría de los hongos prosperan en condiciones de humedad relativa entre 70-90% y temperaturas entre 20-30°C." },
-{ scenario: "🍄 Reproducción", description: "Pregunta sobre las esporas de los hongos.", question: "¿Qué son las esporas y cómo se dispersan principalmente?", options: ["Son raíces subterráneas que se extienden únicamente a través de suelos áridos.", "Son células muertas que se eliminan exclusivamente mediante la luz solar directa.", "Son fragmentos de tejido muscular que se propagan por vectores animales e insectos.", "Son formas de reproducción que se dispersan por el aire, el agua o el contacto."], correct: 3, explanation: "Las esporas son formas de reproducción de los hongos que se dispersan principalmente por el aire, el agua o el contacto." },
-{ scenario: "🍄 Factores de Riesgo", description: "Pregunta sobre factores que facilitan la proliferación de hongos.", question: "¿Cuál de las siguientes opciones agrupa correctamente los factores de riesgo ambientales que facilitan la aparición y proliferación de hongos?", options: ["Ventilación deficiente, acumulación de agua y materiales orgánicos.", "Uso de desinfectantes, flujo constante de aire seco y materiales sintéticos.", "Exposición a la radiación ultravioleta, ambientes sellados al vacío y metales puros.", "Altas corrientes de aire filtrado, drenaje óptimo y ausencia de nutrientes."], correct: 0, explanation: "La ventilación deficiente, la acumulación de agua y la presencia de materiales orgánicos son factores de riesgo que facilitan la proliferación de hongos." }
+  { scenario: "🍄 Reino Fungi", description: "Pregunta sobre la clasificación de los hongos.", question: "¿Por qué el reino de los hongos (Fungi) se clasifica de forma independiente a los animales y los vegetales?", options: ["Porque son los únicos microorganismos que no tienen ninguna célula.", "Porque son organismos no vivos que carecen de funciones de relación.", "Porque sus células son procariotas y se alimentan mediante la fotosíntesis.", "Porque tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila."], correct: 3, explanation: "Los hongos tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila, lo que los diferencia de animales y vegetales." },
+  { scenario: "🍄 Estructura Fúngica", description: "Pregunta sobre la estructura de los hongos pluricelulares.", question: "Cuando un hongo es pluricelular, ¿cómo se denominan los hilos largos y finos que componen su estructura?", options: ["Cápsides.", "Hifas.", "Flagelos.", "Esporas."], correct: 1, explanation: "Los hilos largos y finos que componen la estructura de los hongos pluricelulares se denominan hifas." },
+  { scenario: "🍄 Utilidad Médica", description: "Pregunta sobre el descubrimiento de Alexander Fleming.", question: "¿Qué importante utilidad médica de los hongos se destaca en el video, haciendo mención al descubrimiento de Alexander Fleming?", options: ["La producción de sustancias antibióticas como la penicilina para combatir infecciones bacterianas.", "La síntesis de vacunas universales anuales contra la gripe.", "La creación de geles hidroalcohólicos a base de moho de fruta.", "El desarrollo de nutrientes artificiales para acelerar la fotosíntesis de las plantas."], correct: 0, explanation: "Alexander Fleming descubrió la penicilina, un antibiótico producido por el hongo Penicillium, revolucionando el combate a infecciones bacterianas." },
+  { scenario: "🍄 Condiciones Ambientales", description: "Pregunta sobre las condiciones óptimas para los hongos.", question: "¿Cuáles son las condiciones óptimas de humedad relativa y temperatura que la mayoría de los hongos requieren para prosperar?", options: ["Humedad relativa entre 10-30% y temperatura entre 0-10°C.", "Humedad relativa entre 70-90% y temperatura entre 20-30°C.", "Humedad relativa menor al 50% y temperatura superior a los 50°C.", "Humedad relativa del 100% y temperatura bajo cero."], correct: 1, explanation: "La mayoría de los hongos prosperan en condiciones de humedad relativa entre 70-90% y temperaturas entre 20-30°C." },
+  { scenario: "🍄 Reproducción", description: "Pregunta sobre las esporas de los hongos.", question: "¿Qué son las esporas y cómo se dispersan principalmente?", options: ["Son raíces subterráneas que se extienden únicamente a través de suelos áridos.", "Son células muertas que se eliminan exclusivamente mediante la luz solar directa.", "Son fragmentos de tejido muscular que se propagan por vectores animales e insectos.", "Son formas de reproducción que se dispersan por el aire, el agua o el contacto."], correct: 3, explanation: "Las esporas son formas de reproducción de los hongos que se dispersan principalmente por el aire, el agua o el contacto." },
+  { scenario: "🍄 Factores de Riesgo", description: "Pregunta sobre factores que facilitan la proliferación de hongos.", question: "¿Cuál de las siguientes opciones agrupa correctamente los factores de riesgo ambientales que facilitan la aparición y proliferación de hongos?", options: ["Ventilación deficiente, acumulación de agua y materiales orgánicos.", "Uso de desinfectantes, flujo constante de aire seco y materiales sintéticos.", "Exposición a la radiación ultravioleta, ambientes sellados al vacío y metales puros.", "Altas corrientes de aire filtrado, drenaje óptimo y ausencia de nutrientes."], correct: 0, explanation: "La ventilación deficiente, la acumulación de agua y la presencia de materiales orgánicos son factores de riesgo que facilitan la proliferación de hongos." }
 ];
+
 // ==========================================
-// BANCO DE CASOS - DIAGNÓSTICO (30 casos)
+// BANCO DE CASOS - DIAGNÓSTICO
 // ==========================================
 const diagnosisCases = [
-{ patient: "María, 35 años, residente del Estado Bolívar", symptoms: "Fiebre alta (39°C), dolor de cabeza intenso, dolor muscular, erupciones cutáneas, fatiga extrema.", characteristics: "• Tamaño: 150-250 nanómetros\n• Estructura: ARN monocatenario rodeado de cápside icosaédrica\n• Sin pared celular\n• Requiere célula huésped para replicarse\n• Se transmite por mosquito Aedes aegypti", context: "Zona con alta humedad (85%) y temperatura promedio de 28°C, presencia de agua estancada cerca de la vivienda.", correct: 'virus', explanation: "Las características coinciden con un virus del dengue: tamaño nanométrico, ARN con cápside, sin pared celular, transmitido por mosquito. El ambiente favorece al vector Aedes aegypti." },
-{ patient: "Carlos, 45 años, trabajador de construcción", symptoms: "Tos persistente con flema, fiebre moderada (38°C), dolor en el pecho, sudoración nocturna, pérdida de peso.", characteristics: "• Tamaño: 2-4 micrómetros de largo\n• Forma: Bastones (bacilos)\n• Pared celular gruesa con ácido micólico\n• Tinción: Rojo/rosa (ácido-alcohol resistente)\n• Crece lentamente en pulmones", context: "Vive en zona urbana densamente poblada, trabaja en espacios cerrados con poca ventilación.", correct: 'bacteria', explanation: "Es Mycobacterium tuberculosis: bacilo con pared de ácido micólico, ácido-alcohol resistente, afecta pulmones. El hacinamiento favorece transmisión aérea." },
-{ patient: "Ana, 28 años, ama de casa", symptoms: "Picazón intensa en los pies, descamación de la piel, enrojecimiento, mal olor, aparición de ampollas.", characteristics: "• Estructura: Hifas septadas visibles al microscopio\n• Reproducción: Esporas\n• Pared celular de quitina\n• Crece en capas superficiales de la piel\n• Se alimenta de queratina", context: "Usa zapatos cerrados todo el día, vive en zona de alta humedad (88%), comparte toallas en el gimnasio.", correct: 'hongo', explanation: "Es Tiña pedis (pie de atleta): hifas con quitina, se reproduce por esporas, come queratina. Zapatos cerrados y humedad son factores de riesgo." },
-{ patient: "Luis, 8 años, estudiante", symptoms: "Fiebre, dolor de garganta intenso, dificultad para tragar, ganglios inflamados, manchas rojas en el cuerpo.", characteristics: "• Tamaño: 0.5-1 micrómetros\n• Forma: Cocos en cadenas\n• Pared celular gruesa Gram positiva\n• Produce toxinas eritrogénicas\n• Sensible a penicilina", context: "Escuela con brote reciente, contacto cercano con otros niños sintomáticos.", correct: 'bacteria', explanation: "Es Streptococcus pyogenes (faringitis estreptocócica): cocos Gram+ en cadenas, produce toxinas. Muy contagioso en escuelas." },
-{ patient: "Carmen, 65 años, diabética", symptoms: "Placas blancas en boca y lengua, dificultad para comer, ardor bucal.", characteristics: "• Tamaño: 4-6 micrómetros\n• Forma: Levadura ovalada\n• Se reproduce por gemación\n• Forma pseudohifas\n• Parte de flora normal pero oportunista", context: "Paciente diabética con control glucémico deficiente, usa dentadura postiza.", correct: 'hongo', explanation: "Es Candida albicans (candidiasis oral): levadura que forma pseudohifas, oportunista en diabéticos. La glucosa alta favorece su crecimiento." },
-{ patient: "Pedro, 22 años, universitario", symptoms: "Fiebre, fatiga, dolor de cabeza, náuseas, sensibilidad a la luz, rigidez de nuca.", characteristics: "• Tamaño: 100-200 nanómetros\n• Estructura: ARN con envoltura\n• Se transmite por saliva\n• Afecta meninges\n• Prevenir con vacuna", context: "Vive en residencia universitaria compartida, reciente brote en el campus.", correct: 'virus', explanation: "Es virus de la meningitis (posiblemente enterovirus o herpes): ARN con envoltura, se transmite por saliva, afecta meninges. Las vacunas previenen tipos específicos." },
-{ patient: "Rosa, 50 años, agricultora", symptoms: "Lesiones cutáneas nodulares, fiebre, ganglios locales inflamados, lesiones que no cicatrizan.", characteristics: "• Dimórfico: hifas en ambiente, levadura en tejido\n• Temperatura óptima: 25-30°C ambiente\n• Entra por trauma cutáneo\n• Endémico en zonas tropicales", context: "Trabaja con plantas y tierra, reciente herida en mano con espina de rosa.", correct: 'hongo', explanation: "Es Sporothrix schenckii (esporotricosis): hongo dimórfico que entra por heridas con material vegetal. Endémico en zonas tropicales como Venezuela." },
-{ patient: "Diego, 40 años, viajero internacional", symptoms: "Diarrea severa, vómitos, deshidratación, calambres abdominales.", characteristics: "• Tamaño: 1-3 micrómetros\n• Forma: Bacilo curvo (coma)\n• Gram negativo\n• Produce toxina colérica\n• Transmisión fecal-oral", context: "Reciente viaje a zona con saneamiento deficiente, consumió agua no tratada.", correct: 'bacteria', explanation: "Es Vibrio cholerae (cólera): bacilo Gram- curvo, produce toxina colérica, transmisión por agua contaminada. El saneamiento previene." },
-{ patient: "Sofía, 15 años, estudiante", symptoms: "Fiebre, malestar general, erupción maculopapular, inflamación de parótidas.", characteristics: "• Tamaño: 150-300 nanómetros\n• ARN monocatenario\n• Familia Paramyxoviridae\n• Altamente contagioso\n• Prevenir con vacuna triple viral", context: "Escuela con casos similares, no tiene esquema de vacunación completo.", correct: 'virus', explanation: "Es virus de la parotiditis (paperas): paramyxovirus de ARN, altamente contagioso, causa inflamación de parótidas. La vacuna MMR previene." },
-{ patient: "Miguel, 55 años, transplantado", symptoms: "Fiebre persistente, tos seca, dificultad respiratoria, dolor pleural.", characteristics: "• Hifas septadas con ramificación en 45°\n• Produce conidióforos con esporas\n• Angioinvasivo\n• Galactomanano positivo en suero", context: "Paciente transplantado en tratamiento inmunosupresor, obra en construcción cerca de su casa.", correct: 'hongo', explanation: "Es Aspergillus (aspergilosis invasiva): hifas septadas ramificadas, angioinvasivo, afecta inmunodeprimidos. Las obras dispersan esporas." },
-{ patient: "Elena, 30 años, madre lactante", symptoms: "Grietas dolorosas en pezones, enrojecimiento, ardor durante la lactancia.", characteristics: "• Levadura ovalada\n• Forma pseudohifas a 37°C\n• Gram positiva\n• Parte de flora cutánea normal", context: "Madre primeriza con dificultades de lactancia, bebé con candidiasis oral.", correct: 'hongo', explanation: "Es Candida albicans (candidiasis del pezón): levadura oportunista que prospera en ambiente cálido y húmedo durante la lactancia." },
-{ patient: "Roberto, 60 años, fumador", symptoms: "Tos productiva crónica, disnea, exacerbaciones frecuentes.", characteristics: "• Cocos Gram positivos en racimos\n• Catalasa positiva\n• Coagulasa positiva\n• Resistente a meticilina en algunos casos", context: "Fumador de 40 años, EPOC diagnosticado, hospitalizaciones frecuentes.", correct: 'bacteria', explanation: "Es Staphylococcus aureus (posiblemente MRSA): cocos Gram+ en racimos, patógeno oportunista en pacientes con EPOC y hospitalizaciones." },
-{ patient: "Laura, 25 años, viajera", symptoms: "Fiebre, escalofríos, sudoración, anemia, esplenomegalia.", characteristics: "• Protozoario intracelular\n• Transmisión por vector\n• Ciclo en hepatocitos y eritrocitos\n• No es virus, bacteria ni hongo", context: "Viaje reciente a zona endémica de malaria, picaduras de mosquito.", correct: 'virus', explanation: "Aunque la malaria es causada por un protozoario (Plasmodium), las características de transmisión por vector y ciclo intracelular son similares a virus. Este caso enseña diferenciación." },
-{ patient: "Fernando, 70 años, cateterizado", symptoms: "Fiebre, escalofríos, hipotensión, cultivo de sangre positivo.", characteristics: "• Bacilos Gram negativos\n• Oxidasa negativa\n• Fermenta lactosa\n• Resistente a múltiples antibióticos", context: "Paciente hospitalizado con sonda vesical, uso prolongado de antibióticos.", correct: 'bacteria', explanation: "Es Escherichia coli resistente (posiblemente BLEE): bacilo Gram-, causa infecciones urinarias y bacteriemias en pacientes cateterizados." },
-{ patient: "Isabel, 45 años, jardinera", symptoms: "Nódulos subcutáneos en brazo, úlceras, linfangitis.", characteristics: "• Hongo dimórfico\n• Hifas a 25°C, levadura a 37°C\n• Entra por inoculación traumática\n• Endémico en América Latina", context: "Jardinera aficionada, herida con espina de rosa hace 3 semanas.", correct: 'hongo', explanation: "Es Sporothrix schenckii (esporotricosis): hongo dimórfico que entra por heridas con material vegetal, causa linfangitis nodular." },
-{ patient: "Andrés, 35 años, VIH positivo", symptoms: "Diarrea crónica, pérdida de peso, fiebre, lesiones cutáneas.", characteristics: "• Virus ARN\n• Retrovirus\n• Destruye células CD4\n• Transmisión sexual y sanguínea", context: "Paciente con VIH sin tratamiento antirretroviral, CD4 < 200.", correct: 'virus', explanation: "Es VIH (virus de inmunodeficiencia humana): retrovirus que destruye células CD4, causando inmunosupresión y enfermedades oportunistas." },
-{ patient: "Patricia, 50 años, agricultora", symptoms: "Fiebre, tos, dolor torácico, lesiones cutáneas.", characteristics: "• Hongo dimórfico\n• Endémico en valles áridos\n• Inhalación de esporas\n• Puede diseminarse", context: "Agricultora en zona árida de Venezuela, exposición a polvo.", correct: 'hongo', explanation: "Es Coccidioides (coccidioidomicosis): hongo dimórfico endémico en zonas áridas, inhalación de esporas causa enfermedad pulmonar." },
-{ patient: "Jorge, 28 años, militar", symptoms: "Fiebre alta, cefalea, mialgia, erupción maculopapular.", characteristics: "• Rickettsia\n• Bacteria intracelular obligada\n• Transmisión por garrapatas\n• Gram negativa", context: "Militar en entrenamiento de selva, picaduras de garrapatas.", correct: 'bacteria', explanation: "Es Rickettsia rickettsii (fiebre maculosa): bacteria intracelular transmitida por garrapatas, causa fiebre y erupción característica." },
-{ patient: "Marta, 40 años, diabética", symptoms: "Lesión en pie con olor fétido, necrosis, fiebre.", characteristics: "• Múltiples bacterias\n• Anaerobios y aerobios\n• Sinergia bacteriana\n• Producción de gas en tejidos", context: "Paciente diabética con úlcera en pie, mala circulación.", correct: 'bacteria', explanation: "Es infección polimicrobiana (pie diabético): mezcla de bacterias aerobias y anaerobias que causan necrosis y producción de gas." },
-{ patient: "Ricardo, 55 años, alcohólico", symptoms: "Fiebre, tos con esputo hemoptoico, dolor torácico.", characteristics: "• Bacilo Gram positivo\n• Formador de esporas\n• Anaerobio estricto\n• Produce toxinas potentes", context: "Paciente alcohólico con mala higiene dental, aspiración de contenido gástrico.", correct: 'bacteria', explanation: "Es Actinomyces israelii (actinomicosis): bacteria anaerobia que causa infecciones pulmonares en pacientes con aspiración." },
-{ patient: "Carmen, 65 años, trasplantada", symptoms: "Fiebre, disnea, infiltrados pulmonares.", characteristics: "• Levadura encapsulada\n• Tinta china positiva\n• Antígeno capsular en LCR\n• Oportunista en inmunodeprimidos", context: "Paciente trasplantada renal en inmunosupresión.", correct: 'hongo', explanation: "Es Cryptococcus neoformans (criptococosis): levadura encapsulada que causa meningitis y neumonía en inmunodeprimidos." },
-{ patient: "Luis, 30 años, excursionista", symptoms: "Eritema migrans, fiebre, fatiga, dolor articular.", characteristics: "• Espiroqueta\n• Transmisión por garrapata Ixodes\n• No se tiñe con Gram\n• Cultivo difícil", context: "Excursionista en zona boscosa, picadura de garrapata hace 2 semanas.", correct: 'bacteria', explanation: "Es Borrelia burgdorferi (enfermedad de Lyme): espiroqueta transmitida por garrapatas, causa eritema migrans característico." },
-{ patient: "Ana, 25 años, embarazada", symptoms: "Fiebre, malestar, erupción cutánea, artralgias.", characteristics: "• Virus ARN\n• Familia Togaviridae\n• Transmisión por mosquito\n• Riesgo de microcefalia fetal", context: "Embarazada de 20 semanas, zona endémica de Zika.", correct: 'virus', explanation: "Es virus Zika: togavirus transmitido por mosquito, riesgo de microcefalia y síndrome de Guillain-Barré." },
-{ patient: "Pedro, 50 años, minero", symptoms: "Fiebre, tos, dolor torácico, lesiones cutáneas.", characteristics: "• Hongo dimórfico\n• Endémico en zonas mineras\n• Inhalación de esporas\n• Puede afectar piel y huesos", context: "Minero con exposición a polvo en cuevas.", correct: 'hongo', explanation: "Es Histoplasma capsulatum (histoplasmosis): hongo dimórfico endémico en zonas con excrementos de murciélagos/aves." },
-{ patient: "Sofía, 35 años, viajera", symptoms: "Fiebre intermitente, hepatomegalia, pancitopenia.", characteristics: "• Protozoario intracelular\n• Transmisión por flebótomo\n• Afecta sistema reticuloendotelial\n• No es bacteria ni virus", context: "Viaje a zona endémica de leishmaniasis.", correct: 'virus', explanation: "Aunque la leishmaniasis es causada por un protozoario (Leishmania), este caso enseña diferenciación de patógenos intracelulares." },
-{ patient: "Miguel, 45 años, ganadero", symptoms: "Fiebre, sudoración, fatiga, hepatomegalia.", characteristics: "• Coco-bacilo Gram negativo\n• Intracelular facultativo\n• Transmisión por contacto con animales\n• Zoonosis", context: "Ganadero con exposición a bovinos, consumo de leche no pasteurizada.", correct: 'bacteria', explanation: "Es Brucella abortus (brucelosis): coco-bacilo Gram- que causa zoonosis en ganaderos por contacto con animales infectados." },
-{ patient: "Elena, 60 años, con cáncer", symptoms: "Fiebre, disnea, infiltrados pulmonares bilaterales.", characteristics: "• Levadura\n• Germen tubular positivo\n• Forma pseudohifas\n• Flora normal oportunista", context: "Paciente con cáncer en quimioterapia, neutropenia.", correct: 'hongo', explanation: "Es Candida albicans (candidiasis invasiva): levadura oportunista que causa infecciones graves en pacientes neutropénicos." },
-{ patient: "Roberto, 40 años, VIH+", symptoms: "Diarrea crónica, pérdida de peso, fiebre.", characteristics: "• Virus ARN\n• Familia Retroviridae\n• Destruye linfocitos T CD4+\n• Requiere terapia antirretroviral", context: "Paciente con VIH sin adherencia al tratamiento.", correct: 'virus', explanation: "Es VIH: retrovirus que destruye células CD4+, causando SIDA y enfermedades oportunistas." },
-{ patient: "Laura, 55 años, diabética", symptoms: "Lesión necrótica en pie, olor fétido, crepitación.", characteristics: "• Bacilo Gram positivo\n• Anaerobio estricto\n• Formador de esporas\n• Produce toxinas y gas", context: "Paciente diabética con úlcera en pie, mala perfusión.", correct: 'bacteria', explanation: "Es Clostridium perfringens (gangrena gaseosa): bacilo anaerobio que produce toxinas y gas en tejidos necróticos." },
-{ patient: "Fernando, 30 años, trasplantado", symptoms: "Fiebre, leucopenia, neumonitis.", characteristics: "• Virus ADN\n• Familia Herpesviridae\n• Reactivación en inmunosupresión\n• Células en ojo de búho", context: "Paciente trasplantado de riñón, inmunosupresión.", correct: 'virus', explanation: "Es Citomegalovirus (CMV): herpesvirus que se reactiva en pacientes inmunosuprimidos, causa neumonitis y leucopenia." }
+  { patient: "María, 35 años, residente del Estado Bolívar", symptoms: "Fiebre alta (39°C), dolor de cabeza intenso, dolor muscular, erupciones cutáneas, fatiga extrema.", characteristics: "• Tamaño: 150-250 nanómetros\n• Estructura: ARN monocatenario rodeado de cápside icosaédrica\n• Sin pared celular\n• Requiere célula huésped para replicarse\n• Se transmite por mosquito Aedes aegypti", context: "Zona con alta humedad (85%) y temperatura promedio de 28°C, presencia de agua estancada cerca de la vivienda.", correct: 'virus', explanation: "Las características coinciden con un virus del dengue: tamaño nanométrico, ARN con cápside, sin pared celular, transmitido por mosquito. El ambiente favorece al vector Aedes aegypti." },
+  { patient: "Carlos, 45 años, trabajador de construcción", symptoms: "Tos persistente con flema, fiebre moderada (38°C), dolor en el pecho, sudoración nocturna, pérdida de peso.", characteristics: "• Tamaño: 2-4 micrómetros de largo\n• Forma: Bastones (bacilos)\n• Pared celular gruesa con ácido micólico\n• Tinción: Rojo/rosa (ácido-alcohol resistente)\n• Crece lentamente en pulmones", context: "Vive en zona urbana densamente poblada, trabaja en espacios cerrados con poca ventilación.", correct: 'bacteria', explanation: "Es Mycobacterium tuberculosis: bacilo con pared de ácido micólico, ácido-alcohol resistente, afecta pulmones. El hacinamiento favorece transmisión aérea." },
+  { patient: "Ana, 28 años, ama de casa", symptoms: "Picazón intensa en los pies, descamación de la piel, enrojecimiento, mal olor, aparición de ampollas.", characteristics: "• Estructura: Hifas septadas visibles al microscopio\n• Reproducción: Esporas\n• Pared celular de quitina\n• Crece en capas superficiales de la piel\n• Se alimenta de queratina", context: "Usa zapatos cerrados todo el día, vive en zona de alta humedad (88%), comparte toallas en el gimnasio.", correct: 'hongo', explanation: "Es Tiña pedis (pie de atleta): hifas con quitina, se reproduce por esporas, come queratina. Zapatos cerrados y humedad son factores de riesgo." }
 ];
+
 // ==========================================
 // VARIABLES GLOBALES DE JUEGO
 // ==========================================
@@ -1540,529 +1510,548 @@ let virusState = { questions: [], current: 0, score: 0, correct: 0 };
 let bacteriaState = { questions: [], current: 0, score: 0, correct: 0 };
 let fungusState = { questions: [], current: 0, score: 0, correct: 0 };
 let diagnosisState = { cases: [], current: 0, score: 0, correct: 0 };
+
 function shuffleArray(array) {
-const newArray = [...array];
-for (let i = newArray.length - 1; i > 0; i--) {
-const j = Math.floor(Math.random() * (i + 1));
-[newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
 }
-return newArray;
-}
+
 function getUniqueQuestions(bank, usedList, count) {
-const available = bank.filter((q, index) => !usedList.includes(index));
-if (available.length < count) {
-usedList.length = 0;
-return shuffleArray(bank).slice(0, count);
+  const available = bank.filter((q, index) => !usedList.includes(index));
+  if (available.length < count) {
+    usedList.length = 0;
+    return shuffleArray(bank).slice(0, count);
+  }
+  const shuffled = shuffleArray(available);
+  const selected = shuffled.slice(0, count);
+  selected.forEach(q => {
+    const originalIndex = bank.indexOf(q);
+    if (originalIndex !== -1 && !usedList.includes(originalIndex)) {
+      usedList.push(originalIndex);
+    }
+  });
+  return selected;
 }
-const shuffled = shuffleArray(available);
-const selected = shuffled.slice(0, count);
-selected.forEach(q => {
-const originalIndex = bank.indexOf(q);
-if (originalIndex !== -1 && !usedList.includes(originalIndex)) {
-usedList.push(originalIndex);
-}
-});
-return selected;
-}
+
 // ==========================================
 // MISIÓN VIRUS
 // ==========================================
 function startVirusGame() {
-document.getElementById('virusStartScreen').style.display = 'none';
-document.getElementById('virusGameContainer').style.display = 'block';
-document.getElementById('virusResults').style.display = 'none';
-virusState.current = 0;
-virusState.score = 0;
-virusState.correct = 0;
-updateInGameSkills('virus');
-loadVirusQuestion();
+  document.getElementById('virusStartScreen').style.display = 'none';
+  document.getElementById('virusGameContainer').style.display = 'block';
+  document.getElementById('virusResults').style.display = 'none';
+  virusState.current = 0;
+  virusState.score = 0;
+  virusState.correct = 0;
+  updateInGameSkills('virus');
+  loadVirusQuestion();
 }
+
 function loadVirusQuestion() {
-if (virusState.current >= 5) {
-showVirusResults();
-return;
+  if (virusState.current >= 5) {
+    showVirusResults();
+    return;
+  }
+  document.getElementById('virusQuestionNum').textContent = `${virusState.current + 1}/5`;
+  document.getElementById('virusQuestionText').textContent = 'Empareja cada concepto con su definición';
+  document.getElementById('virusFeedback').textContent = '';
+  const matchContainer = document.getElementById('virusMatch');
+  matchContainer.innerHTML = '';
+  const pairs = virusMatchPairs.slice(0, 3);
+  const leftItems = shuffleArray(pairs.map((p, i) => ({ text: p.term, match: i, side: 'left' })));
+  const rightItems = shuffleArray(pairs.map((p, i) => ({ text: p.definition, match: i, side: 'right' })));
+  let selectedLeft = null;
+  let selectedRight = null;
+  let matchedCount = 0;
+  leftItems.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.textContent = item.text;
+    div.dataset.match = item.match;
+    div.dataset.side = 'left';
+    div.onclick = () => {
+      if (div.classList.contains('correct')) return;
+      document.querySelectorAll('.match-item[data-side="left"]').forEach(el => el.classList.remove('selected'));
+      div.classList.add('selected');
+      selectedLeft = div;
+      if (selectedLeft && selectedRight) {
+        checkVirusMatch(selectedLeft, selectedRight, () => {
+          matchedCount++;
+          if (matchedCount === 3) {
+            stopTimer();
+            let points = 5;
+            const activeSkill = window['activeSkill_virus'];
+            if (activeSkill === 'doublePoints') {
+              points *= 2;
+              window['activeSkill_virus'] = null;
+            }
+            addPoints(points);
+            virusState.score += points;
+            virusState.correct++;
+            document.getElementById('virusScore').textContent = virusState.score;
+            document.getElementById('virusFeedback').textContent = `✅ ¡Correcto! +${points} puntos`;
+            document.getElementById('virusFeedback').style.color = '#2ecc71';
+            setTimeout(() => {
+              virusState.current++;
+              loadVirusQuestion();
+            }, 1500);
+          }
+        }, () => {
+          document.getElementById('virusFeedback').textContent = '❌ Incorrecto, intenta de nuevo';
+          document.getElementById('virusFeedback').style.color = '#e74c3c';
+          selectedLeft.classList.remove('selected');
+          selectedRight.classList.remove('selected');
+          selectedLeft = null;
+          selectedRight = null;
+        });
+      }
+    };
+    matchContainer.appendChild(div);
+  });
+  rightItems.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.textContent = item.text;
+    div.dataset.match = item.match;
+    div.dataset.side = 'right';
+    div.onclick = () => {
+      if (div.classList.contains('correct')) return;
+      document.querySelectorAll('.match-item[data-side="right"]').forEach(el => el.classList.remove('selected'));
+      div.classList.add('selected');
+      selectedRight = div;
+      if (selectedLeft && selectedRight) {
+        checkVirusMatch(selectedLeft, selectedRight, () => {
+          matchedCount++;
+          if (matchedCount === 3) {
+            stopTimer();
+            let points = 5;
+            const activeSkill = window['activeSkill_virus'];
+            if (activeSkill === 'doublePoints') {
+              points *= 2;
+              window['activeSkill_virus'] = null;
+            }
+            addPoints(points);
+            virusState.score += points;
+            virusState.correct++;
+            document.getElementById('virusScore').textContent = virusState.score;
+            document.getElementById('virusFeedback').textContent = `✅ ¡Correcto! +${points} puntos`;
+            document.getElementById('virusFeedback').style.color = '#2ecc71';
+            setTimeout(() => {
+              virusState.current++;
+              loadVirusQuestion();
+            }, 1500);
+          }
+        }, () => {
+          document.getElementById('virusFeedback').textContent = '❌ Incorrecto, intenta de nuevo';
+          document.getElementById('virusFeedback').style.color = '#e74c3c';
+          selectedLeft.classList.remove('selected');
+          selectedRight.classList.remove('selected');
+          selectedLeft = null;
+          selectedRight = null;
+        });
+      }
+    };
+    matchContainer.appendChild(div);
+  });
+  startTimer('virus', () => {
+    document.getElementById('virusFeedback').textContent = '⏰ ¡Se acabó el tiempo!';
+    document.getElementById('virusFeedback').style.color = '#e74c3c';
+    setTimeout(() => {
+      virusState.current++;
+      loadVirusQuestion();
+    }, 1500);
+  });
 }
-document.getElementById('virusQuestionNum').textContent = `${virusState.current + 1}/5`;
-document.getElementById('virusQuestionText').textContent = 'Empareja cada concepto con su definición';
-document.getElementById('virusFeedback').textContent = '';
-const matchContainer = document.getElementById('virusMatch');
-matchContainer.innerHTML = '';
-const pairs = virusMatchPairs.slice(0, 3);
-const leftItems = shuffleArray(pairs.map((p, i) => ({ text: p.term, match: i, side: 'left' })));
-const rightItems = shuffleArray(pairs.map((p, i) => ({ text: p.definition, match: i, side: 'right' })));
-let selectedLeft = null;
-let selectedRight = null;
-let matchedCount = 0;
-leftItems.forEach(item => {
-const div = document.createElement('div');
-div.className = 'match-item';
-div.textContent = item.text;
-div.dataset.match = item.match;
-div.dataset.side = 'left';
-div.onclick = () => {
-if (div.classList.contains('correct')) return;
-document.querySelectorAll('.match-item[data-side="left"]').forEach(el => el.classList.remove('selected'));
-div.classList.add('selected');
-selectedLeft = div;
-if (selectedLeft && selectedRight) {
-checkVirusMatch(selectedLeft, selectedRight, () => {
-matchedCount++;
-if (matchedCount === 3) {
-stopTimer();
-let points = 5;
-const activeSkill = window['activeSkill_virus'];
-if (activeSkill === 'doublePoints') {
-points *= 2;
-window['activeSkill_virus'] = null;
-}
-addPoints(points);
-virusState.score += points;
-virusState.correct++;
-document.getElementById('virusScore').textContent = virusState.score;
-document.getElementById('virusFeedback').textContent = `✅ ¡Correcto! +${points} puntos`;
-document.getElementById('virusFeedback').style.color = '#2ecc71';
-setTimeout(() => {
-virusState.current++;
-loadVirusQuestion();
-}, 1500);
-}
-}, () => {
-document.getElementById('virusFeedback').textContent = '❌ Incorrecto, intenta de nuevo';
-document.getElementById('virusFeedback').style.color = '#e74c3c';
-selectedLeft.classList.remove('selected');
-selectedRight.classList.remove('selected');
-selectedLeft = null;
-selectedRight = null;
-});
-}
-};
-matchContainer.appendChild(div);
-});
-rightItems.forEach(item => {
-const div = document.createElement('div');
-div.className = 'match-item';
-div.textContent = item.text;
-div.dataset.match = item.match;
-div.dataset.side = 'right';
-div.onclick = () => {
-if (div.classList.contains('correct')) return;
-document.querySelectorAll('.match-item[data-side="right"]').forEach(el => el.classList.remove('selected'));
-div.classList.add('selected');
-selectedRight = div;
-if (selectedLeft && selectedRight) {
-checkVirusMatch(selectedLeft, selectedRight, () => {
-matchedCount++;
-if (matchedCount === 3) {
-stopTimer();
-let points = 5;
-const activeSkill = window['activeSkill_virus'];
-if (activeSkill === 'doublePoints') {
-points *= 2;
-window['activeSkill_virus'] = null;
-}
-addPoints(points);
-virusState.score += points;
-virusState.correct++;
-document.getElementById('virusScore').textContent = virusState.score;
-document.getElementById('virusFeedback').textContent = `✅ ¡Correcto! +${points} puntos`;
-document.getElementById('virusFeedback').style.color = '#2ecc71';
-setTimeout(() => {
-virusState.current++;
-loadVirusQuestion();
-}, 1500);
-}
-}, () => {
-document.getElementById('virusFeedback').textContent = '❌ Incorrecto, intenta de nuevo';
-document.getElementById('virusFeedback').style.color = '#e74c3c';
-selectedLeft.classList.remove('selected');
-selectedRight.classList.remove('selected');
-selectedLeft = null;
-selectedRight = null;
-});
-}
-};
-matchContainer.appendChild(div);
-});
-startTimer('virus', () => {
-document.getElementById('virusFeedback').textContent = '⏰ ¡Se acabó el tiempo!';
-document.getElementById('virusFeedback').style.color = '#e74c3c';
-setTimeout(() => {
-virusState.current++;
-loadVirusQuestion();
-}, 1500);
-});
-}
+
 function checkVirusMatch(left, right, onSuccess, onFail) {
-if (left.dataset.match === right.dataset.match) {
-left.classList.remove('selected');
-right.classList.remove('selected');
-left.classList.add('correct');
-right.classList.add('correct');
-onSuccess();
-} else {
-left.classList.add('wrong');
-right.classList.add('wrong');
-setTimeout(() => {
-left.classList.remove('wrong');
-right.classList.remove('wrong');
-}, 500);
-onFail();
+  if (left.dataset.match === right.dataset.match) {
+    left.classList.remove('selected');
+    right.classList.remove('selected');
+    left.classList.add('correct');
+    right.classList.add('correct');
+    onSuccess();
+  } else {
+    left.classList.add('wrong');
+    right.classList.add('wrong');
+    setTimeout(() => {
+      left.classList.remove('wrong');
+      right.classList.remove('wrong');
+    }, 500);
+    onFail();
+  }
 }
-}
+
 function showVirusResults() {
-stopTimer();
-document.getElementById('virusGameContainer').style.display = 'none';
-document.getElementById('virusResults').style.display = 'block';
-document.getElementById('virusFinalScore').textContent = virusState.score;
-document.getElementById('virusCorrect').textContent = `${virusState.correct}/5`;
-let msg = '';
-if (virusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en virus.';
-else if (virusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre virus.';
-else msg = '📚 Necesitas repasar más sobre virus.';
-document.getElementById('virusFinalMessage').textContent = msg;
+  stopTimer();
+  document.getElementById('virusGameContainer').style.display = 'none';
+  document.getElementById('virusResults').style.display = 'block';
+  document.getElementById('virusFinalScore').textContent = virusState.score;
+  document.getElementById('virusCorrect').textContent = `${virusState.correct}/5`;
+  let msg = '';
+  if (virusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en virus.';
+  else if (virusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre virus.';
+  else msg = '📚 Necesitas repasar más sobre virus.';
+  document.getElementById('virusFinalMessage').textContent = msg;
 }
+
 function resetVirusGame() {
-virusState.current = 0;
-virusState.score = 0;
-virusState.correct = 0;
-window['activeSkill_virus'] = null;
-document.getElementById('virusResults').style.display = 'none';
-document.getElementById('virusStartScreen').style.display = 'block';
-document.getElementById('virusGameContainer').style.display = 'none';
-stopTimer();
+  virusState.current = 0;
+  virusState.score = 0;
+  virusState.correct = 0;
+  window['activeSkill_virus'] = null;
+  document.getElementById('virusResults').style.display = 'none';
+  document.getElementById('virusStartScreen').style.display = 'block';
+  document.getElementById('virusGameContainer').style.display = 'none';
+  stopTimer();
 }
+
 // ==========================================
 // MISIÓN BACTERIAS
 // ==========================================
 function startBacteriaGame() {
-document.getElementById('bacteriaStartScreen').style.display = 'none';
-document.getElementById('bacteriaGameContainer').style.display = 'block';
-document.getElementById('bacteriaResults').style.display = 'none';
-bacteriaState.questions = getUniqueQuestions(bacteriaQuestions, usedQuestions.bacteria, 5);
-bacteriaState.current = 0;
-bacteriaState.score = 0;
-bacteriaState.correct = 0;
-updateInGameSkills('bacteria');
-loadBacteriaQuestion();
+  document.getElementById('bacteriaStartScreen').style.display = 'none';
+  document.getElementById('bacteriaGameContainer').style.display = 'block';
+  document.getElementById('bacteriaResults').style.display = 'none';
+  bacteriaState.questions = getUniqueQuestions(bacteriaQuestions, usedQuestions.bacteria, 5);
+  bacteriaState.current = 0;
+  bacteriaState.score = 0;
+  bacteriaState.correct = 0;
+  updateInGameSkills('bacteria');
+  loadBacteriaQuestion();
 }
+
 function loadBacteriaQuestion() {
-if (bacteriaState.current >= 5) {
-showBacteriaResults();
-return;
+  if (bacteriaState.current >= 5) {
+    showBacteriaResults();
+    return;
+  }
+  const q = bacteriaState.questions[bacteriaState.current];
+  document.getElementById('bacteriaQuestionNum').textContent = `${bacteriaState.current + 1}/5`;
+  document.getElementById('bacteriaQuestionText').textContent = q.q;
+  const optionsContainer = document.getElementById('bacteriaOptionsContainer');
+  optionsContainer.innerHTML = '';
+  const optionsWithIndex = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.correct }));
+  const shuffledOptions = shuffleArray(optionsWithIndex);
+  shuffledOptions.forEach((opt, idx) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt.text;
+    div.dataset.originalIndex = idx;
+    div.onclick = () => {
+      if (div.classList.contains('disabled')) return;
+      stopTimer();
+      document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => el.classList.add('disabled'));
+      if (opt.isCorrect) {
+        div.classList.add('correct');
+        let points = 5;
+        const activeSkill = window['activeSkill_bacteria'];
+        if (activeSkill === 'doublePoints') {
+          points *= 2;
+          window['activeSkill_bacteria'] = null;
+        }
+        addPoints(points);
+        bacteriaState.score += points;
+        bacteriaState.correct++;
+        document.getElementById('bacteriaScore').textContent = bacteriaState.score;
+      } else {
+        div.classList.add('incorrect');
+        document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => {
+          if (el.textContent === q.options[q.correct]) {
+            el.classList.add('correct');
+          }
+        });
+      }
+      setTimeout(() => {
+        bacteriaState.current++;
+        loadBacteriaQuestion();
+      }, 2000);
+    };
+    optionsContainer.appendChild(div);
+  });
+  const activeSkill = window['activeSkill_bacteria'];
+  if (activeSkill === 'fiftyFifty') {
+    window['activeSkill_bacteria'] = null;
+    const options = document.querySelectorAll('#bacteriaOptionsContainer .option');
+    let removed = 0;
+    options.forEach(opt => {
+      if (removed < 2 && !opt.classList.contains('correct')) {
+        opt.style.visibility = 'hidden';
+        removed++;
+      }
+    });
+  }
+  startTimer('bacteria', () => {
+    document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => el.classList.add('disabled'));
+    document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => {
+      if (el.textContent === q.options[q.correct]) {
+        el.classList.add('correct');
+      }
+    });
+    setTimeout(() => {
+      bacteriaState.current++;
+      loadBacteriaQuestion();
+    }, 2000);
+  });
 }
-const q = bacteriaState.questions[bacteriaState.current];
-document.getElementById('bacteriaQuestionNum').textContent = `${bacteriaState.current + 1}/5`;
-document.getElementById('bacteriaQuestionText').textContent = q.q;
-const optionsContainer = document.getElementById('bacteriaOptionsContainer');
-optionsContainer.innerHTML = '';
-const optionsWithIndex = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.correct }));
-const shuffledOptions = shuffleArray(optionsWithIndex);
-shuffledOptions.forEach((opt, idx) => {
-const div = document.createElement('div');
-div.className = 'option';
-div.textContent = opt.text;
-div.dataset.originalIndex = idx;
-div.onclick = () => {
-if (div.classList.contains('disabled')) return;
-stopTimer();
-document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => el.classList.add('disabled'));
-if (opt.isCorrect) {
-div.classList.add('correct');
-let points = 5;
-const activeSkill = window['activeSkill_bacteria'];
-if (activeSkill === 'doublePoints') {
-points *= 2;
-window['activeSkill_bacteria'] = null;
-}
-addPoints(points);
-bacteriaState.score += points;
-bacteriaState.correct++;
-document.getElementById('bacteriaScore').textContent = bacteriaState.score;
-} else {
-div.classList.add('incorrect');
-document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => {
-if (el.textContent === q.options[q.correct]) {
-el.classList.add('correct');
-}
-});
-}
-setTimeout(() => {
-bacteriaState.current++;
-loadBacteriaQuestion();
-}, 2000);
-};
-optionsContainer.appendChild(div);
-});
-const activeSkill = window['activeSkill_bacteria'];
-if (activeSkill === 'fiftyFifty') {
-window['activeSkill_bacteria'] = null;
-const options = document.querySelectorAll('#bacteriaOptionsContainer .option');
-let removed = 0;
-options.forEach(opt => {
-if (removed < 2 && !opt.classList.contains('correct')) {
-opt.style.visibility = 'hidden';
-removed++;
-}
-});
-}
-startTimer('bacteria', () => {
-document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => el.classList.add('disabled'));
-document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => {
-if (el.textContent === q.options[q.correct]) {
-el.classList.add('correct');
-}
-});
-setTimeout(() => {
-bacteriaState.current++;
-loadBacteriaQuestion();
-}, 2000);
-});
-}
+
 function showBacteriaResults() {
-stopTimer();
-document.getElementById('bacteriaGameContainer').style.display = 'none';
-document.getElementById('bacteriaResults').style.display = 'block';
-document.getElementById('bacteriaFinalScore').textContent = bacteriaState.score;
-document.getElementById('bacteriaCorrect').textContent = `${bacteriaState.correct}/5`;
-let msg = '';
-if (bacteriaState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en bacterias.';
-else if (bacteriaState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre bacterias.';
-else msg = '📚 Necesitas repasar más sobre bacterias.';
-document.getElementById('bacteriaFinalMessage').textContent = msg;
+  stopTimer();
+  document.getElementById('bacteriaGameContainer').style.display = 'none';
+  document.getElementById('bacteriaResults').style.display = 'block';
+  document.getElementById('bacteriaFinalScore').textContent = bacteriaState.score;
+  document.getElementById('bacteriaCorrect').textContent = `${bacteriaState.correct}/5`;
+  let msg = '';
+  if (bacteriaState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en bacterias.';
+  else if (bacteriaState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre bacterias.';
+  else msg = '📚 Necesitas repasar más sobre bacterias.';
+  document.getElementById('bacteriaFinalMessage').textContent = msg;
 }
+
 function resetBacteriaGame() {
-bacteriaState.current = 0;
-bacteriaState.score = 0;
-bacteriaState.correct = 0;
-bacteriaState.questions = [];
-window['activeSkill_bacteria'] = null;
-document.getElementById('bacteriaResults').style.display = 'none';
-document.getElementById('bacteriaStartScreen').style.display = 'block';
-document.getElementById('bacteriaGameContainer').style.display = 'none';
-stopTimer();
+  bacteriaState.current = 0;
+  bacteriaState.score = 0;
+  bacteriaState.correct = 0;
+  bacteriaState.questions = [];
+  window['activeSkill_bacteria'] = null;
+  document.getElementById('bacteriaResults').style.display = 'none';
+  document.getElementById('bacteriaStartScreen').style.display = 'block';
+  document.getElementById('bacteriaGameContainer').style.display = 'none';
+  stopTimer();
 }
+
 // ==========================================
 // MISIÓN HONGOS
 // ==========================================
 function startFungusGame() {
-document.getElementById('fungusStartScreen').style.display = 'none';
-document.getElementById('fungusGameContainer').style.display = 'block';
-document.getElementById('fungusResults').style.display = 'none';
-fungusState.questions = getUniqueQuestions(fungusQuestions, usedQuestions.fungus, 5);
-fungusState.current = 0;
-fungusState.score = 0;
-fungusState.correct = 0;
-updateInGameSkills('fungus');
-loadFungusQuestion();
+  document.getElementById('fungusStartScreen').style.display = 'none';
+  document.getElementById('fungusGameContainer').style.display = 'block';
+  document.getElementById('fungusResults').style.display = 'none';
+  fungusState.questions = getUniqueQuestions(fungusQuestions, usedQuestions.fungus, 5);
+  fungusState.current = 0;
+  fungusState.score = 0;
+  fungusState.correct = 0;
+  updateInGameSkills('fungus');
+  loadFungusQuestion();
 }
+
 function loadFungusQuestion() {
-if (fungusState.current >= 5) {
-showFungusResults();
-return;
+  if (fungusState.current >= 5) {
+    showFungusResults();
+    return;
+  }
+  const q = fungusState.questions[fungusState.current];
+  document.getElementById('fungusQuestionNum').textContent = `${fungusState.current + 1}/5`;
+  const container = document.getElementById('fungusScenarioContainer');
+  container.innerHTML = `
+    <div class="scenario-card">
+      <div class="scenario-image">${q.scenario.split(' ')[0]}</div>
+      <h3>${q.scenario.substring(q.scenario.indexOf(' ') + 1)}</h3>
+      <div class="scenario-description">${q.description || ''}</div>
+      <p style="font-size: 1.1rem; margin: 20px 0; font-weight: bold;">${q.question}</p>
+      <div class="fungus-options" id="fungusOptions">
+        ${q.options.map((opt, idx) => `
+          <button class="fungus-btn" data-idx="${idx}">${opt}</button>
+        `).join('')}
+      </div>
+      <div id="fungusFeedback" style="margin-top: 20px; padding: 15px; border-radius: 10px; display: none;"></div>
+    </div>
+  `;
+  document.querySelectorAll('.fungus-btn').forEach(btn => {
+    btn.onclick = () => {
+      if (btn.classList.contains('disabled')) return;
+      stopTimer();
+      const idx = parseInt(btn.dataset.idx);
+      document.querySelectorAll('.fungus-btn').forEach(b => b.classList.add('disabled'));
+      const feedback = document.getElementById('fungusFeedback');
+      feedback.style.display = 'block';
+      if (idx === q.correct) {
+        btn.classList.add('correct');
+        let points = 5;
+        const activeSkill = window['activeSkill_fungus'];
+        if (activeSkill === 'doublePoints') {
+          points *= 2;
+          window['activeSkill_fungus'] = null;
+        }
+        addPoints(points);
+        fungusState.score += points;
+        fungusState.correct++;
+        document.getElementById('fungusScore').textContent = fungusState.score;
+        feedback.className = 'feedback success show';
+        feedback.innerHTML = `<strong>✅ ¡Correcto!</strong><br>${q.explanation}`;
+      } else {
+        btn.classList.add('incorrect');
+        document.querySelectorAll('.fungus-btn')[q.correct].classList.add('correct');
+        feedback.className = 'feedback error show';
+        feedback.innerHTML = `<strong>❌ Incorrecto</strong><br>${q.explanation}`;
+      }
+      setTimeout(() => {
+        fungusState.current++;
+        loadFungusQuestion();
+      }, 4000);
+    };
+  });
+  const activeSkill = window['activeSkill_fungus'];
+  if (activeSkill === 'fiftyFifty') {
+    window['activeSkill_fungus'] = null;
+    const buttons = document.querySelectorAll('.fungus-btn');
+    let removed = 0;
+    buttons.forEach(btn => {
+      if (removed < 2 && parseInt(btn.dataset.idx) !== q.correct) {
+        btn.style.visibility = 'hidden';
+        removed++;
+      }
+    });
+  }
+  startTimer('fungus', () => {
+    document.querySelectorAll('.fungus-btn').forEach(b => b.classList.add('disabled'));
+    document.querySelectorAll('.fungus-btn')[q.correct].classList.add('correct');
+    const feedback = document.getElementById('fungusFeedback');
+    feedback.style.display = 'block';
+    feedback.className = 'feedback error show';
+    feedback.innerHTML = `<strong>⏰ ¡Se acabó el tiempo!</strong><br>${q.explanation}`;
+    setTimeout(() => {
+      fungusState.current++;
+      loadFungusQuestion();
+    }, 4000);
+  });
 }
-const q = fungusState.questions[fungusState.current];
-document.getElementById('fungusQuestionNum').textContent = `${fungusState.current + 1}/5`;
-const container = document.getElementById('fungusScenarioContainer');
-container.innerHTML = `
-<div class="scenario-card">
-<div class="scenario-image">${q.scenario.split(' ')[0]}</div>
-<h3>${q.scenario.substring(q.scenario.indexOf(' ') + 1)}</h3>
-<div class="scenario-description">${q.description || ''}</div>
-<p style="font-size: 1.1rem; margin: 20px 0; font-weight: bold;">${q.question}</p>
-<div class="fungus-options" id="fungusOptions">
-${q.options.map((opt, idx) => `
-<button class="fungus-btn" data-idx="${idx}">${opt}</button>
-`).join('')}
-</div>
-<div id="fungusFeedback" style="margin-top: 20px; padding: 15px; border-radius: 10px; display: none;"></div>
-</div>
-`;
-document.querySelectorAll('.fungus-btn').forEach(btn => {
-btn.onclick = () => {
-if (btn.classList.contains('disabled')) return;
-stopTimer();
-const idx = parseInt(btn.dataset.idx);
-document.querySelectorAll('.fungus-btn').forEach(b => b.classList.add('disabled'));
-const feedback = document.getElementById('fungusFeedback');
-feedback.style.display = 'block';
-if (idx === q.correct) {
-btn.classList.add('correct');
-let points = 5;
-const activeSkill = window['activeSkill_fungus'];
-if (activeSkill === 'doublePoints') {
-points *= 2;
-window['activeSkill_fungus'] = null;
-}
-addPoints(points);
-fungusState.score += points;
-fungusState.correct++;
-document.getElementById('fungusScore').textContent = fungusState.score;
-feedback.className = 'feedback success show';
-feedback.innerHTML = `<strong>✅ ¡Correcto!</strong><br>${q.explanation}`;
-} else {
-btn.classList.add('incorrect');
-document.querySelectorAll('.fungus-btn')[q.correct].classList.add('correct');
-feedback.className = 'feedback error show';
-feedback.innerHTML = `<strong>❌ Incorrecto</strong><br>${q.explanation}`;
-}
-setTimeout(() => {
-fungusState.current++;
-loadFungusQuestion();
-}, 4000);
-};
-});
-const activeSkill = window['activeSkill_fungus'];
-if (activeSkill === 'fiftyFifty') {
-window['activeSkill_fungus'] = null;
-const buttons = document.querySelectorAll('.fungus-btn');
-let removed = 0;
-buttons.forEach(btn => {
-if (removed < 2 && parseInt(btn.dataset.idx) !== q.correct) {
-btn.style.visibility = 'hidden';
-removed++;
-}
-});
-}
-startTimer('fungus', () => {
-document.querySelectorAll('.fungus-btn').forEach(b => b.classList.add('disabled'));
-document.querySelectorAll('.fungus-btn')[q.correct].classList.add('correct');
-const feedback = document.getElementById('fungusFeedback');
-feedback.style.display = 'block';
-feedback.className = 'feedback error show';
-feedback.innerHTML = `<strong>⏰ ¡Se acabó el tiempo!</strong><br>${q.explanation}`;
-setTimeout(() => {
-fungusState.current++;
-loadFungusQuestion();
-}, 4000);
-});
-}
+
 function showFungusResults() {
-stopTimer();
-document.getElementById('fungusGameContainer').style.display = 'none';
-document.getElementById('fungusResults').style.display = 'block';
-document.getElementById('fungusFinalScore').textContent = fungusState.score;
-document.getElementById('fungusCorrect').textContent = `${fungusState.correct}/5`;
-let msg = '';
-if (fungusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en hongos.';
-else if (fungusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre hongos.';
-else msg = '📚 Necesitas repasar más sobre hongos.';
-document.getElementById('fungusFinalMessage').textContent = msg;
+  stopTimer();
+  document.getElementById('fungusGameContainer').style.display = 'none';
+  document.getElementById('fungusResults').style.display = 'block';
+  document.getElementById('fungusFinalScore').textContent = fungusState.score;
+  document.getElementById('fungusCorrect').textContent = `${fungusState.correct}/5`;
+  let msg = '';
+  if (fungusState.correct === 5) msg = '🏆 ¡Perfecto! Eres un experto en hongos.';
+  else if (fungusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo sobre hongos.';
+  else msg = '📚 Necesitas repasar más sobre hongos.';
+  document.getElementById('fungusFinalMessage').textContent = msg;
 }
+
 function resetFungusGame() {
-fungusState.current = 0;
-fungusState.score = 0;
-fungusState.correct = 0;
-fungusState.questions = [];
-window['activeSkill_fungus'] = null;
-document.getElementById('fungusResults').style.display = 'none';
-document.getElementById('fungusStartScreen').style.display = 'block';
-document.getElementById('fungusGameContainer').style.display = 'none';
-stopTimer();
+  fungusState.current = 0;
+  fungusState.score = 0;
+  fungusState.correct = 0;
+  fungusState.questions = [];
+  window['activeSkill_fungus'] = null;
+  document.getElementById('fungusResults').style.display = 'none';
+  document.getElementById('fungusStartScreen').style.display = 'block';
+  document.getElementById('fungusGameContainer').style.display = 'none';
+  stopTimer();
 }
+
 // ==========================================
 // ZONA DE DIAGNÓSTICO
 // ==========================================
 function startDiagnosisGame() {
-document.getElementById('diagnosisStartScreen').style.display = 'none';
-document.getElementById('diagnosisGameContainer').style.display = 'block';
-document.getElementById('diagnosisResults').style.display = 'none';
-diagnosisState.cases = getUniqueQuestions(diagnosisCases, usedQuestions.diagnosis, 3);
-diagnosisState.current = 0;
-diagnosisState.score = 0;
-diagnosisState.correct = 0;
-updateInGameSkills('diagnosis');
-loadDiagnosisCase();
+  document.getElementById('diagnosisStartScreen').style.display = 'none';
+  document.getElementById('diagnosisGameContainer').style.display = 'block';
+  document.getElementById('diagnosisResults').style.display = 'none';
+  diagnosisState.cases = getUniqueQuestions(diagnosisCases, usedQuestions.diagnosis, 3);
+  diagnosisState.current = 0;
+  diagnosisState.score = 0;
+  diagnosisState.correct = 0;
+  updateInGameSkills('diagnosis');
+  loadDiagnosisCase();
 }
+
 function loadDiagnosisCase() {
-if (diagnosisState.current >= 3) {
-showDiagnosisResults();
-return;
+  if (diagnosisState.current >= 3) {
+    showDiagnosisResults();
+    return;
+  }
+  const caseData = diagnosisState.cases[diagnosisState.current];
+  document.getElementById('currentCase').textContent = diagnosisState.current + 1;
+  document.getElementById('totalCases').textContent = 3;
+  document.getElementById('caseDescription').innerHTML = `
+    <strong>Paciente:</strong> ${caseData.patient}<br><br>
+    <strong>Síntomas:</strong> ${caseData.symptoms}<br><br>
+    <strong>Características del patógeno (observadas al microscopio):</strong><br>
+    ${caseData.characteristics.replace(/\n/g, '<br>')}<br><br>
+    <strong>Contexto ambiental:</strong> ${caseData.context}
+  `;
+  document.getElementById('diagnosisFeedback').classList.remove('show');
+  document.querySelectorAll('.diagnosis-btn').forEach(btn => {
+    btn.classList.remove('disabled');
+  });
+  startTimer('diagnosis', () => {
+    document.querySelectorAll('.diagnosis-btn').forEach(btn => btn.classList.add('disabled'));
+    const feedback = document.getElementById('diagnosisFeedback');
+    const title = document.getElementById('feedbackTitle');
+    const text = document.getElementById('feedbackText');
+    feedback.className = 'feedback error show';
+    title.textContent = '⏰ ¡Se acabó el tiempo!';
+    text.textContent = `La respuesta correcta era: ${caseData.correct.toUpperCase()}. ${caseData.explanation}`;
+  });
 }
-const caseData = diagnosisState.cases[diagnosisState.current];
-document.getElementById('currentCase').textContent = diagnosisState.current + 1;
-document.getElementById('totalCases').textContent = 3;
-document.getElementById('caseDescription').innerHTML = `
-<strong>Paciente:</strong> ${caseData.patient}<br><br>
-<strong>Síntomas:</strong> ${caseData.symptoms}<br><br>
-<strong>Características del patógeno (observadas al microscopio):</strong><br>
-${caseData.characteristics.replace(/\n/g, '<br>')}<br><br>
-<strong>Contexto ambiental:</strong> ${caseData.context}
-`;
-document.getElementById('diagnosisFeedback').classList.remove('show');
-document.querySelectorAll('.diagnosis-btn').forEach(btn => {
-btn.classList.remove('disabled');
-});
-startTimer('diagnosis', () => {
-document.querySelectorAll('.diagnosis-btn').forEach(btn => btn.classList.add('disabled'));
-const feedback = document.getElementById('diagnosisFeedback');
-const title = document.getElementById('feedbackTitle');
-const text = document.getElementById('feedbackText');
-feedback.className = 'feedback error show';
-title.textContent = '⏰ ¡Se acabó el tiempo!';
-text.textContent = `La respuesta correcta era: ${caseData.correct.toUpperCase()}. ${caseData.explanation}`;
-});
-}
+
 function checkDiagnosis(answer) {
-stopTimer();
-const caseData = diagnosisState.cases[diagnosisState.current];
-const feedback = document.getElementById('diagnosisFeedback');
-const title = document.getElementById('feedbackTitle');
-const text = document.getElementById('feedbackText');
-document.querySelectorAll('.diagnosis-btn').forEach(btn => btn.classList.add('disabled'));
-if (answer === caseData.correct) {
-feedback.className = 'feedback success show';
-title.textContent = '✅ ¡Correcto!';
-text.textContent = caseData.explanation;
-let points = 10;
-const activeSkill = window['activeSkill_diagnosis'];
-if (activeSkill === 'doublePoints') {
-points *= 2;
-window['activeSkill_diagnosis'] = null;
+  stopTimer();
+  const caseData = diagnosisState.cases[diagnosisState.current];
+  const feedback = document.getElementById('diagnosisFeedback');
+  const title = document.getElementById('feedbackTitle');
+  const text = document.getElementById('feedbackText');
+  document.querySelectorAll('.diagnosis-btn').forEach(btn => btn.classList.add('disabled'));
+  if (answer === caseData.correct) {
+    feedback.className = 'feedback success show';
+    title.textContent = '✅ ¡Correcto!';
+    text.textContent = caseData.explanation;
+    let points = 10;
+    const activeSkill = window['activeSkill_diagnosis'];
+    if (activeSkill === 'doublePoints') {
+      points *= 2;
+      window['activeSkill_diagnosis'] = null;
+    }
+    addPoints(points);
+    diagnosisState.score += points;
+    diagnosisState.correct++;
+  } else {
+    feedback.className = 'feedback error show';
+    title.textContent = '❌ Incorrecto';
+    text.textContent = `La respuesta correcta es ${caseData.correct.toUpperCase()}. ${caseData.explanation}`;
+  }
 }
-addPoints(points);
-diagnosisState.score += points;
-diagnosisState.correct++;
-} else {
-feedback.className = 'feedback error show';
-title.textContent = '❌ Incorrecto';
-text.textContent = `La respuesta correcta es ${caseData.correct.toUpperCase()}. ${caseData.explanation}`;
-}
-}
+
 function nextCase() {
-diagnosisState.current++;
-loadDiagnosisCase();
+  diagnosisState.current++;
+  loadDiagnosisCase();
 }
+
 function showDiagnosisResults() {
-stopTimer();
-document.getElementById('diagnosisGameContainer').style.display = 'none';
-document.getElementById('diagnosisResults').style.display = 'block';
-document.getElementById('diagnosisFinalScore').textContent = diagnosisState.score;
-document.getElementById('diagnosisCorrect').textContent = `${diagnosisState.correct}/3`;
-let msg = '';
-if (diagnosisState.correct === 3) msg = '🏆 ¡Excelente detective sanitario! Diagnosticaste todos los casos correctamente.';
-else if (diagnosisState.correct >= 2) msg = '👍 Buen trabajo, tienes buenos conocimientos de diagnóstico.';
-else msg = '📚 Necesitas repasar más sobre virus, bacterias y hongos.';
-document.getElementById('diagnosisFinalMessage').textContent = msg;
+  stopTimer();
+  document.getElementById('diagnosisGameContainer').style.display = 'none';
+  document.getElementById('diagnosisResults').style.display = 'block';
+  document.getElementById('diagnosisFinalScore').textContent = diagnosisState.score;
+  document.getElementById('diagnosisCorrect').textContent = `${diagnosisState.correct}/3`;
+  let msg = '';
+  if (diagnosisState.correct === 3) msg = '🏆 ¡Excelente detective sanitario! Diagnosticaste todos los casos correctamente.';
+  else if (diagnosisState.correct >= 2) msg = '👍 Buen trabajo, tienes buenos conocimientos de diagnóstico.';
+  else msg = '📚 Necesitas repasar más sobre virus, bacterias y hongos.';
+  document.getElementById('diagnosisFinalMessage').textContent = msg;
 }
+
 function resetDiagnosisGame() {
-diagnosisState.current = 0;
-diagnosisState.score = 0;
-diagnosisState.correct = 0;
-diagnosisState.cases = [];
-window['activeSkill_diagnosis'] = null;
-document.getElementById('diagnosisResults').style.display = 'none';
-document.getElementById('diagnosisStartScreen').style.display = 'block';
-document.getElementById('diagnosisGameContainer').style.display = 'none';
-stopTimer();
+  diagnosisState.current = 0;
+  diagnosisState.score = 0;
+  diagnosisState.correct = 0;
+  diagnosisState.cases = [];
+  window['activeSkill_diagnosis'] = null;
+  document.getElementById('diagnosisResults').style.display = 'none';
+  document.getElementById('diagnosisStartScreen').style.display = 'block';
+  document.getElementById('diagnosisGameContainer').style.display = 'none';
+  stopTimer();
 }
+
 // ==========================================
 // INICIALIZACIÓN
 // ==========================================
 window.onload = function() {
-const savedUser = localStorage.getItem('currentUser');
-if (savedUser) {
-document.getElementById('usernameInput').value = savedUser;
-}
+  // El usuario se carga manualmente al ingresar su nombre
 };
 </script>
 </body>
