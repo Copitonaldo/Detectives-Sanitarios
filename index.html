@@ -264,49 +264,6 @@ transition: width 1s linear;
 font-size: 2rem;
 font-weight: bold;
 }
-.matching-game {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 15px;
-max-width: 600px;
-margin: 0 auto;
-}
-.match-item {
-background: white;
-padding: 20px;
-border-radius: 10px;
-cursor: pointer;
-transition: all 0.3s;
-border: 3px solid #ddd;
-font-size: 1rem;
-}
-.match-item:hover:not(.correct) {
-background: #e3f2fd;
-border-color: #3498db;
-transform: scale(1.05);
-}
-.match-item.selected {
-background: #3498db;
-color: white;
-border-color: #2980b9;
-}
-.match-item.correct {
-background: #2ecc71;
-color: white;
-border-color: #27ae60;
-cursor: default;
-}
-.match-item.wrong {
-background: #e74c3c;
-color: white;
-border-color: #c0392b;
-animation: shake 0.5s;
-}
-@keyframes shake {
-0%, 100% { transform: translateX(0); }
-25% { transform: translateX(-10px); }
-75% { transform: translateX(10px); }
-}
 .question-box {
 background: white;
 padding: 30px;
@@ -763,7 +720,6 @@ margin-top: 40px;
 .mission-card { min-height: 220px; padding: 20px; }
 .content-section { padding: 20px; }
 .content-section h2 { font-size: 1.5rem; }
-.matching-game { grid-template-columns: 1fr; }
 .stats-container { flex-direction: column; gap: 10px; }
 .stat-box { width: 100%; }
 .final-stats { flex-direction: column; gap: 15px; }
@@ -853,7 +809,6 @@ margin-top: 40px;
 <div class="content-section">
 <div class="intro-content">
 <h2>📚 Clase Introductoria</h2>
-<!-- PRIMERO: Mensaje de Bienvenida -->
 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
 <h3 style="font-size: 1.8rem; margin-bottom: 15px;">¡Bienvenidos a Detectives Sanitarios!</h3>
 <p style="font-size: 1.2rem; line-height: 1.6;">
@@ -863,7 +818,6 @@ a las bacterias, los virus y los hongos.
 <strong>¡Prepárate para resolver el misterio de lo invisible!</strong>
 </p>
 </div>
-<!-- SEGUNDO: Video 1 -->
 <div class="video-container" style="margin-bottom: 20px;">
 <iframe
 src="https://www.youtube.com/embed/sjXegsXg7V8"
@@ -873,7 +827,6 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 allowfullscreen>
 </iframe>
 </div>
-<!-- TERCERO: Video 2 Agregado -->
 <div class="video-container" style="margin-bottom: 40px;">
 <iframe
 src="https://www.youtube.com/embed/P5hKe5P6d54"
@@ -883,7 +836,6 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 allowfullscreen>
 </iframe>
 </div>
-<!-- CUARTO: Contenido Principal -->
 <div style="background: #f8f9fa; padding: 30px; border-radius: 15px; margin-bottom: 30px;">
 <h3 style="color: #9b59b6; font-size: 1.6rem; margin-bottom: 20px; text-align: center;">
 ¡Bienvenidos a su primera misión, Detectives!
@@ -896,9 +848,7 @@ hay tres personajes principales que suelen causar confusión.
 <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 30px; font-weight: bold; color: #2c3e50;">
 Aunque todos son diminutos, ¡son completamente diferentes! Vamos a identificarlos:
 </p>
-<!-- Las 3 Tarjetas de Microorganismos -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin: 30px 0;">
-<!-- Bacterias -->
 <div style="background: white; padding: 25px; border-radius: 15px; border-top: 5px solid #3498db; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
 <div style="font-size: 3rem; text-align: center; margin-bottom: 15px;">🦠</div>
 <h4 style="color: #3498db; font-size: 1.4rem; margin-bottom: 15px; text-align: center;">1. Las Bacterias: Las vecinas independientes</h4>
@@ -911,7 +861,6 @@ pueden comer, reproducirse y vivir casi en cualquier lugar.
 <span style="color: #555;"> No todas son las "malas de la película". Muchas son buenísimas y nos ayudan a digerir la comida o a fabricar yogur.</span>
 </div>
 </div>
-<!-- Virus -->
 <div style="background: white; padding: 25px; border-radius: 15px; border-top: 5px solid #e74c3c; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
 <div style="font-size: 3rem; text-align: center; margin-bottom: 15px;">🚀</div>
 <h4 style="color: #e74c3c; font-size: 1.4rem; margin-bottom: 15px; text-align: center;">2. Los Virus: Los invasores astutos</h4>
@@ -925,7 +874,6 @@ Son como pequeños paquetes de información que necesitan entrar a la célula de
 <span style="color: #555;"> Son muchísimo más pequeños que las bacterias. Si una bacteria fuera del tamaño de un estadio de fútbol, ¡un virus sería el balón!</span>
 </div>
 </div>
-<!-- Hongos -->
 <div style="background: white; padding: 25px; border-radius: 15px; border-top: 5px solid #9b59b6; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
 <div style="font-size: 3rem; text-align: center; margin-bottom: 15px;">🍄</div>
 <h4 style="color: #9b59b6; font-size: 1.4rem; margin-bottom: 15px; text-align: center;">3. Los Hongos: Los recicladores de la naturaleza</h4>
@@ -939,7 +887,6 @@ No producen su propio alimento como las plantas, sino que absorben los nutriente
 </div>
 </div>
 </div>
-<!-- Pista Final -->
 <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 15px; margin: 30px 0; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
 <h4 style="font-size: 1.5rem; margin-bottom: 15px;">🔍 Tu primera pista de Detective:</h4>
 <p style="font-size: 1.2rem; line-height: 1.8; font-weight: bold;">
@@ -947,7 +894,6 @@ Recuerda esto para tus misiones: Las bacterias están vivas y son independientes
 los virus necesitan un huésped para activarse, y los hongos se encargan de deshacer y reciclar lo que ya no sirve.
 </p>
 </div>
-<!-- Call to Action -->
 <div style="text-align: center; margin-top: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
 <p style="font-size: 1.3rem; color: #2c3e50; margin-bottom: 20px; font-weight: bold;">
 ¿Estás listo para empezar a investigar?
@@ -975,8 +921,8 @@ los virus necesitan un huésped para activarse, y los hongos se encargan de desh
 </ul>
 </div>
 <div id="virusStartScreen" class="start-screen">
-<h3>🎮 Juego de Emparejamiento</h3>
-<p>Une cada parte del virus con su función correcta. Tienes 15 segundos para cada pregunta.</p>
+<h3>⏱️ Trivia Contrarreloj - Cazador de Virus</h3>
+<p>Responde preguntas sobre virus y su comportamiento. Tienes 15 segundos por pregunta.</p>
 <button class="btn-start-game" onclick="startVirusGame()">¡Empezar!</button>
 </div>
 <div id="virusGameContainer" style="display: none;">
@@ -998,11 +944,10 @@ los virus necesitan un huésped para activarse, y los hongos se encargan de desh
 <span id="virusScore">0</span>
 </div>
 </div>
-<div class="game-container">
+<div class="question-box" id="virusQuestionBox">
 <h3 id="virusQuestionText">Cargando...</h3>
-<div class="matching-game" id="virusMatch">
+<div class="options" id="virusOptionsContainer">
 </div>
-<p id="virusFeedback" style="margin-top: 20px; font-weight: bold; min-height: 30px;"></p>
 </div>
 </div>
 <div id="virusResults" class="results-container" style="display: none;">
@@ -1466,7 +1411,7 @@ timerBar.style.width = `${percentage}%`;
 }
 }
 // ==========================================
-// BANCO DE PREGUNTAS - VIRUS (TUS PREGUNTAS NUEVAS CON RESPUESTAS CORRECTAS)
+// BANCO DE PREGUNTAS - VIRUS
 // ==========================================
 const virusQuestions = [
   { q: "¿Por qué los virus no son seres vivos?", options: ["Porque no tienen material genético en su estructura básica.", "Porque no pueden cumplir con la función vital de reproducción por sí mismos.", "Porque son microscópicos y ningún organismo vivo puede ser así de pequeño.", "Porque mueren inmediatamente al entrar en contacto con el aire."], correct: 1 },
@@ -1476,9 +1421,8 @@ const virusQuestions = [
   { q: "¿Cuál es el orden cronológico correcto de las etapas en el ciclo de replicación viral?", options: ["Penetración → Adsorción → Ensamblaje → Replicación → Liberación.", "Adsorción → Replicación → Penetración → Liberación → Ensamblaje.", "Adsorción → Penetración → Replicación → Ensamblaje → Liberación.", "Replicación → Ensamblaje → Adsorción → Penetración → Liberación."], correct: 2 },
   { q: "En relación con la estructura básica de un virus y el propósito de las vacunas, ¿cuál de las siguientes afirmaciones es correcta?", options: ["Los virus poseen una estructura compleja con orgánulos celulares, y las vacunas destruyen directamente su cápside proteica.", "El virus está compuesto solo por proteínas libres, y la vacunación sirve para mutar de forma segura su material genético.", "La estructura básica consta de material genético (ADN o ARN) rodeado por una cápside proteica, y la vacunación entrena al sistema inmunológico para reconocerlo y combatirlo.", "El virus está formado exclusivamente por ADN bicatenario, y las vacunas impiden mecánicamente su adsorción en la piel."], correct: 2 }
 ];
-
 // ==========================================
-// BANCO DE PREGUNTAS - BACTERIAS (TUS PREGUNTAS NUEVAS CON RESPUESTAS CORRECTAS)
+// BANCO DE PREGUNTAS - BACTERIAS
 // ==========================================
 const bacteriaQuestions = [
   { q: "¿Cuál es la característica fundamental de las bacterias en cuanto a su núcleo y tipo de célula?", options: ["Son células eucariotas con un núcleo bien protegido por una membrana.", "Son seres pluricelulares con núcleos ramificados en hilos.", "Son células procariotas, lo que significa que no tienen núcleo.", "No poseen células y su material genético flota fuera de la membrana."], correct: 2 },
@@ -1486,11 +1430,10 @@ const bacteriaQuestions = [
   { q: "¿Qué grave consecuencia produce si se realiza un mal uso de los antibióticos?", options: ["Que las bacterias se transformen de inmediato en hongos pluricelulares.", "Que el cuerpo humano deje de producir glóbulos rojos.", "Que se generen bacterias resistentes contra las que no haya cura.", "Que los virus muten y adquieran flagelos para desplazarse."], correct: 2 },
   { q: "¿Cuál es la diferencia estructural y de tinción entre las bacterias Gram positivas y las Gram negativas según el método de Tinción de Gram?", options: ["Las Gram positivas tienen una pared celular delgada y se tiñen de rosa/rojo, mientras que las Gram negativas tienen una pared gruesa y se tiñen de morado/violeta.", "Las Gram positivas tienen una pared celular gruesa y se tiñen de morado/violeta, mientras que las Gram negativas tienen una pared delgada con membrana externa y se tiñen de rosa/rojo.", "Ambos tipos de bacterias tienen la misma estructura celular, pero las Gram positivas se tiñen de verde y las Gram negativas de azul.", "Las Gram positivas carecen de pared celular y se tiñen de morado, mientras que las Gram negativas tienen una membrana doble y no se tiñen."], correct: 1 },
   { q: "¿Qué se entiende por resistencia bacteriana?", options: ["La capacidad de los antibióticos para destruir cualquier tipo de bacteria en pocos minutos.", "El mecanismo por el cual el cuerpo humano rechaza de forma natural las infecciones por hongos.", "La capacidad de las bacterias para sobrevivir a los efectos de los antibióticos.", "El proceso de división celular acelerado que ocurre cuando las bacterias entran en contacto con el agua."], correct: 2 },
-  { q: "¿cuál es el peligro principal de la automedicación con antibióticos?", options: ["El uso incorrecto de estos medicamentos debilita los músculos e impide que la tinción de Gram funcione.", "Provoca una disminución inmediata en el grosor de la pared celular de todas las bacterias Gram positivas.", "El uso incorrecto de antibióticos estimula la creación de vacunas naturales dentro de la membrana bacteriana externa.", "El uso incorrecto de antibióticos genera superbacterias resistentes."], correct: 3 }
+  { q: "¿Cuál es el peligro principal de la automedicación con antibióticos?", options: ["El uso incorrecto de estos medicamentos debilita los músculos e impide que la tinción de Gram funcione.", "Provoca una disminución inmediata en el grosor de la pared celular de todas las bacterias Gram positivas.", "El uso incorrecto de antibióticos estimula la creación de vacunas naturales dentro de la membrana bacteriana externa.", "El uso incorrecto de antibióticos genera superbacterias resistentes."], correct: 3 }
 ];
-
 // ==========================================
-// BANCO DE PREGUNTAS - HONGOS (TUS PREGUNTAS NUEVAS CON RESPUESTAS CORRECTAS)
+// BANCO DE PREGUNTAS - HONGOS
 // ==========================================
 const fungusQuestions = [
   { scenario: "🍄 Reino Fungi", description: "Pregunta sobre la clasificación de los hongos.", question: "¿Por qué el reino de los hongos (Fungi) se clasifica de forma independiente a los animales y los vegetales?", options: ["Porque son los únicos microorganismos que no tienen ninguna célula.", "Porque son organismos no vivos que carecen de funciones de relación.", "Porque sus células son procariotas y se alimentan mediante la fotosíntesis.", "Porque tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila."], correct: 3, explanation: "Los hongos tienen células eucariotas con pared celular, no forman tejidos verdaderos y carecen de clorofila, lo que los diferencia de animales y vegetales." },
@@ -1501,7 +1444,7 @@ const fungusQuestions = [
   { scenario: "🍄 Factores de Riesgo", description: "Pregunta sobre factores que facilitan la proliferación de hongos.", question: "¿Cuál de las siguientes opciones agrupa correctamente los factores de riesgo ambientales que facilitan la aparición y proliferación de hongos?", options: ["Ventilación deficiente, acumulación de agua y materiales orgánicos.", "Uso de desinfectantes, flujo constante de aire seco y materiales sintéticos.", "Exposición a la radiación ultravioleta, ambientes sellados al vacío y metales puros.", "Altas corrientes de aire filtrado, drenaje óptimo y ausencia de nutrientes."], correct: 0, explanation: "La ventilación deficiente, la acumulación de agua y la presencia de materiales orgánicos son factores de riesgo que facilitan la proliferación de hongos." }
 ];
 // ==========================================
-// BANCO DE CASOS - DIAGNÓSTICO (30 casos)
+// BANCO DE CASOS - DIAGNÓSTICO
 // ==========================================
 const diagnosisCases = [
 { patient: "María, 35 años, residente del Estado Bolívar", symptoms: "Fiebre alta (39°C), dolor de cabeza intenso, dolor muscular, erupciones cutáneas, fatiga extrema.", characteristics: "• Tamaño: 150-250 nanómetros\n• Estructura: ARN monocatenario rodeado de cápside icosaédrica\n• Sin pared celular\n• Requiere célula huésped para replicarse\n• Se transmite por mosquito Aedes aegypti", context: "Zona con alta humedad (85%) y temperatura promedio de 28°C, presencia de agua estancada cerca de la vivienda.", correct: 'virus', explanation: "Las características coinciden con un virus del dengue: tamaño nanométrico, ARN con cápside, sin pared celular, transmitido por mosquito. El ambiente favorece al vector Aedes aegypti." },
@@ -1567,15 +1510,8 @@ usedList.push(originalIndex);
 return selected;
 }
 // ==========================================
-// MISIÓN VIRUS
+// MISIÓN VIRUS - AHORA CON OPCIONES MÚLTIPLES
 // ==========================================
-const virusMatchPairs = [
-{ term: "Cápside", definition: "Protege el material genético" },
-{ term: "Material Genético", definition: "Contiene información para replicarse" },
-{ term: "Envoltura Viral", definition: "Ayuda a entrar en la célula huésped" },
-{ term: "Adsorción", definition: "Virus se une a la célula" },
-{ term: "Liberación", definition: "Nuevos virus salen de la célula" }
-];
 function startVirusGame() {
 document.getElementById('virusStartScreen').style.display = 'none';
 document.getElementById('virusGameContainer').style.display = 'block';
@@ -1595,31 +1531,21 @@ return;
 const q = virusState.questions[virusState.current];
 document.getElementById('virusQuestionNum').textContent = `${virusState.current + 1}/5`;
 document.getElementById('virusQuestionText').textContent = q.q;
-document.getElementById('virusFeedback').textContent = '';
-const matchContainer = document.getElementById('virusMatch');
-matchContainer.innerHTML = '';
-const pairs = virusMatchPairs.slice(0, 3);
-const leftItems = shuffleArray(pairs.map((p, i) => ({ text: p.term, match: i, side: 'left' })));
-const rightItems = shuffleArray(pairs.map((p, i) => ({ text: p.definition, match: i, side: 'right' })));
-let selectedLeft = null;
-let selectedRight = null;
-let matchedCount = 0;
-leftItems.forEach(item => {
+const optionsContainer = document.getElementById('virusOptionsContainer');
+optionsContainer.innerHTML = '';
+const optionsWithIndex = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.correct }));
+const shuffledOptions = shuffleArray(optionsWithIndex);
+shuffledOptions.forEach((opt, idx) => {
 const div = document.createElement('div');
-div.className = 'match-item';
-div.textContent = item.text;
-div.dataset.match = item.match;
-div.dataset.side = 'left';
+div.className = 'option';
+div.textContent = opt.text;
+div.dataset.originalIndex = idx;
 div.onclick = () => {
-if (div.classList.contains('correct')) return;
-document.querySelectorAll('.match-item[data-side="left"]').forEach(el => el.classList.remove('selected'));
-div.classList.add('selected');
-selectedLeft = div;
-if (selectedLeft && selectedRight) {
-checkVirusMatch(selectedLeft, selectedRight, () => {
-matchedCount++;
-if (matchedCount === 3) {
+if (div.classList.contains('disabled')) return;
 stopTimer();
+document.querySelectorAll('#virusOptionsContainer .option').forEach(el => el.classList.add('disabled'));
+if (opt.isCorrect) {
+div.classList.add('correct');
 let points = 5;
 const activeSkill = window['activeSkill_virus'];
 if (activeSkill === 'doublePoints') {
@@ -1630,95 +1556,45 @@ addPoints(points);
 virusState.score += points;
 virusState.correct++;
 document.getElementById('virusScore').textContent = virusState.score;
-document.getElementById('virusFeedback').textContent = `✅ ¡Correcto! +${points} puntos`;
-document.getElementById('virusFeedback').style.color = '#2ecc71';
-setTimeout(() => {
-virusState.current++;
-loadVirusQuestion();
-}, 1500);
-}
-}, () => {
-document.getElementById('virusFeedback').textContent = '❌ Incorrecto, intenta de nuevo';
-document.getElementById('virusFeedback').style.color = '#e74c3c';
-selectedLeft.classList.remove('selected');
-selectedRight.classList.remove('selected');
-selectedLeft = null;
-selectedRight = null;
-});
-}
-};
-matchContainer.appendChild(div);
-});
-rightItems.forEach(item => {
-const div = document.createElement('div');
-div.className = 'match-item';
-div.textContent = item.text;
-div.dataset.match = item.match;
-div.dataset.side = 'right';
-div.onclick = () => {
-if (div.classList.contains('correct')) return;
-document.querySelectorAll('.match-item[data-side="right"]').forEach(el => el.classList.remove('selected'));
-div.classList.add('selected');
-selectedRight = div;
-if (selectedLeft && selectedRight) {
-checkVirusMatch(selectedLeft, selectedRight, () => {
-matchedCount++;
-if (matchedCount === 3) {
-stopTimer();
-let points = 5;
-const activeSkill = window['activeSkill_virus'];
-if (activeSkill === 'doublePoints') {
-points *= 2;
-window['activeSkill_virus'] = null;
-}
-addPoints(points);
-virusState.score += points;
-virusState.correct++;
-document.getElementById('virusScore').textContent = virusState.score;
-document.getElementById('virusFeedback').textContent = `✅ ¡Correcto! +${points} puntos`;
-document.getElementById('virusFeedback').style.color = '#2ecc71';
-setTimeout(() => {
-virusState.current++;
-loadVirusQuestion();
-}, 1500);
-}
-}, () => {
-document.getElementById('virusFeedback').textContent = '❌ Incorrecto, intenta de nuevo';
-document.getElementById('virusFeedback').style.color = '#e74c3c';
-selectedLeft.classList.remove('selected');
-selectedRight.classList.remove('selected');
-selectedLeft = null;
-selectedRight = null;
-});
-}
-};
-matchContainer.appendChild(div);
-});
-startTimer('virus', () => {
-document.getElementById('virusFeedback').textContent = '⏰ ¡Se acabó el tiempo!';
-document.getElementById('virusFeedback').style.color = '#e74c3c';
-setTimeout(() => {
-virusState.current++;
-loadVirusQuestion();
-}, 1500);
-});
-}
-function checkVirusMatch(left, right, onSuccess, onFail) {
-if (left.dataset.match === right.dataset.match) {
-left.classList.remove('selected');
-right.classList.remove('selected');
-left.classList.add('correct');
-right.classList.add('correct');
-onSuccess();
 } else {
-left.classList.add('wrong');
-right.classList.add('wrong');
-setTimeout(() => {
-left.classList.remove('wrong');
-right.classList.remove('wrong');
-}, 500);
-onFail();
+div.classList.add('incorrect');
+document.querySelectorAll('#virusOptionsContainer .option').forEach(el => {
+if (el.textContent === q.options[q.correct]) {
+el.classList.add('correct');
 }
+});
+}
+setTimeout(() => {
+virusState.current++;
+loadVirusQuestion();
+}, 2000);
+};
+optionsContainer.appendChild(div);
+});
+const activeSkill = window['activeSkill_virus'];
+if (activeSkill === 'fiftyFifty') {
+window['activeSkill_virus'] = null;
+const options = document.querySelectorAll('#virusOptionsContainer .option');
+let removed = 0;
+options.forEach(opt => {
+if (removed < 2 && !opt.classList.contains('correct')) {
+opt.style.visibility = 'hidden';
+removed++;
+}
+});
+}
+startTimer('virus', () => {
+document.querySelectorAll('#virusOptionsContainer .option').forEach(el => el.classList.add('disabled'));
+document.querySelectorAll('#virusOptionsContainer .option').forEach(el => {
+if (el.textContent === q.options[q.correct]) {
+el.classList.add('correct');
+}
+});
+setTimeout(() => {
+virusState.current++;
+loadVirusQuestion();
+}, 2000);
+});
 }
 function showVirusResults() {
 stopTimer();
@@ -1732,22 +1608,15 @@ else if (virusState.correct >= 3) msg = '👍 Buen trabajo, sigue aprendiendo so
 else msg = '📚 Necesitas repasar más sobre virus.';
 document.getElementById('virusFinalMessage').textContent = msg;
 }
-// ==========================================
-// FUNCIÓN CORREGIDA - RESET VIRUS GAME
-// ==========================================
 function resetVirusGame() {
-// Resetear el estado del juego
 virusState.current = 0;
 virusState.score = 0;
 virusState.correct = 0;
 virusState.questions = [];
-// Limpiar habilidades activas
 window['activeSkill_virus'] = null;
-// Ocultar resultados y mostrar pantalla de inicio
 document.getElementById('virusResults').style.display = 'none';
 document.getElementById('virusStartScreen').style.display = 'block';
 document.getElementById('virusGameContainer').style.display = 'none';
-// Detener cualquier timer activo
 stopTimer();
 }
 // ==========================================
@@ -1784,7 +1653,7 @@ div.dataset.originalIndex = idx;
 div.onclick = () => {
 if (div.classList.contains('disabled')) return;
 stopTimer();
-document.querySelectorAll('.option').forEach(el => el.classList.add('disabled'));
+document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => el.classList.add('disabled'));
 if (opt.isCorrect) {
 div.classList.add('correct');
 let points = 5;
@@ -1799,7 +1668,7 @@ bacteriaState.correct++;
 document.getElementById('bacteriaScore').textContent = bacteriaState.score;
 } else {
 div.classList.add('incorrect');
-document.querySelectorAll('.option').forEach(el => {
+document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => {
 if (el.textContent === q.options[q.correct]) {
 el.classList.add('correct');
 }
@@ -1815,7 +1684,7 @@ optionsContainer.appendChild(div);
 const activeSkill = window['activeSkill_bacteria'];
 if (activeSkill === 'fiftyFifty') {
 window['activeSkill_bacteria'] = null;
-const options = document.querySelectorAll('.option');
+const options = document.querySelectorAll('#bacteriaOptionsContainer .option');
 let removed = 0;
 options.forEach(opt => {
 if (removed < 2 && !opt.classList.contains('correct')) {
@@ -1825,8 +1694,8 @@ removed++;
 });
 }
 startTimer('bacteria', () => {
-document.querySelectorAll('.option').forEach(el => el.classList.add('disabled'));
-document.querySelectorAll('.option').forEach(el => {
+document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => el.classList.add('disabled'));
+document.querySelectorAll('#bacteriaOptionsContainer .option').forEach(el => {
 if (el.textContent === q.options[q.correct]) {
 el.classList.add('correct');
 }
